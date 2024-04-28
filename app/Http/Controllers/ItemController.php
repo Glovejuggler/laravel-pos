@@ -53,12 +53,14 @@ class ItemController extends Controller
 
         $item->save();
 
-        foreach ($request->breakdown as $costing) {
-            Costing::create([
-                'name' => $costing['name'],
-                'cost' => $costing['cost'],
-                'item_id' => $item->id
-            ]);
+        if ($request->breakdown) {
+            foreach ($request->breakdown as $costing) {
+                Costing::create([
+                    'name' => $costing['name'],
+                    'cost' => $costing['cost'],
+                    'item_id' => $item->id
+                ]);
+            }
         }
 
         return redirect()->route('items.index', Category::find($item->category_id));

@@ -14,8 +14,17 @@ class TransactionController extends Controller
      */
     public function index()
     {
-        return inertia('Kitchen', [
-            'orders' => Transaction::all(),
+        $transactions = Transaction::onlyTrashed()->whereDate('deleted_at', today())->get();
+        $sold = SoldItem::whereBelongsTo($transactions)
+                        ->selectRaw('item_id, sum(quantity) as total_sold')
+                        ->groupBy('item_id')
+                        ->get();
+
+        // dd($sold);
+
+        return inertia('Sales', [
+            'transactions' => $transactions,
+            'soldItems' => $sold
         ]);
     }
 
@@ -82,6 +91,20 @@ class TransactionController extends Controller
      */
     public function destroy(Transaction $transaction)
     {
-        //
+        $transaction->delete();
+
+        return 'Order done';
+    }
+
+    /**
+     * Force delete the specified resource
+     */
+    public function raze(Transaction $transaction)
+    {
+        SoldItem::where('transaction_id', $transaction->id)->delete();
+
+        $transaction->forceDelete();
+
+        return 'Order cancelled';
     }
 }

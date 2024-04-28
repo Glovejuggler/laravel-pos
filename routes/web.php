@@ -1,6 +1,8 @@
 <?php
 
+use App\Models\Item;
 use Inertia\Inertia;
+use App\Models\Transaction;
 use App\Http\Controllers\POS;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
@@ -30,7 +32,9 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
+    return Inertia::render('Dashboard', [
+        'items' => Item::count()
+    ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -44,10 +48,19 @@ Route::middleware('auth')->group(function () {
     Route::post('/item/store', [ItemController::class, 'store'])->name('items.store');
     Route::get('/items/{id}/show', [ItemController::class, 'show'])->name('items.show');
     Route::post('/items/{item}/update', [ItemController::class, 'update'])->name('items.update');
+
+    Route::get('/kitchen', function () {
+        return inertia('Kitchen', [
+            'orders' => Transaction::all()
+        ]);
+    })->name('kitchen');
+    Route::delete('/order/{transaction}/cancel', [TransactionController::class, 'raze'])->name('order.cancel');
+    Route::delete('/order/{transaction}/delete', [TransactionController::class, 'destroy'])->name('order.done');
+
+    Route::get('sales', [TransactionController::class, 'index'])->name('sales');
+    Route::get('/pos', [POS::class, 'index'])->name('pos');
 });
 
-Route::get('/kitchen', [TransactionController::class, 'index'])->name('kitchen');
-Route::get('/pos', [POS::class, 'index'])->name('pos');
 Route::post('/transact', [TransactionController::class, 'store'])->name('transaction.save');
 
 require __DIR__.'/auth.php';

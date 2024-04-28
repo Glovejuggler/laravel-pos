@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class SoldItem extends Model
 {
@@ -11,10 +12,15 @@ class SoldItem extends Model
 
     protected $fillable = ['transaction_id', 'item_id', 'quantity'];
 
-    protected $appends = ['item'];
+    protected $with = ['item'];
 
-    public function getItemAttribute()
+    public function item(): BelongsTo
     {
-        return Item::find($this->item_id);
+        return $this->belongsTo(Item::class);
+    }
+
+    public function transaction(): BelongsTo
+    {
+        return $this->belongsTo(Transaction::class);
     }
 }

@@ -1,8 +1,8 @@
 <script setup>
 import { ref, computed } from 'vue';
-import { router, Head } from '@inertiajs/vue3';
-import TextInput from '@/Components/TextInput.vue';
+import { Head } from '@inertiajs/vue3';
 import axios from 'axios';
+import Modal from '@/Components/Modal.vue';
 
 defineOptions({
     layout: null
@@ -17,6 +17,12 @@ const cartValue = computed(() => {
     return cart.value?.reduce((acc, item) => acc + item.price * item.count, 0)
 })
 const payment = ref(0)
+const showConfirmation = ref(false)
+const confirmationMessage = ref(null)
+
+const showMessage = () => {
+    showConfirmation.value = true
+}
 
 const addToCart = (item) => {
     if (cart.value) {
@@ -50,23 +56,28 @@ const saveTransaction = () => {
     axios.post(route('transaction.save'), {
         items: cart.value,
         payment: payment.value
-    }).then((d) => console.log(d)).finally(() => {
+    }).then((d) => { confirmationMessage.value = d.data }).finally(() => {
         cart.value = null
         payment.value = null
+        showMessage()
     })
 }
 </script>
 
 <template>
+
     <Head>
         <title>
             POS
         </title>
     </Head>
+
     <div class="fixed w-9/12 inset-y-0 left-0 select-none" @contextmenu.prevent="">
         <div class="p-4 flex space-x-2">
-            <div class="border flex w-48 h-48 relative active:scale-95 duration-150 ease-in-out rounded-md overflow-hidden" v-for="item in items" @click="addToCart(item)" ontouchstart>
-                <img draggable="false" @contextmenu.prevent="" @dragstart.prevent="" :src="`../storage/${item.pic}`" class="w-48 h-48 object-cover" height="25px" width="25px" alt="">
+            <div class="border flex w-48 h-48 relative active:scale-95 duration-150 ease-in-out rounded-md overflow-hidden"
+                v-for="item in items" @click="addToCart(item)" ontouchstart>
+                <img draggable="false" @contextmenu.prevent="" @dragstart.prevent="" :src="`../storage/${item.pic}`"
+                    class="w-48 h-48 object-cover" height="25px" width="25px" alt="">
                 <p class="absolute bottom-0 inset-x-0 bg-black/50 p-2 text-white">{{ item.name }}</p>
                 <span class="absolute top-2 right-2 bg-black/50 text-white rounded-lg p-1">{{ item.price }}</span>
             </div>
@@ -77,38 +88,62 @@ const saveTransaction = () => {
         <div class="h-1/2 relative overflow-y-auto">
             <div class="text-white flex justify-between" v-for="item in cart">
                 <div class="flex space-x-1">
-                    <button @click="decreaseCount(item)" class="w-4 h-4 bg-blue-500 inline-flex justify-center items-center">-</button>
+                    <button @click="decreaseCount(item)"
+                        class="w-4 h-4 bg-blue-500 inline-flex justify-center items-center">-</button>
                     <span>{{ `${item.name} x${item.count}` }}</span>
                 </div>
                 <div class="flex space-x-1">
                     <span>{{ item.price * item.count }}</span>
-                    <button @click="removeItem(item)" class="w-5 h-5 bg-red-500 inline-flex justify-center items-center"><i class="bx bx-trash"></i></button>
+                    <button @click="removeItem(item)"
+                        class="w-5 h-5 bg-red-500 inline-flex justify-center items-center"><i
+                            class="bx bx-trash"></i></button>
                 </div>
             </div>
-    
-            <p v-if="cartValue > 0" class="font-bold text-white absolute bottom-2">Total: <span class="text-2xl font-black">{{ cartValue }}</span></p>
+
+            <p v-if="cartValue > 0" class="font-bold text-white absolute bottom-2">Total: <span
+                    class="text-2xl font-black">{{ cartValue }}</span></p>
         </div>
+
         <hr class="border-gray-500">
+
         <div class="h-1/2 relative" v-if="cartValue">
             <span class="mt-4 text-white">Payment</span>
-            <TextInput
-                v-model="payment"
-                type="number"
-                class="w-full"/>
+            <!-- <TextInput v-model="payment" type="number" class="w-full" /> -->
+            <label class="relative block">
+                <input v-model="payment"
+                    class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none duration-300 ease-in-out placeholder:text-xs placeholder:text-gray-400 text-white block bg-gray-900 w-full border-slate-300 dark:border-slate-300/20 rounded-md py-2 pl-3 pr-9 shadow-sm focus:border-indigo-300 focus:ring-indigo-200 focus:ring focus:ring-opacity-50"
+                    placeholder="P 0.00" type="number" name="payment" />
+                <i @click.self="payment = null"
+                    class='bx bx-x-circle text-white/40 absolute text-xl inset-y-0 right-0 flex items-center pr-3 hover:text-red-500'></i>
+            </label>
             <div class="grid grid-cols-5 gap-2 my-2">
-                <button class="p-2 text-xl font-bold text-gray-800 bg-white rounded-md active:scale-95" @click="payment += 50">50</button>
-                <button class="p-2 text-xl font-bold text-gray-800 bg-white rounded-md active:scale-95" @click="payment += 100">100</button>
-                <button class="p-2 text-xl font-bold text-gray-800 bg-white rounded-md active:scale-95" @click="payment += 200">200</button>
-                <button class="p-2 text-xl font-bold text-gray-800 bg-white rounded-md active:scale-95" @click="payment += 500">500</button>
-                <button class="p-2 font-bold text-gray-800 bg-white rounded-md active:scale-95" @click="payment += 1000">1000</button>
+                <button class="p-2 text-xl font-bold text-gray-800 bg-white rounded-md active:scale-95"
+                    @click="payment += 50">50</button>
+                <button class="p-2 text-xl font-bold text-gray-800 bg-white rounded-md active:scale-95"
+                    @click="payment += 100">100</button>
+                <button class="p-2 text-xl font-bold text-gray-800 bg-white rounded-md active:scale-95"
+                    @click="payment += 200">200</button>
+                <button class="p-2 text-xl font-bold text-gray-800 bg-white rounded-md active:scale-95"
+                    @click="payment += 500">500</button>
+                <button class="p-2 font-bold text-gray-800 bg-white rounded-md active:scale-95"
+                    @click="payment += 1000">1000</button>
             </div>
-            <button class="bg-white rounded-md w-full p-2 font-bold active:scale-[0.98]" @click="payment = cartValue">Exact amount</button>
+            <button class="bg-white rounded-md w-full p-2 font-bold active:scale-[0.98]"
+                @click="payment = cartValue">Exact amount</button>
 
-            <p v-if="payment > cartValue" class="text-white mt-2">Change: {{ cartValue && payment-cartValue }}</p>
-            <button class="bg-white rounded-md w-full p-2 font-bold enabled:active:scale-[0.98] absolute bottom-0 right-0"
-                @click="saveTransaction"
-                :class="{'opacity-50': cartValue && payment < cartValue}"
+            <p v-if="payment > cartValue" class="text-white mt-2">Change: {{ cartValue && payment - cartValue }}</p>
+
+            <button
+                class="bg-white rounded-md w-full p-2 font-bold enabled:active:scale-[0.98] absolute bottom-0 right-0"
+                @click="saveTransaction" :class="{ 'opacity-50': cartValue && payment < cartValue }"
                 :disabled="cartValue && payment < cartValue">Place order</button>
         </div>
     </div>
+
+    <!-- Messages Modal -->
+    <Modal :max-width="'sm'" :show="showConfirmation" @close="showConfirmation = false">
+        <div class="flex justify-center p-4 bg-white  text-gray-900 text-3xl font-bold uppercase">
+            {{ confirmationMessage }}
+        </div>
+    </Modal>
 </template>
