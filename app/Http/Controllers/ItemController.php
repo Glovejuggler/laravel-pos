@@ -22,9 +22,14 @@ class ItemController extends Controller
                 'category' => $category
             ]);
         } else {
-            return inertia('Item/Index', [
-                'categories' => Category::all()
-            ]);
+            $category = Category::first();
+            if ($category) {
+                return redirect()->route('items.index', $category);
+            } else {
+                return inertia('Item/Index', [
+                    'categories' => Category::all()
+                ]);
+            }
         }
     }
 
