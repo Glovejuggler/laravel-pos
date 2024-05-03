@@ -14,6 +14,8 @@ class SoldItem extends Model
 
     protected $with = ['item'];
 
+    protected $appends = ['price', 'cost'];
+
     public function item(): BelongsTo
     {
         return $this->belongsTo(Item::class);
@@ -22,5 +24,15 @@ class SoldItem extends Model
     public function transaction(): BelongsTo
     {
         return $this->belongsTo(Transaction::class);
+    }
+
+    public function getPriceAttribute()
+    {
+        return $this->item->price * $this->quantity;
+    }
+
+    public function getCostAttribute()
+    {
+        return $this->item->cost * $this->quantity;
     }
 }

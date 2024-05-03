@@ -1,3 +1,0 @@
-import{o as t,f as e,a as u,w as d,u as i,b as o,F as a,l as n,Z as _,d as m,t as l}from"./app-DZUnaK7f.js";const x=o("title",null,`
-            Sales
-        `,-1),p={class:"max-w-screen-xl mx-auto mt-8"},g={class:"text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 p-4"},y={__name:"Sales",props:{transactions:Object,soldItems:Object},setup(c){return(f,h)=>(t(),e(a,null,[u(i(_),null,{default:d(()=>[x]),_:1}),o("div",p,[(t(!0),e(a,null,n(c.transactions,s=>(t(),e("div",g,[m(l(s.created_at)+" ",1),(t(!0),e(a,null,n(s.items,r=>(t(),e("div",null,l(`${r.item.name} x${r.quantity}`),1))),256))]))),256))])],64))}};export{y as default};

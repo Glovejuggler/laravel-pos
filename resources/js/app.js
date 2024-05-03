@@ -30,3 +30,16 @@ createInertiaApp({
         color: '#4B5563',
     },
 });
+
+// Custom methods
+Date.prototype.toWordFormat = function () {
+    return Intl.DateTimeFormat('en-US', {month: 'long', 'day': 'numeric', 'year': 'numeric'}).format(this)
+}
+
+Date.prototype.toTimeFormat = function () {
+    return Intl.DateTimeFormat('en-US', {hour: 'numeric', minute: '2-digit', hour12: true}).format(this)
+}
+
+Number.prototype.amountFormat = function () {
+    return this > 0 ? this.toLocaleString(undefined, {minimumFractionDigits: 2,maximumFractionDigits: 2}) : 0
+}

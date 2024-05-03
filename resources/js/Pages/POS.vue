@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from 'vue';
 import { Head } from '@inertiajs/vue3';
 import axios from 'axios';
 import Modal from '@/Components/Modal.vue';
+import domtoimage from 'dom-to-image';
 
 defineOptions({
     layout: null
@@ -66,9 +67,14 @@ const saveTransaction = () => {
     axios.post(route('transaction.save'), {
         items: cart.value,
         payment: payment.value
-    }).then((d) => { confirmationMessage.value = d.data }).finally(() => {
+    }).then((d) => {
+        confirmationMessage.value = d.data.message
+    }).catch((err) => {
+        console.log(err)
+    }).finally(() => {
         cart.value = null
         payment.value = null
+        printReceipt()
         showMessage()
     })
 }
@@ -76,6 +82,14 @@ const saveTransaction = () => {
 onMounted(() => {
     changeCat(props.categories[0].name)
 })
+
+const printReceipt = () => {
+    const r = document.getElementById('receipt')
+    domtoimage.toPng(r).then((e) => {
+        console.log(e)
+    })
+    // window.location.href="rawbt:"+r;
+}
 </script>
 
 <template>
@@ -86,7 +100,7 @@ onMounted(() => {
         </title>
     </Head>
 
-    <div class="fixed w-9/12 inset-y-0 left-0 select-none" @contextmenu.prevent="">
+    <div class="fixed w-9/12 inset-y-0 left-0 select-none no-print" @contextmenu.prevent="">
         <div class="p-4 flex space-x-2">
             <div class="border flex w-48 h-48 relative active:scale-95 duration-150 ease-in-out rounded-md overflow-hidden"
                 v-for="item in visibleItems" @click="addToCart(item)" ontouchstart>
@@ -97,22 +111,12 @@ onMounted(() => {
             </div>
         </div>
 
-        <div id="receipt" ref="receipt">
-            <div v-for="item in cart">
-                <p>{{ item.name }}</p>
-                <div class="flex justify-between">
-                    <span class="ml-8">{{ `${item.price} x${item.count}` }}</span>
-                    <span>{{ item.price * item.count }}</span>
-                </div>
-            </div>
-        </div>
-
         <div class="absolute bottom-0 w-full bg-zinc-800 flex">
             <div v-for="category in categories" :class="{'bg-blue-500 text-white font-bold': currentTab === category.name}" @click="changeCat(category.name)" class="py-2 px-4 text-zinc-300 border-r border-zinc-700">{{ category.name }}</div>
         </div>
     </div>
 
-    <div class="fixed w-3/12 inset-y-0 right-0 bg-zinc-800 p-4">
+    <div class="fixed w-3/12 inset-y-0 right-0 bg-zinc-800 p-4 no-print">
         <div class="h-1/2 relative overflow-y-auto">
             <div class="text-white flex justify-between" v-for="item in cart">
                 <div class="flex space-x-1">
@@ -168,21 +172,14 @@ onMounted(() => {
     </div>
 
     <!-- Messages Modal -->
-    <Modal :max-width="'sm'" :show="showConfirmation" @close="showConfirmation = false">
+    <Modal :max-width="'sm'" :show="showConfirmation" @close="showConfirmation = false" class="no-print">
         <div class="flex justify-center p-4 bg-white  text-gray-900 text-3xl font-bold uppercase">
             {{ confirmationMessage }}
         </div>
     </Modal>
+
+    <!-- Receipt -->
+    <!-- <div id="receipt" class="flex justify-center">
+        <button class="bg-red-500 p-2 text-white">GGEZ</button>
+    </div> -->
 </template>
-
-<style scoped>
-#receipt {
-    display: none !important;
-}
-
-@media print {
-    #receipt {
-        display: flex !important;
-    }
-}
-</style>

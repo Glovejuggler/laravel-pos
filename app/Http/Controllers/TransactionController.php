@@ -15,16 +15,15 @@ class TransactionController extends Controller
     public function index()
     {
         $transactions = Transaction::onlyTrashed()->whereDate('deleted_at', today())->get();
-        $sold = SoldItem::whereBelongsTo($transactions)
-                        ->selectRaw('item_id, sum(quantity) as total_sold')
-                        ->groupBy('item_id')
-                        ->get();
+        // $sold = SoldItem::whereBelongsTo($transactions)
+        //                 ->selectRaw('item_id, sum(quantity) as total_sold')
+        //                 ->groupBy('item_id')
+        //                 ->get();
 
         // dd($sold);
 
         return inertia('Sales', [
             'transactions' => $transactions,
-            'soldItems' => $sold
         ]);
     }
 
@@ -57,7 +56,10 @@ class TransactionController extends Controller
             
             OrderPlaced::dispatch($order);
 
-            return 'Order Placed';
+            return [
+                'message' => 'Order placed',
+                'transaction_id' => $order->id
+            ];
             // return $request->items;
         }
     }
@@ -65,9 +67,13 @@ class TransactionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Transaction $transaction)
+    public function show($id)
     {
-        //
+        $transaction = Transaction::withTrashed()->findOrFail($id);
+
+        return view('receipt', [
+            'transaction' => $transaction
+        ]);
     }
 
     /**

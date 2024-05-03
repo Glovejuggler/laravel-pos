@@ -13,7 +13,7 @@ class Transaction extends Model
 
     protected $fillable = ['name', 'payment'];
 
-    protected $appends = ['price'];
+    protected $appends = ['price', 'quantity', 'gross', 'cost'];
 
     public function items(): HasMany
     {
@@ -23,5 +23,20 @@ class Transaction extends Model
     public function getPriceAttribute()
     {
         return $this->items->sum('item.price');
+    }
+
+    public function getQuantityAttribute()
+    {
+        return $this->items->sum('quantity');
+    }
+
+    public function getGrossAttribute()
+    {
+        return $this->items->sum('price');
+    }
+
+    public function getCostAttribute()
+    {
+        return $this->items->sum('cost');
     }
 }
