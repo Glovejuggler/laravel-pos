@@ -3,7 +3,7 @@ import { ref, computed, onMounted } from 'vue';
 import { Head } from '@inertiajs/vue3';
 import axios from 'axios';
 import Modal from '@/Components/Modal.vue';
-import domtoimage from 'dom-to-image';
+import { domToPng } from 'modern-screenshot';
 
 defineOptions({
     layout: null
@@ -16,7 +16,7 @@ const props = defineProps({
 
 const visibleItems = ref(null)
 const currentTab = ref(null)
-const receipt = ref(null)
+const isAndroid = ref(false)
 
 const changeCat = (cat) => {
     currentTab.value = cat
@@ -28,6 +28,7 @@ const cartValue = computed(() => {
     return cart.value?.reduce((acc, item) => acc + item.price * item.count, 0)
 })
 const payment = ref(0)
+const customer = ref('')
 const showConfirmation = ref(false)
 const confirmationMessage = ref(null)
 
@@ -66,29 +67,39 @@ const removeItem = (item) => {
 const saveTransaction = () => {
     axios.post(route('transaction.save'), {
         items: cart.value,
-        payment: payment.value
+        payment: payment.value,
+        customer: customer.value
     }).then((d) => {
+        printReceipt()
         confirmationMessage.value = d.data.message
     }).catch((err) => {
         console.log(err)
     }).finally(() => {
         cart.value = null
         payment.value = null
-        printReceipt()
+        customer.value = null
         showMessage()
     })
 }
 
 onMounted(() => {
     changeCat(props.categories[0].name)
+    let ua = navigator.userAgent.toLowerCase()
+    isAndroid.value = ua.indexOf('android') > -1
 })
 
 const printReceipt = () => {
     const r = document.getElementById('receipt')
-    domtoimage.toPng(r).then((e) => {
+    domToPng(r, {
+        quality: 1,
+        scale: 2,
+    }).then((e) => {
         console.log(e)
+        if (isAndroid) {
+            window.location.href="rawbt:"+e;
+        }
     })
-    // window.location.href="rawbt:"+r;
+    
 }
 </script>
 
@@ -100,7 +111,7 @@ const printReceipt = () => {
         </title>
     </Head>
 
-    <div class="fixed w-9/12 inset-y-0 left-0 select-none no-print" @contextmenu.prevent="">
+    <div class="fixed w-9/12 inset-y-0 left-0 select-none bg-white" @contextmenu.prevent="">
         <div class="p-4 flex space-x-2">
             <div class="border flex w-48 h-48 relative active:scale-95 duration-150 ease-in-out rounded-md overflow-hidden"
                 v-for="item in visibleItems" @click="addToCart(item)" ontouchstart>
@@ -141,6 +152,13 @@ const printReceipt = () => {
         <div class="h-1/2 relative" v-if="cartValue">
             <span class="mt-4 text-white">Payment</span>
             <label class="relative block">
+                <input v-model="customer"
+                    class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none duration-300 ease-in-out placeholder:text-xs placeholder:text-gray-400 text-white block bg-zinc-900 w-full border-slate-300 dark:border-slate-300/20 rounded-md py-2 pl-3 pr-9 shadow-sm focus:border-indigo-300 focus:ring-indigo-200 focus:ring focus:ring-opacity-50"
+                    placeholder="Customer" type="text" name="customer" />
+                <i @click.self="customer = null"
+                    class='bx bx-x-circle text-white/40 absolute text-xl inset-y-0 right-0 flex items-center pr-3 hover:text-red-500'></i>
+            </label>
+            <label class="relative block">
                 <input v-model="payment"
                     class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none duration-300 ease-in-out placeholder:text-xs placeholder:text-gray-400 text-white block bg-zinc-900 w-full border-slate-300 dark:border-slate-300/20 rounded-md py-2 pl-3 pr-9 shadow-sm focus:border-indigo-300 focus:ring-indigo-200 focus:ring focus:ring-opacity-50"
                     placeholder="P 0.00" type="number" name="payment" />
@@ -179,7 +197,27 @@ const printReceipt = () => {
     </Modal>
 
     <!-- Receipt -->
-    <!-- <div id="receipt" class="flex justify-center">
-        <button class="bg-red-500 p-2 text-white">GGEZ</button>
-    </div> -->
+    <div id="receipt" class="w-64 bg-white">
+        <div class="flex justify-center">
+            <img src="http://192.168.1.10:8000/storage/images/ikMaavBDw8fiDxbVULaKdjHJPfsOMEYFKPkYCBw1.jpg" class="w-48" alt="">
+        </div>
+        <div>
+            <div v-for="item in cart">
+                <p>{{ item.name }}</p>
+                <div class="flex justify-between pl-4 w-full">
+                    <p class="w-full">{{ item.price.toFixed(2) }} x{{ item.count }}</p>
+                    <p>{{ (item.count * item.price).toFixed(2) }}</p>
+                </div>
+            </div>
+            <div class="mt-2">
+                <p class="font-bold">TOTAL: {{ cartValue?.toFixed(2) }}</p>
+                <div class="pl-4">
+                    <p>CASH: {{ Number(payment).toFixed(2) }}</p>
+                    <p>CHANGE: {{ (Number(payment) - cartValue).toFixed(2) }}</p>
+                </div>
+            </div>
+            <hr class="border-black my-2">
+            <p>THIS IS NOT AN OFFICIAL RECEIPT</p>
+        </div>
+    </div>
 </template>

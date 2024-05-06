@@ -43,7 +43,8 @@ class TransactionController extends Controller
         if ($request->wantsJson()) {
             $order = Transaction::create([
                 'name' => $request->name,
-                'payment' => $request->payment
+                'payment' => $request->payment,
+                'name' => $request->customer
             ]);
 
             foreach ($request->items as $item) {
@@ -60,7 +61,6 @@ class TransactionController extends Controller
                 'message' => 'Order placed',
                 'transaction_id' => $order->id
             ];
-            // return $request->items;
         }
     }
 
@@ -69,11 +69,7 @@ class TransactionController extends Controller
      */
     public function show($id)
     {
-        $transaction = Transaction::withTrashed()->findOrFail($id);
-
-        return view('receipt', [
-            'transaction' => $transaction
-        ]);
+        //
     }
 
     /**
