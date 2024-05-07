@@ -7,6 +7,7 @@ use App\Http\Controllers\POS;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
 use App\Http\Controllers\ItemController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\TransactionController;
@@ -41,7 +42,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
+    
+    Route::get('users', [UserController::class, 'index'])->name('users.index');
+    Route::post('users', [UserController::class, 'store'])->name('users.store');
+    Route::put('users/{id}', [UserController::class, 'update'])->name('users.update');
+    Route::delete('users/{id}/destroy', [UserController::class, 'destroy'])->name('users.destroy');
+    
     Route::post('/category', [CategoryController::class, 'store'])->name('categories.store');
     Route::get('/items/{category?}', [ItemController::class, 'index'])->name('items.index');
     Route::get('/item/create', [ItemController::class, 'create'])->name('items.create');

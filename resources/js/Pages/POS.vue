@@ -65,12 +65,12 @@ const removeItem = (item) => {
 }
 
 const saveTransaction = () => {
+    printReceipt()
     axios.post(route('transaction.save'), {
         items: cart.value,
         payment: payment.value,
         customer: customer.value
     }).then((d) => {
-        printReceipt()
         confirmationMessage.value = d.data.message
     }).catch((err) => {
         console.log(err)
@@ -190,7 +190,7 @@ const printReceipt = () => {
     </div>
 
     <!-- Messages Modal -->
-    <Modal :max-width="'sm'" :show="showConfirmation" @close="showConfirmation = false" class="no-print">
+    <Modal :max-width="'sm'" :show="showConfirmation" @close="showConfirmation = false">
         <div class="flex justify-center p-4 bg-white  text-gray-900 text-3xl font-bold uppercase">
             {{ confirmationMessage }}
         </div>
@@ -201,6 +201,7 @@ const printReceipt = () => {
         <div class="flex justify-center">
             <img src="http://192.168.1.10:8000/storage/images/ikMaavBDw8fiDxbVULaKdjHJPfsOMEYFKPkYCBw1.jpg" class="w-48" alt="">
         </div>
+        <p>Cashier: {{ $page.props.auth.user.name }}</p>
         <div>
             <div v-for="item in cart">
                 <p>{{ item.name }}</p>
