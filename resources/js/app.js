@@ -33,7 +33,7 @@ createInertiaApp({
 
 // Custom methods
 Date.prototype.toWordFormat = function () {
-    return Intl.DateTimeFormat('en-US', {month: 'long', 'day': 'numeric', 'year': 'numeric'}).format(this)
+    return Intl.DateTimeFormat('en-US', {month: 'long', day: 'numeric', year: 'numeric'}).format(this)
 }
 
 Date.prototype.toTimeFormat = function () {

@@ -1,8 +1,9 @@
 <script setup>
-import { Link, Head, useForm } from '@inertiajs/vue3';
+import { Head, useForm } from '@inertiajs/vue3';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { ref } from 'vue';
+import Modal from '@/Components/Modal.vue';
 
 const props = defineProps({
     item: Object
@@ -39,6 +40,8 @@ const addBreakdown = () => {
 const removeBreakdown = (index) => {
     form.breakdown.splice(index, 1)
 }
+
+const showDeleteConfirmationModal = ref(false)
 </script>
 
 <template>
@@ -50,8 +53,11 @@ const removeBreakdown = (index) => {
 
     <div class="max-w-screen-lg mx-auto mt-8">
         <p class="dark:text-white mb-8">{{ item.name }}</p>
-        <div class="grid grid-cols-3 gap-4">
-            <div @click="newImage.click()" class="h-72 w-72 rounded-lg overflow-hidden bg-gray-700 flex justify-center items-center">
+        <div class="lg:grid grid-cols-3 gap-4">
+            <div @click="newImage.click()" class="h-72 w-72 rounded-lg overflow-hidden bg-gray-700 flex justify-center items-center relative group">
+                <div v-if="item.pic" class="absolute inset-0 flex justify-center items-center bg-black/40 group-hover:opacity-100 opacity-0 duration-200 ease-in-out">
+                    <i class='bx bx-photo-album text-5xl text-white p-3 rounded-full'></i>
+                </div>
                 <i v-if="!form.image && !item.pic" class="bx bx-plus font-bold text-3xl text-white"></i>
                 <img v-if="form.image || item.pic" :src="imgTmp || `../../storage/${item.pic}`" class="w-72 h-72 object-cover" alt="">
             </div>
@@ -93,5 +99,21 @@ const removeBreakdown = (index) => {
                 </form>
             </div>
         </div>
+
+        <div class="flex justify-end py-8">
+            <button @click="showDeleteConfirmationModal = true" type="button" class="text-red-500 border border-red-500 px-4 hover:bg-red-500 hover:text-white rounded-lg text-sm">Delete</button>
+        </div>
     </div>
+
+    <!-- Delete Modal -->
+    <Modal :show="showDeleteConfirmationModal" @close="showDeleteConfirmationModal = false" max-width="md">
+        <div class="p-4 dark:text-white">
+            <p class="font-bold">Confirmation</p>
+            <p>Are you sure you want to delete {{ item.name }}?</p>
+            <div class="mt-4 flex justify-end space-x-2">
+                <button @click="showDeleteConfirmationModal = false" class="dark:text-white hover:underline">Cancel</button>
+                <button @click="$inertia.delete(route('items.destroy', item))" class="bg-red-500 hover:bg-red-700 active:bg-red-900 duration-200 ease-in-out px-3 py-1 text-white rounded-lg">Delete</button>
+            </div>
+        </div>
+    </Modal>
 </template>

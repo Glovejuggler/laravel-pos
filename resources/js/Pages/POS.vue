@@ -199,7 +199,7 @@ const printReceipt = () => {
     <!-- Receipt -->
     <div id="receipt" class="w-64 bg-white">
         <div class="flex justify-center">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQeYKrsf-Sh8dAg21_WUrw2q4v5fPJIQuSjUCO1t1zKg&s" class="w-48" alt="">
+            <img src="logo.jpg" class="w-32" alt="">
         </div>
         <p>Cashier: {{ $page.props.auth.user.name }}</p>
         <div>

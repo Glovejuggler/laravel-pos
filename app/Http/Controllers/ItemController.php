@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreItemRequest;
 use App\Models\Item;
 use App\Models\Costing;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreItemRequest;
+use App\Models\SoldItem;
+use App\Models\Transaction;
+use Illuminate\Support\Facades\Storage;
 
 class ItemController extends Controller
 {
@@ -131,6 +134,18 @@ class ItemController extends Controller
      */
     public function destroy(Item $item)
     {
-        //
+        if ($item->pic) {
+            Storage::disk('public')->delete($item->pic);
+        }
+
+        Costing::where('item_id', $item->id)->delete();
+        $sold = SoldItem::where('item-_id', $item->id)->get();
+        foreach ($sold as $kitchenItem) {
+            $kitchenItem->delete();
+        }
+        
+        $item->delete();
+
+        return redirect()->route('items.index');
     }
 }

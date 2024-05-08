@@ -12,9 +12,12 @@ class TransactionController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $transactions = Transaction::onlyTrashed()->whereDate('deleted_at', today())->get();
+        // dd($request->date);
+        $transactions = Transaction::onlyTrashed()
+                        ->filter($request->only(['search', 'date']))
+                        ->get();
         // $sold = SoldItem::whereBelongsTo($transactions)
         //                 ->selectRaw('item_id, sum(quantity) as total_sold')
         //                 ->groupBy('item_id')
@@ -24,6 +27,7 @@ class TransactionController extends Controller
 
         return inertia('Sales', [
             'transactions' => $transactions,
+            'filters' => $request->only(['search', 'date'])
         ]);
     }
 

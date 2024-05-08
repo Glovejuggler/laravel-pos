@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -38,5 +39,17 @@ class Transaction extends Model
     public function getCostAttribute()
     {
         return $this->items->sum('cost');
+    }
+
+    public function scopeFilter($query, array $filters)
+    {
+        $query->when($filters['search'] ?? null, function ($query, $search) {
+            $query->where(function ($query) use ($search) {
+                $query->where('name', 'like', '%'.$search.'%');
+            });
+        })->when($filters['date'] ?? null, function ($query, $date) {
+            $date = $date ? Carbon::parse($date) : today();
+            $query->whereDate('deleted_at', $date);
+        });
     }
 }

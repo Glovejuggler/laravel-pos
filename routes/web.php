@@ -54,6 +54,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/item/store', [ItemController::class, 'store'])->name('items.store');
     Route::get('/items/{id}/show', [ItemController::class, 'show'])->name('items.show');
     Route::post('/items/{item}/update', [ItemController::class, 'update'])->name('items.update');
+    Route::delete('/item/delete/{item}', [ItemController::class, 'destroy'])->name('items.destroy');
 
     Route::get('/kitchen', function () {
         return inertia('Kitchen', [
