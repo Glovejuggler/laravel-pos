@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name')->nullable();
             $table->integer('payment');
+            $table->string('type');
             $table->softDeletes();
             $table->timestamps();
         });

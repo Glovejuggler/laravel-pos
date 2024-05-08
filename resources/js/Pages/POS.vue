@@ -86,6 +86,7 @@ onMounted(() => {
     changeCat(props.categories[0].name)
     let ua = navigator.userAgent.toLowerCase()
     isAndroid.value = ua.indexOf('android') > -1
+    console.log(isAndroid.value)
 })
 
 const printReceipt = () => {
@@ -95,11 +96,11 @@ const printReceipt = () => {
         scale: 2,
     }).then((e) => {
         console.log(e)
-        if (isAndroid) {
-            window.location.href="rawbt:"+e;
+        if (isAndroid.value) {
+            window.location.href = "rawbt:" + e;
         }
     })
-    
+
 }
 </script>
 
@@ -112,7 +113,7 @@ const printReceipt = () => {
     </Head>
 
     <div class="fixed w-9/12 inset-y-0 left-0 select-none bg-white" @contextmenu.prevent="">
-        <div class="p-4 flex space-x-2">
+        <div class="p-4 flex flex-wrap">
             <div class="border flex w-48 h-48 relative active:scale-95 duration-150 ease-in-out rounded-md overflow-hidden"
                 v-for="item in visibleItems" @click="addToCart(item)" ontouchstart>
                 <img draggable="false" @contextmenu.prevent="" @dragstart.prevent="" :src="`../storage/${item.pic}`"
@@ -123,7 +124,10 @@ const printReceipt = () => {
         </div>
 
         <div class="absolute bottom-0 w-full bg-zinc-800 flex">
-            <div v-for="category in categories" :class="{'bg-blue-500 text-white font-bold': currentTab === category.name}" @click="changeCat(category.name)" class="py-2 px-4 text-zinc-300 border-r border-zinc-700">{{ category.name }}</div>
+            <div v-for="category in categories"
+                :class="{ 'bg-blue-500 text-white font-bold': currentTab === category.name }"
+                @click="changeCat(category.name)" class="py-2 px-4 text-zinc-300 border-r border-zinc-700">{{
+        category.name }}</div>
         </div>
     </div>
 
@@ -147,34 +151,34 @@ const printReceipt = () => {
                     class="text-2xl font-black">{{ cartValue }}</span></p>
         </div>
 
-        <hr class="border-gray-500">
+        <hr class="border-zinc-500">
 
         <div class="h-1/2 relative" v-if="cartValue">
             <span class="mt-4 text-white">Payment</span>
             <label class="relative block">
                 <input v-model="customer"
-                    class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none duration-300 ease-in-out placeholder:text-xs placeholder:text-gray-400 text-white block bg-zinc-900 w-full border-slate-300 dark:border-slate-300/20 rounded-md py-2 pl-3 pr-9 shadow-sm focus:border-indigo-300 focus:ring-indigo-200 focus:ring focus:ring-opacity-50"
+                    class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none duration-300 ease-in-out placeholder:text-xs placeholder:text-zinc-400 text-white block bg-zinc-900 w-full border-slate-300 dark:border-slate-300/20 rounded-md py-2 pl-3 pr-9 shadow-sm focus:border-indigo-300 focus:ring-indigo-200 focus:ring focus:ring-opacity-50"
                     placeholder="Customer" type="text" name="customer" />
                 <i @click.self="customer = null"
                     class='bx bx-x-circle text-white/40 absolute text-xl inset-y-0 right-0 flex items-center pr-3 hover:text-red-500'></i>
             </label>
             <label class="relative block">
                 <input v-model="payment"
-                    class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none duration-300 ease-in-out placeholder:text-xs placeholder:text-gray-400 text-white block bg-zinc-900 w-full border-slate-300 dark:border-slate-300/20 rounded-md py-2 pl-3 pr-9 shadow-sm focus:border-indigo-300 focus:ring-indigo-200 focus:ring focus:ring-opacity-50"
+                    class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none duration-300 ease-in-out placeholder:text-xs placeholder:text-zinc-400 text-white block bg-zinc-900 w-full border-slate-300 dark:border-slate-300/20 rounded-md py-2 pl-3 pr-9 shadow-sm focus:border-indigo-300 focus:ring-indigo-200 focus:ring focus:ring-opacity-50"
                     placeholder="P 0.00" type="number" name="payment" />
                 <i @click.self="payment = null"
                     class='bx bx-x-circle text-white/40 absolute text-xl inset-y-0 right-0 flex items-center pr-3 hover:text-red-500'></i>
             </label>
             <div class="grid grid-cols-2 md:grid-cols-5 gap-2 my-2">
-                <button class="p-2 text-sm font-bold text-gray-800 bg-white rounded-md active:scale-95"
+                <button class="p-2 text-sm font-bold text-zinc-800 bg-white rounded-md active:scale-95"
                     @click="payment += 50">50</button>
-                <button class="p-2 text-sm font-bold text-gray-800 bg-white rounded-md active:scale-95"
+                <button class="p-2 text-sm font-bold text-zinc-800 bg-white rounded-md active:scale-95"
                     @click="payment += 100">100</button>
-                <button class="p-2 text-sm font-bold text-gray-800 bg-white rounded-md active:scale-95"
+                <button class="p-2 text-sm font-bold text-zinc-800 bg-white rounded-md active:scale-95"
                     @click="payment += 200">200</button>
-                <button class="p-2 text-sm font-bold text-gray-800 bg-white rounded-md active:scale-95"
+                <button class="p-2 text-sm font-bold text-zinc-800 bg-white rounded-md active:scale-95"
                     @click="payment += 500">500</button>
-                <button class="p-2 text-xs font-bold text-gray-800 bg-white rounded-md active:scale-95"
+                <button class="p-2 text-xs font-bold text-zinc-800 bg-white rounded-md active:scale-95"
                     @click="payment += 1000">1000</button>
                 <button class="bg-white rounded-md w-full p-2 font-bold text-sm active:scale-[0.98] col-span-5"
                     @click="payment = cartValue">Exact amount</button>
@@ -191,13 +195,13 @@ const printReceipt = () => {
 
     <!-- Messages Modal -->
     <Modal :max-width="'sm'" :show="showConfirmation" @close="showConfirmation = false">
-        <div class="flex justify-center p-4 bg-white  text-gray-900 text-3xl font-bold uppercase">
+        <div class="flex justify-center p-4 bg-white  text-zinc-900 text-3xl font-bold uppercase">
             {{ confirmationMessage }}
         </div>
     </Modal>
 
     <!-- Receipt -->
-    <div id="receipt" class="w-64 bg-white">
+    <div id="receipt" class="w-64 bg-white pb-6">
         <div class="flex justify-center">
             <img src="logo.jpg" class="w-32" alt="">
         </div>

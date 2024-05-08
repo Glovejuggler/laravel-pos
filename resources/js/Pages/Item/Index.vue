@@ -49,15 +49,16 @@ const newCatForm = useForm({
     </Head>
 
     <div class="max-w-screen-lg flex mx-auto mt-8">
-        <div class="w-1/6 bg-white dark:bg-gray-800 py-4 rounded-lg h-min">
+        <div class="w-1/6 bg-white dark:bg-zinc-800 py-4 rounded-lg h-min">
             <div class="flex justify-between items-center px-4 dark:text-white">
                 <span>Categories</span>
                 <i @click="addNewCategory"
                     class='bx bx-plus rounded-full hover:bg-white/20 w-8 h-8 inline-flex justify-center items-center duration-200 ease-in-out'></i>
             </div>
-            <hr class="border-gray-600 mt-1">
-            <Link v-for="category in categories" :href="route('items.index', category)" :class="{'bg-blue-500 hover:bg-blue-500': $page.url === `/items/${category.name}`}"
-                class="dark:text-white hover:bg-gray-700 px-4 py-2 block duration-200 ease-in-out">{{ category.name }}
+            <hr class="border-zinc-600 mt-1">
+            <Link v-for="category in categories" :href="route('items.index', category)"
+                :class="{ 'bg-blue-500 hover:bg-blue-500': $page.url === `/items/${category.name}` }"
+                class="dark:text-white hover:bg-zinc-700 px-4 py-2 block duration-200 ease-in-out">{{ category.name }}
             </Link>
         </div>
         <div class="w-5/6 ml-4 p-4 dark:text-white">
@@ -69,10 +70,10 @@ const newCatForm = useForm({
             <div class="grid grid-cols-4 gap-2">
                 <div @click="$inertia.get(route('items.show', item.id))" v-for="item in items"
                     class="flex flex-col rounded-lg overflow-hidden">
-                    <div class="bg-gray-500">
+                    <div class="bg-zinc-500">
                         <img v-if="item.pic" :src="`../storage/${item.pic}`">
                     </div>
-                    <div class="bg-gray-800 p-4 rounded-b-lg">{{ item.name }}</div>
+                    <div class="bg-zinc-800 p-4 rounded-b-lg">{{ item.name }}</div>
                 </div>
             </div>
         </div>

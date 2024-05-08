@@ -45,6 +45,7 @@ const showDeleteConfirmationModal = ref(false)
 </script>
 
 <template>
+
     <Head>
         <title>
             {{ item.name }}
@@ -54,54 +55,48 @@ const showDeleteConfirmationModal = ref(false)
     <div class="max-w-screen-lg mx-auto mt-8">
         <p class="dark:text-white mb-8">{{ item.name }}</p>
         <div class="lg:grid grid-cols-3 gap-4">
-            <div @click="newImage.click()" class="h-72 w-72 rounded-lg overflow-hidden bg-gray-700 flex justify-center items-center relative group">
-                <div v-if="item.pic" class="absolute inset-0 flex justify-center items-center bg-black/40 group-hover:opacity-100 opacity-0 duration-200 ease-in-out">
+            <div @click="newImage.click()"
+                class="h-72 w-72 rounded-lg overflow-hidden bg-zinc-700 flex justify-center items-center relative group">
+                <div v-if="item.pic"
+                    class="absolute inset-0 flex justify-center items-center bg-black/40 group-hover:opacity-100 opacity-0 duration-200 ease-in-out">
                     <i class='bx bx-photo-album text-5xl text-white p-3 rounded-full'></i>
                 </div>
                 <i v-if="!form.image && !item.pic" class="bx bx-plus font-bold text-3xl text-white"></i>
-                <img v-if="form.image || item.pic" :src="imgTmp || `../../storage/${item.pic}`" class="w-72 h-72 object-cover" alt="">
+                <img v-if="form.image || item.pic" :src="imgTmp || `../../storage/${item.pic}`"
+                    class="w-72 h-72 object-cover" alt="">
             </div>
-            <div class="col-span-2 p-6 rounded-lg bg-gray-800">
+            <div class="col-span-2 p-6 rounded-lg bg-zinc-800">
                 <form @submit.prevent="form.post(route('items.update', item))" enctype="multipart/form-data">
-                <input ref="newImage" @input="form.image = $event.target.files[0]" @change="showImage" type="file" accept="image/*" hidden>
-                <InputLabel for="name" value="Name"/>
-                <TextInput
-                    id="name"
-                    type="text"
-                    v-model="form.name"
-                    class="mt-2 w-full block"/>
+                    <input ref="newImage" @input="form.image = $event.target.files[0]" @change="showImage" type="file"
+                        accept="image/*" hidden>
+                    <InputLabel for="name" value="Name" />
+                    <TextInput id="name" type="text" v-model="form.name" class="mt-2 w-full block" />
 
-                <InputLabel class="mt-4" for="price" value="Price"/>
-                <TextInput
-                    id="price"
-                    type="number"
-                    v-model="form.price"
-                    class="mt-2 w-full block"/>
+                    <InputLabel class="mt-4" for="price" value="Price" />
+                    <TextInput id="price" type="number" v-model="form.price" class="mt-2 w-full block" />
 
-                <p class="block font-medium text-sm text-gray-700 dark:text-gray-300 mt-4 select-none">Breakdown of cost</p>
-                <div v-for="(ing, index) in form.breakdown" :key="index" class="grid grid-cols-11 gap-2 m-2">
-                    <TextInput
-                        type="text"
-                        v-model="ing.name"
-                        class="w-full block col-span-5"
-                        placeholder="Item"/>
-                    <TextInput
-                        type="number"
-                        v-model="ing.cost"
-                        class="w-full block col-span-5"
-                        placeholder="Cost"/>
-                    <i @click="removeBreakdown(index)" class="bx bx-x p-2 w-8 h-8 rounded-lg text-white bg-red-500 hover:bg-red-700 duration-200 ease-in-out inline-flex justify-center items-center"></i>
-                </div>
-                <button type="button" class="text-xs px-4 py-1 rounded-lg bg-gray-400 text-white" @click="addBreakdown">Add</button>
-                <div class="flex justify-end">
-                    <button type-="submit" class="rounded-lg px-4 py-2 bg-green-500 hover:bg-green-700 active:bg-green-900 text-white text-sm duration-200 ease-in-out">Save</button>
-                </div>
+                    <p class="block font-medium text-sm text-zinc-700 dark:text-zinc-300 mt-4 select-none">Breakdown of
+                        cost</p>
+                    <div v-for="(ing, index) in form.breakdown" :key="index" class="grid grid-cols-11 gap-2 m-2">
+                        <TextInput type="text" v-model="ing.name" class="w-full block col-span-5" placeholder="Item" />
+                        <TextInput type="number" v-model="ing.cost" class="w-full block col-span-5"
+                            placeholder="Cost" />
+                        <i @click="removeBreakdown(index)"
+                            class="bx bx-x p-2 w-8 h-8 rounded-lg text-white bg-red-500 hover:bg-red-700 duration-200 ease-in-out inline-flex justify-center items-center"></i>
+                    </div>
+                    <button type="button" class="text-xs px-4 py-1 rounded-lg bg-zinc-400 text-white"
+                        @click="addBreakdown">Add</button>
+                    <div class="flex justify-end">
+                        <button type-="submit"
+                            class="rounded-lg px-4 py-2 bg-green-500 hover:bg-green-700 active:bg-green-900 text-white text-sm duration-200 ease-in-out">Save</button>
+                    </div>
                 </form>
             </div>
         </div>
 
         <div class="flex justify-end py-8">
-            <button @click="showDeleteConfirmationModal = true" type="button" class="text-red-500 border border-red-500 px-4 hover:bg-red-500 hover:text-white rounded-lg text-sm">Delete</button>
+            <button @click="showDeleteConfirmationModal = true" type="button"
+                class="text-red-500 border border-red-500 px-4 hover:bg-red-500 hover:text-white rounded-lg text-sm">Delete</button>
         </div>
     </div>
 
@@ -111,8 +106,10 @@ const showDeleteConfirmationModal = ref(false)
             <p class="font-bold">Confirmation</p>
             <p>Are you sure you want to delete {{ item.name }}?</p>
             <div class="mt-4 flex justify-end space-x-2">
-                <button @click="showDeleteConfirmationModal = false" class="dark:text-white hover:underline">Cancel</button>
-                <button @click="$inertia.delete(route('items.destroy', item))" class="bg-red-500 hover:bg-red-700 active:bg-red-900 duration-200 ease-in-out px-3 py-1 text-white rounded-lg">Delete</button>
+                <button @click="showDeleteConfirmationModal = false"
+                    class="dark:text-white hover:underline">Cancel</button>
+                <button @click="$inertia.delete(route('items.destroy', item))"
+                    class="bg-red-500 hover:bg-red-700 active:bg-red-900 duration-200 ease-in-out px-3 py-1 text-white rounded-lg">Delete</button>
             </div>
         </div>
     </Modal>

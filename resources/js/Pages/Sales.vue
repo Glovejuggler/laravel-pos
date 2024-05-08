@@ -7,7 +7,7 @@ const props = defineProps({
 })
 
 const date = props.filters.date ? new Date(props.filters.date) : new Date()
-const nextable = date < new Date(new Date().setHours(0,0,0,0))
+const nextable = date < new Date(new Date().setHours(0, 0, 0, 0))
 </script>
 
 <template>
@@ -20,11 +20,14 @@ const nextable = date < new Date(new Date().setHours(0,0,0,0))
 
     <div class="max-w-screen-xl mx-auto mt-8">
         <div class="mb-4 flex space-x-2">
-            <i @click="$inertia.get(route('sales'), {date: new Date(date.setDate(date.getDate() - 1)).toLocaleDateString()})" class='bx bxs-chevron-left dark:text-white w-6 h-6 inline-flex justify-center items-center rounded-full border dark:border-white'></i>
+            <i @click="$inertia.get(route('sales'), { date: new Date(date.setDate(date.getDate() - 1)).toLocaleDateString() })"
+                class='bx bxs-chevron-left dark:text-white w-6 h-6 inline-flex justify-center items-center rounded-full border dark:border-white'></i>
             <p class="dark:text-white font-semibold">{{ date.toWordFormat() }}</p>
-            <i v-if="nextable" @click="$inertia.get(route('sales'), {date: new Date(date.setDate(date.getDate() + 1)).toLocaleDateString()})" class='bx bxs-chevron-right dark:text-white w-6 h-6 inline-flex justify-center items-center rounded-full border dark:border-white'></i>
+            <i v-if="nextable"
+                @click="$inertia.get(route('sales'), { date: new Date(date.setDate(date.getDate() + 1)).toLocaleDateString() })"
+                class='bx bxs-chevron-right dark:text-white w-6 h-6 inline-flex justify-center items-center rounded-full border dark:border-white'></i>
         </div>
-        <table class="dark:text-white w-full bg-white dark:bg-gray-800 text-left">
+        <table class="dark:text-white w-full bg-white dark:bg-zinc-800 text-left">
             <thead class="text-xs">
                 <tr>
                     <th class="p-4">Customer</th>
@@ -38,7 +41,7 @@ const nextable = date < new Date(new Date().setHours(0,0,0,0))
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="transaction in transactions" class="bg-white dark:bg-gray-800 border-b border-gray-600">
+                <tr v-for="transaction in transactions" class="bg-white dark:bg-zinc-800 border-b border-zinc-600">
                     <td class="px-4 py-2">{{ transaction.name ?? '-' }}</td>
                     <td class="px-4 py-2">{{ new Date(transaction.created_at).toTimeFormat() }}</td>
                     <td class="px-4 py-2">{{ new Date(transaction.created_at).toWordFormat() }}</td>
