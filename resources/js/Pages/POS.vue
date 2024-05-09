@@ -86,9 +86,9 @@ const saveTransaction = () => {
         customer.value = null
         type.value = null
         isProcessing.value = false
+        printReceipt()
         showMessage()
     })
-    printReceipt()
 }
 
 onMounted(() => {
@@ -217,7 +217,7 @@ const printReceipt = () => {
     </Modal>
 
     <!-- Receipt -->
-    <div v-if="receipt" id="receipt" class="w-64 *:bg-white pb-6">
+    <div v-if="receipt" id="receipt" class="w-64 bg-white pb-6">
         <div class="flex justify-center">
             <img src="logo.jpg" class="w-32" alt="">
         </div>
