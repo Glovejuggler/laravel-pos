@@ -236,7 +236,7 @@ const printReceipt = () => {
             <div v-for="item in receipt.items">
                 <p>{{ item.item.name }}</p>
                 <div class="flex justify-between pl-4 w-full">
-                    <p class="w-full">{{ item.item.price.amountFormat() }} x{{ item.quantity }}</p>
+                    <p class="w-full">{{ Number(item.item.price).amountFormat() }} x{{ item.quantity }}</p>
                     <p>{{ (item.quantity * item.item.price).amountFormat() }}</p>
                 </div>
             </div>
