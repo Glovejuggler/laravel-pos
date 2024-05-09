@@ -86,9 +86,9 @@ const saveTransaction = () => {
         customer.value = null
         type.value = null
         isProcessing.value = false
-        printReceipt()
         showMessage()
     })
+    printReceipt()
 }
 
 onMounted(() => {
