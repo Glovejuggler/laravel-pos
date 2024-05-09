@@ -15,8 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('pic')->nullable();
-            $table->integer('price');
+            $table->string('color')->nullable();
+            $table->decimal('price', 11, 2);
             $table->smallInteger('category_id');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

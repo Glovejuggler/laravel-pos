@@ -16,6 +16,7 @@ return new class extends Migration
             $table->smallInteger('transaction_id');
             $table->smallInteger('item_id');
             $table->smallInteger('quantity');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

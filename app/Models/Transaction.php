@@ -12,9 +12,9 @@ class Transaction extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['name', 'payment'];
+    protected $fillable = ['name', 'payment', 'type'];
 
-    protected $appends = ['price', 'quantity', 'gross', 'cost'];
+    protected $appends = ['price', 'quantity', 'gross', 'cost', 'elapsed'];
 
     public function items(): HasMany
     {
@@ -41,6 +41,11 @@ class Transaction extends Model
         return $this->items->sum('cost');
     }
 
+    public function getElapsedAttribute()
+    {
+        return $this->deleted_at?->diffInSeconds($this->created_at);
+    }
+
     public function scopeFilter($query, array $filters)
     {
         $query->when($filters['search'] ?? null, function ($query, $search) {
@@ -48,7 +53,7 @@ class Transaction extends Model
                 $query->where('name', 'like', '%'.$search.'%');
             });
         })->when($filters['date'] ?? null, function ($query, $date) {
-            $date = $date ? Carbon::parse($date) : today();
+            $date = $date != null ? Carbon::parse($date) : today();
             $query->whereDate('deleted_at', $date);
         });
     }

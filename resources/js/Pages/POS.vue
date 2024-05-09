@@ -16,6 +16,7 @@ const props = defineProps({
 
 const visibleItems = ref(null)
 const currentTab = ref(null)
+const isProcessing = ref(false)
 const isAndroid = ref(false)
 
 const changeCat = (cat) => {
@@ -29,9 +30,12 @@ const cartValue = computed(() => {
 })
 const payment = ref(0)
 const customer = ref('')
+const type = ref('')
+
+const receipt = ref(null)
+
 const showConfirmation = ref(false)
 const confirmationMessage = ref(null)
-
 const showMessage = () => {
     showConfirmation.value = true
 }
@@ -65,19 +69,24 @@ const removeItem = (item) => {
 }
 
 const saveTransaction = () => {
-    printReceipt()
+    isProcessing.value = true
     axios.post(route('transaction.save'), {
         items: cart.value,
         payment: payment.value,
-        customer: customer.value
+        name: customer.value,
+        type: type.value
     }).then((d) => {
         confirmationMessage.value = d.data.message
+        receipt.value = d.data.transaction
     }).catch((err) => {
         console.log(err)
     }).finally(() => {
         cart.value = null
         payment.value = null
         customer.value = null
+        type.value = null
+        isProcessing.value = false
+        printReceipt()
         showMessage()
     })
 }
@@ -86,7 +95,6 @@ onMounted(() => {
     changeCat(props.categories[0].name)
     let ua = navigator.userAgent.toLowerCase()
     isAndroid.value = ua.indexOf('android') > -1
-    console.log(isAndroid.value)
 })
 
 const printReceipt = () => {
@@ -100,19 +108,17 @@ const printReceipt = () => {
             window.location.href = "rawbt:" + e;
         }
     })
-
 }
 </script>
 
 <template>
-
     <Head>
         <title>
             POS
         </title>
     </Head>
 
-    <div class="fixed w-9/12 inset-y-0 left-0 select-none bg-white" @contextmenu.prevent="">
+    <div class="fixed w-9/12 inset-y-0 left-0 select-none bg-white overflow-y-scroll" @contextmenu.prevent="">
         <div class="p-4 flex flex-wrap">
             <div class="border flex w-48 h-48 relative active:scale-95 duration-150 ease-in-out rounded-md overflow-hidden"
                 v-for="item in visibleItems" @click="addToCart(item)" ontouchstart>
@@ -185,11 +191,21 @@ const printReceipt = () => {
             </div>
 
             <p v-if="payment > cartValue" class="text-white mt-2">Change: {{ cartValue && payment - cartValue }}</p>
+            <div class="flex justify-between text-white">
+                <div class="w-full">
+                    <input type="radio" name="type" id="dinein" value="Dine-in" v-model="type">
+                    <label class="ml-2 text-sm" for="dinein">Dine-in</label>
+                </div>
+                <div class="w-full">
+                    <input type="radio" name="type" id="takeout" value="Take-out" v-model="type">
+                    <label class="ml-2 text-sm" for="takeout">Take-out</label>
+                </div>
+            </div>
 
             <button
-                class="bg-white rounded-md text-sm w-full p-2 font-bold enabled:active:scale-[0.98] absolute bottom-0 right-0"
-                @click="saveTransaction" :class="{ 'opacity-50': cartValue && payment < cartValue }"
-                :disabled="cartValue && payment < cartValue">Place order</button>
+                class="bg-white disabled:opacity-50 rounded-md text-sm w-full p-2 font-bold enabled:active:scale-[0.98] absolute bottom-0 right-0"
+                @click="saveTransaction"
+                :disabled="!type || cartValue && payment < cartValue || isProcessing">{{ isProcessing ? 'Processing...' : 'Place order' }}</button>
         </div>
     </div>
 
@@ -201,26 +217,59 @@ const printReceipt = () => {
     </Modal>
 
     <!-- Receipt -->
-    <div id="receipt" class="w-64 bg-white pb-6">
+    <div v-if="receipt" id="receipt" class="w-64 *:bg-white pb-6">
         <div class="flex justify-center">
             <img src="logo.jpg" class="w-32" alt="">
         </div>
-        <p>Cashier: {{ $page.props.auth.user.name }}</p>
+        <p>{{ receipt.name }}</p>
+        <div class="grid grid-cols-2">
+            <b>Type</b>
+            <b class="text-right">{{ receipt.type }}</b>
+        </div>
+        <hr class="border-black mt-2">
+        <div class="flex justify-between">
+            <p>Name</p>
+            <p>Subtotal</p>
+        </div>
+        <hr class="border-black mb-2">
         <div>
-            <div v-for="item in cart">
-                <p>{{ item.name }}</p>
+            <div v-for="item in receipt.items">
+                <p>{{ item.item.name }}</p>
                 <div class="flex justify-between pl-4 w-full">
-                    <p class="w-full">{{ item.price.toFixed(2) }} x{{ item.count }}</p>
-                    <p>{{ (item.count * item.price).toFixed(2) }}</p>
+                    <p class="w-full">{{ item.item.price.amountFormat() }} x{{ item.quantity }}</p>
+                    <p>{{ (item.quantity * item.item.price).amountFormat() }}</p>
                 </div>
             </div>
-            <div class="mt-2">
-                <p class="font-bold">TOTAL: {{ cartValue?.toFixed(2) }}</p>
+            <hr class="border-black my-2">
+            <div>
+                <div class="font-bold text-lg flex justify-between">
+                    <p>TOTAL</p>
+                    <p>{{ receipt.gross.amountFormat() }}</p>
+                </div>
                 <div class="pl-4">
-                    <p>CASH: {{ Number(payment).toFixed(2) }}</p>
-                    <p>CHANGE: {{ (Number(payment) - cartValue).toFixed(2) }}</p>
+                    <p>CASH: {{ receipt.payment.amountFormat() }}</p>
+                    <p>CHANGE: {{ (receipt.payment - receipt.gross).amountFormat() }}</p>
                 </div>
             </div>
+            <hr class="border-black my-2">
+            <div class="flex justify-between text-sm">
+                <p>Cashier</p>
+                <p>{{ $page.props.auth.user.name }}</p>
+            </div>
+            <div class="flex justify-between text-sm">
+                <p>Order ID</p>
+                <p class="text-right">{{ `dQw4w9WgXcQ${receipt.id.pad(4)}` }}</p>
+            </div>
+            <div class="flex justify-between text-sm">
+                <p class="w-max">Order Time</p>
+                <p class="w-max">{{ Intl.DateTimeFormat('en-US', {month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: 'numeric', hour12: true}).format(new Date(receipt.created_at)) }}</p>
+            </div>
+                <div class="flex flex-col items-center justify-center text-sm mt-2 w-full">
+                    <b>UPTop Diner</b>
+                    <p>25 L. Geirosa Ave., Brgy. Silangan</p>
+                    <p>Calauan, Laguna</p>
+                    <p>La Famiglia Building 2nd Floor</p>
+                </div>
             <hr class="border-black my-2">
             <p>THIS IS NOT AN OFFICIAL RECEIPT</p>
         </div>

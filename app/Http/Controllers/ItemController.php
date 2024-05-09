@@ -139,9 +139,12 @@ class ItemController extends Controller
         }
 
         Costing::where('item_id', $item->id)->delete();
+        
         $sold = SoldItem::where('item-_id', $item->id)->get();
-        foreach ($sold as $kitchenItem) {
-            $kitchenItem->delete();
+        if ($sold) {
+            foreach ($sold as $kitchenItem) {
+                $kitchenItem->delete();
+            }
         }
         
         $item->delete();

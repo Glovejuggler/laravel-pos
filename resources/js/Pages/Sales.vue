@@ -43,7 +43,7 @@ const nextable = date < new Date(new Date().setHours(0, 0, 0, 0))
             <tbody>
                 <tr v-for="transaction in transactions" class="bg-white dark:bg-zinc-800 border-b border-zinc-600">
                     <td class="px-4 py-2">{{ transaction.name ?? '-' }}</td>
-                    <td class="px-4 py-2">{{ new Date(transaction.created_at).toTimeFormat() }}</td>
+                    <td class="px-4 py-2">{{ new Date(transaction.created_at).toTimeFormat() }} <span class="text-xs opacity-70">{{ transaction.elapsed }}s</span></td>
                     <td class="px-4 py-2">{{ new Date(transaction.created_at).toWordFormat() }}</td>
                     <td class="px-4 py-2">
                         <div>

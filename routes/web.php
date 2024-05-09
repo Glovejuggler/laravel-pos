@@ -4,6 +4,7 @@ use App\Models\Item;
 use Inertia\Inertia;
 use App\Models\Transaction;
 use App\Http\Controllers\POS;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
 use App\Http\Controllers\ItemController;
@@ -33,8 +34,15 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
+    // $t = Transaction::onlyTrashed()->get();
+    // $time = 0;
+    // foreach ($t as $tr) {
+    //     $time += $tr->deleted_at->diffInSeconds($tr->created_at);
+    // }
+
+    // dd($time/$t->count());
     return Inertia::render('Dashboard', [
-        'items' => Item::count()
+        'items' => Item::count(),
     ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 

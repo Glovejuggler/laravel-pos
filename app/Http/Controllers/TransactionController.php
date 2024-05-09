@@ -6,6 +6,7 @@ use App\Models\SoldItem;
 use App\Events\OrderPlaced;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreTransactionRequest;
 
 class TransactionController extends Controller
 {
@@ -42,28 +43,24 @@ class TransactionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreTransactionRequest $request)
     {
-        if ($request->wantsJson()) {
-            $order = Transaction::create([
-                'name' => $request->name,
-                'payment' => $request->payment,
-                'name' => $request->customer
+        $order = Transaction::create($request->validated());
+
+        foreach ($request->items as $item) {
+            SoldItem::create([
+                'transaction_id' => $order->id,
+                'item_id' => $item['id'],
+                'quantity' => $item['count']
             ]);
+        }
+        
+        OrderPlaced::dispatch($order);
 
-            foreach ($request->items as $item) {
-                SoldItem::create([
-                    'transaction_id' => $order->id,
-                    'item_id' => $item['id'],
-                    'quantity' => $item['count']
-                ]);
-            }
-            
-            OrderPlaced::dispatch($order);
-
+        if ($request->wantsJson()) {
             return [
                 'message' => 'Order placed',
-                'transaction_id' => $order->id
+                'transaction' => $order
             ];
         }
     }

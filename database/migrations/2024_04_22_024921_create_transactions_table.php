@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             $table->string('name')->nullable();
-            $table->integer('payment');
-            $table->string('type');
+            $table->decimal('payment', 11, 2);
+            $table->enum('type', ['Dine-in', 'Take-out']);
             $table->softDeletes();
             $table->timestamps();
         });

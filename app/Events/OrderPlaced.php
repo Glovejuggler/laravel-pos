@@ -29,10 +29,11 @@ class OrderPlaced implements ShouldBroadcast
      *
      * @return array<int, \Illuminate\Broadcasting\Channel>
      */
-    public function broadcastOn(): array
+    public function broadcastOn(): Channel
     {
-        return [
-            'public',
-        ];
+        // return [
+        //     'public',
+        // ];
+        return new PrivateChannel('kitchen');
     }
 }

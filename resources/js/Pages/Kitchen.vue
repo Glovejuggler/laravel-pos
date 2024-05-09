@@ -13,7 +13,7 @@ const props = defineProps({
 
 const ordersData = ref(props.orders)
 
-Echo.channel('public')
+Echo.private('kitchen')
     .listen('OrderPlaced', (e) => {
         if (ordersData.value) {
             ordersData.value.push(e.order)
@@ -69,6 +69,8 @@ const beforeLeave = (el) => {
                 <p v-for="item in order.items">
                     {{ `${item.item.name} x${item.quantity}` }}
                 </p>
+
+                <p>{{ order.type }}</p>
 
                 <div class="flex justify-between">
                     <button @click="removeOrder(index, order)" class="p-2 bg-red-500 text-white text-xs">Cancel</button>

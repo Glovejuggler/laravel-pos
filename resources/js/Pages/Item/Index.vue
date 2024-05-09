@@ -57,7 +57,7 @@ const newCatForm = useForm({
             </div>
             <hr class="border-zinc-600 mt-1">
             <Link v-for="category in categories" :href="route('items.index', category)"
-                :class="{ 'bg-blue-500 hover:bg-blue-500': $page.url === `/items/${category.name}` }"
+                :class="{ 'bg-blue-500 hover:bg-blue-500': $page.url.replace('%20', ' ') === `/items/${category.name}` }"
                 class="dark:text-white hover:bg-zinc-700 px-4 py-2 block duration-200 ease-in-out">{{ category.name }}
             </Link>
         </div>

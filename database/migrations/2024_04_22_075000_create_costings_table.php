@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('costings', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->integer('cost');
+            $table->decimal('cost', 11, 2);
             $table->smallInteger('item_id');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

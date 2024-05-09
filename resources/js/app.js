@@ -43,3 +43,9 @@ Date.prototype.toTimeFormat = function () {
 Number.prototype.amountFormat = function () {
     return this > 0 ? this.toLocaleString(undefined, {minimumFractionDigits: 2,maximumFractionDigits: 2}) : 0
 }
+
+Number.prototype.pad = function(size) {
+    var s = String(this);
+    while (s.length < (size || 2)) {s = "0" + s;}
+    return s;
+}

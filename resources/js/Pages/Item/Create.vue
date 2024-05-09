@@ -3,6 +3,10 @@ import { Head, useForm } from '@inertiajs/vue3';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { ref } from 'vue';
+// import colors from 'tailwindcss/colors';
+
+// const tc = Object.keys(colors)
+//     .filter(key => typeof colors[key] === 'object')
 
 const params = new URLSearchParams(window.location.search)
 
@@ -14,6 +18,7 @@ const form = useForm({
     breakdown: []
 })
 
+// const selectedColor = ref('')
 const newImage = ref(null)
 const imgTmp = ref(null)
 const showImage = () => {
@@ -59,6 +64,16 @@ const removeBreakdown = (index) => {
                 <form @submit.prevent="form.post(route('items.store'))">
                     <input ref="newImage" @input="form.image = $event.target.files[0]" @change="showImage" type="file"
                         accept="image/*" hidden>
+                        <!-- <div class="flex">
+                            <select name="color" @change="selectedColor = $event.target.value">
+                                <template v-for="color in tc">
+                                    <option v-for="shade in colors[color]" :style="`background: ${shade} !important`" :value="shade">
+                                        {{ shade }}
+                                    </option>
+                                </template>
+                            </select>
+                            <div class="w-5 h-5" :style="`background-color: ${selectedColor} !important`"></div>
+                        </div> -->
                     <InputLabel for="name" value="Name" />
                     <TextInput id="name" type="text" v-model="form.name" class="mt-2 w-full block" />
 
