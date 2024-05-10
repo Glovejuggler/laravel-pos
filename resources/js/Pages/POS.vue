@@ -75,9 +75,13 @@ const saveTransaction = () => {
         payment: payment.value,
         name: customer.value,
         type: type.value
+    }, {
+        maxBodyLength: 2048,
+        maxContentLength: 2048,
     }).then((d) => {
         confirmationMessage.value = d.data.message
         receipt.value = d.data.transaction
+        console.log(d.data.usage)
     }).catch((err) => {
         console.log(err)
     }).finally(() => {
@@ -118,9 +122,9 @@ const printReceipt = () => {
         </title>
     </Head>
 
-    <div class="fixed w-9/12 inset-y-0 left-0 select-none bg-white overflow-y-scroll" @contextmenu.prevent="">
+    <div class="fixed w-9/12 top-0 bottom-10 left-0 select-none bg-white overflow-y-auto" @contextmenu.prevent="">
         <div class="p-4 flex flex-wrap">
-            <div class="border flex w-48 h-48 relative active:scale-95 duration-150 ease-in-out rounded-md overflow-hidden"
+            <div class="item border flex w-48 h-48 relative active:scale-95 duration-150 ease-in-out rounded-md overflow-hidden"
                 v-for="item in visibleItems" @click="addToCart(item)" ontouchstart>
                 <img draggable="false" @contextmenu.prevent="" @dragstart.prevent="" :src="`../storage/${item.pic}`"
                     class="w-48 h-48 object-cover" height="25px" width="25px" alt="">
@@ -129,7 +133,7 @@ const printReceipt = () => {
             </div>
         </div>
 
-        <div class="absolute bottom-0 w-full bg-zinc-800 flex">
+        <div class="fixed bottom-0 w-full bg-zinc-800 flex">
             <div v-for="category in categories"
                 :class="{ 'bg-blue-500 text-white font-bold': currentTab === category.name }"
                 @click="changeCat(category.name)" class="py-2 px-4 text-zinc-300 border-r border-zinc-700">{{

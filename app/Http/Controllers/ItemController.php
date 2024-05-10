@@ -82,7 +82,8 @@ class ItemController extends Controller
         $item = Item::findOrFail($id);
 
         return inertia('Item/Show', [
-            'item' => $item
+            'item' => $item,
+            'categories' => Category::all()
         ]);
     }
 

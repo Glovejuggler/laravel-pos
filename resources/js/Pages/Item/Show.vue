@@ -6,7 +6,8 @@ import { ref } from 'vue';
 import Modal from '@/Components/Modal.vue';
 
 const props = defineProps({
-    item: Object
+    item: Object,
+    categories: Object
 })
 
 const form = useForm({
@@ -69,7 +70,12 @@ const showDeleteConfirmationModal = ref(false)
                 <form @submit.prevent="form.post(route('items.update', item))" enctype="multipart/form-data">
                     <input ref="newImage" @input="form.image = $event.target.files[0]" @change="showImage" type="file"
                         accept="image/*" hidden>
-                    <InputLabel for="name" value="Name" />
+                    <InputLabel for="categories" value="Category" />
+                    <select v-model="form.category_id" id="categories" class="w-full mt-2 border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+                        <option hidden disabled :selected="item.category_id === 69420">Select category</option>
+                        <option v-for="category in categories" :value="category.id" :selected="item.category_id === category.id">{{ category.name }}</option>
+                    </select>
+                    <InputLabel class="mt-4" for="name" value="Name" />
                     <TextInput id="name" type="text" v-model="form.name" class="mt-2 w-full block" />
 
                     <InputLabel class="mt-4" for="price" value="Price" />

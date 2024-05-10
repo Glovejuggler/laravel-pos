@@ -53,8 +53,7 @@ class Transaction extends Model
                 $query->where('name', 'like', '%'.$search.'%');
             });
         })->when($filters['date'] ?? null, function ($query, $date) {
-            $date = $date != null ? Carbon::parse($date) : today();
-            $query->whereDate('deleted_at', $date);
+            $query->whereDate('deleted_at', Carbon::parse($date));
         });
     }
 }

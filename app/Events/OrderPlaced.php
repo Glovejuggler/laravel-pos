@@ -15,7 +15,7 @@ class OrderPlaced implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public Transaction $order;
+    public $order;
     /**
      * Create a new event instance.
      */

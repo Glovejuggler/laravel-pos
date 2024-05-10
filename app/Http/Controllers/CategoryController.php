@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Item;
 use App\Models\Category;
 use Illuminate\Http\Request;
 
@@ -58,13 +59,15 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Category $category)
+    public function update(Request $request, $id)
     {
+        // dd($id);
+        $category = Category::findOrFail($id);
         $category->update([
             'name' => $request->name
         ]);
 
-        return redirect()->back();
+        return redirect()->route('items.index');
     }
 
     /**
@@ -72,6 +75,11 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        //
+        Item::where('category_id', $category->id)->update([
+            'category_id' => 69420
+        ]);
+        $category->delete();
+
+        return redirect()->back();
     }
 }

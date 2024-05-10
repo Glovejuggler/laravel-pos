@@ -15,9 +15,11 @@ class TransactionController extends Controller
      */
     public function index(Request $request)
     {
-        // dd($request->date);
         $transactions = Transaction::onlyTrashed()
-                        ->filter($request->only(['search', 'date']))
+                        ->filter([
+                            'date' => $request->date ? $request->date : today(),
+                            'search' => $request->search
+                        ])
                         ->get();
         // $sold = SoldItem::whereBelongsTo($transactions)
         //                 ->selectRaw('item_id, sum(quantity) as total_sold')
@@ -45,22 +47,26 @@ class TransactionController extends Controller
      */
     public function store(StoreTransactionRequest $request)
     {
-        $order = Transaction::create($request->validated());
-
-        foreach ($request->items as $item) {
-            SoldItem::create([
-                'transaction_id' => $order->id,
-                'item_id' => $item['id'],
-                'quantity' => $item['count']
-            ]);
-        }
+        // if ($request->wantsJson()) {
+        //     return $request;
+        // }
         
-        OrderPlaced::dispatch($order);
-
         if ($request->wantsJson()) {
+            $order = Transaction::create($request->validated());
+    
+            foreach ($request->items as $item) {
+                SoldItem::create([
+                    'transaction_id' => $order->id,
+                    'item_id' => $item['id'],
+                    'quantity' => $item['count']
+                ]);
+            }
+            
+            OrderPlaced::dispatch($order);
+
             return [
                 'message' => 'Order placed',
-                'transaction' => $order
+                'transaction' => $order,
             ];
         }
     }

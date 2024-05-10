@@ -29,6 +29,45 @@ const submitCategory = () => {
     })
 }
 
+const editCategoryModal = ref(false)
+const editCatInput = ref(null)
+
+const editCategory = (category) => {
+    editCatForm.name = category.name
+    editCatForm.id = category.id
+    editCategoryModal.value = true
+
+    nextTick(() => editCatInput.value.focus())
+}
+
+const closeEditCategory = () => {
+    editCategoryModal.value = false
+
+    editCatForm.reset()
+}
+
+const submitEditCategory = () => {
+    editCatForm.put(route('categories.update', editCatForm.id), {
+        preserveScroll: true,
+        preserveState: false,
+        onSuccess: () => closeEditCategory,
+        onError: () => editCatInput.value.focus(),
+        onFinish: () => editCatForm.reset()
+    })
+}
+
+const deleteModal = ref(false)
+const categoryToDelete = ref(null)
+const deleteCategory = (category) => {
+    categoryToDelete.value = category
+    deleteModal.value = true
+}
+
+const closeDeleteModal = () => {
+    deleteModal.value = false
+    categoryToDelete.value = null
+}
+
 const props = defineProps({
     items: Object,
     categories: Object,
@@ -37,6 +76,11 @@ const props = defineProps({
 
 const newCatForm = useForm({
     name: ''
+})
+
+const editCatForm = useForm({
+    name: '',
+    id: '',
 })
 </script>
 
@@ -56,10 +100,15 @@ const newCatForm = useForm({
                     class='bx bx-plus rounded-full hover:bg-white/20 w-8 h-8 inline-flex justify-center items-center duration-200 ease-in-out'></i>
             </div>
             <hr class="border-zinc-600 mt-1">
-            <Link v-for="category in categories" :href="route('items.index', category)"
+            <div v-for="category in categories" @click.stop="$inertia.get(route('items.index', category))"
                 :class="{ 'bg-blue-500 hover:bg-blue-500': $page.url.replace('%20', ' ') === `/items/${category.name}` }"
-                class="dark:text-white hover:bg-zinc-700 px-4 py-2 block duration-200 ease-in-out">{{ category.name }}
-            </Link>
+                class="dark:text-white px-4 py-2 duration-200 ease-in-out flex justify-between group cursor-pointer">
+                    <span>{{ category.name }}</span>
+                    <div class="invisible group-hover:visible space-x-2">
+                        <i class="bx bx-edit opacity-70 hover:opacity-100" @click.stop="editCategory(category)"></i>
+                        <i class="bx bx-trash opacity-70 hover:opacity-100" @click.stop="deleteCategory(category)"></i>
+                    </div>
+            </div>
         </div>
         <div class="w-5/6 ml-4 p-4 dark:text-white">
             <div v-if="category" class="flex items-center">
@@ -85,6 +134,32 @@ const newCatForm = useForm({
             <p class="dark:text-white font-semibold">Add Category</p>
             <TextInput ref="newCatInput" class="mt-2 block w-full" type="text" v-model="newCatForm.name"
                 placeholder="Category" @keyup.enter="submitCategory" />
+        </div>
+    </Modal>
+
+    <!-- Edit Category Modal -->
+    <Modal :show="editCategoryModal" @close="closeEditCategory">
+        <div class="p-6">
+            <p class="dark:text-white font-semibold">Edit Category</p>
+            <TextInput ref="editCatInput" class="mt-2 block w-full" type="text" v-model="editCatForm.name"
+                placeholder="Category" @keyup.enter="submitEditCategory" />
+        </div>
+    </Modal>
+
+    <!-- Delete Category Modal -->
+    <Modal :show="deleteModal" @close="closeDeleteModal">
+        <div class="p-6 dark:text-white">
+            <p class="font-semibold">Confirmation</p>
+            <p class="mt-2">Are you sure you want to delete this category: {{ categoryToDelete.name }}?</p>
+            <p class="sm italic text-red-500">This action cannot be undone</p>
+            <div class="mt-4 flex justify-end space-x-2">
+                <button @click="closeDeleteModal" class="hover:underline">Cancel</button>
+                <button @click="$inertia.delete(route('categories.destroy', categoryToDelete), {
+                    preserveScroll: true,
+                    preserveState: false,
+                    onSuccess: () => closeDeleteModal,
+                })" class="px-4 py-2 text-sm text-white bg-red-500 hover:bg-red-700 active:bg-red-900 duration-200 ease-in-out">Delete</button>
+            </div>
         </div>
     </Modal>
 </template>
