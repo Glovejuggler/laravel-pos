@@ -1,10 +1,13 @@
 <?php
 
+use Carbon\Carbon;
 use App\Models\Item;
 use Inertia\Inertia;
+use App\Models\Costing;
+use App\Models\Category;
 use App\Models\Transaction;
+use Illuminate\Http\Request;
 use App\Http\Controllers\POS;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
 use App\Http\Controllers\ItemController;
@@ -41,8 +44,11 @@ Route::get('/dashboard', function () {
     // }
 
     // dd($time/$t->count());
+    $finishedOrders = Transaction::onlyTrashed();
+    // dd($finishedOrders->get()->sum('elapsed') / $finishedOrders->count());
     return Inertia::render('Dashboard', [
         'items' => Item::count(),
+        'avgS' => $finishedOrders->get()->sum('elapsed') / $finishedOrders->count()
     ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -69,17 +75,48 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/kitchen', function () {
         return inertia('Kitchen', [
-            'orders' => Transaction::all()
+            'orders' => Transaction::all()->pluck('id')
         ]);
     })->name('kitchen');
-    Route::delete('/order/{transaction}/cancel', [TransactionController::class, 'raze'])->name('order.cancel');
-    Route::delete('/order/{transaction}/delete', [TransactionController::class, 'destroy'])->name('order.done');
+    Route::delete('/order/{id}/cancel', [TransactionController::class, 'raze'])->name('order.cancel');
+    Route::delete('/order/{id}/delete', [TransactionController::class, 'destroy'])->name('order.done');
 
+    Route::get('unit_sales/{category?}', function (Request $request, Category $category = null) {
+        // $dd = Costing::withCount(['sold' => function ($query) {
+        //     $query->whereDate('created_at', today());
+        // }])->get();
+        // dd($request);
+        // dd($date);
+        if ($category) {
+            $date = $request->date ? Carbon::parse($request->date) : today();
+            return inertia('UnitSales', [
+                'items' => Item::where('category_id',$category->id)
+                            ->withSum(['sales as total_quantity' => function ($query) use ($date) {
+                                $query->whereDate('created_at', $date);
+                            }], 'quantity')
+                            ->get(),
+                'categories' => Category::all(),
+                'filters' => $request->only(['date']),
+                'cat' => $category
+            ]);
+        } else {
+            $category = Category::first();
+            if ($category) {
+                return redirect()->route('unit.sales', $category);
+            } else {
+                return inertia('UnitSales', [
+                    'categories' => Category::all()
+                ]);
+            }
+        }
+    })->name('unit.sales');
     Route::get('sales', [TransactionController::class, 'index'])->name('sales');
     Route::get('/pos', [POS::class, 'index'])->name('pos');
     Route::get('receipt/{id}', [TransactionController::class, 'show'])->name('receipt');
+
+    Route::post('/transact', [TransactionController::class, 'store'])->name('transaction.save');
+    Route::get('order/{id}', [TransactionController::class, 'show'])->name('order.get');
 });
 
-Route::post('/transact', [TransactionController::class, 'store'])->name('transaction.save');
 
 require __DIR__.'/auth.php';

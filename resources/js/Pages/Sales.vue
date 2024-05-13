@@ -3,7 +3,8 @@ import { Head } from '@inertiajs/vue3';
 
 const props = defineProps({
     transactions: Object,
-    filters: Object
+    filters: Object,
+    total: Object
 })
 
 const date = props.filters.date ? new Date(props.filters.date) : new Date()
@@ -54,6 +55,16 @@ const nextable = date < new Date(new Date().setHours(0, 0, 0, 0))
                     <td class="px-4 py-2">{{ transaction.gross }}</td>
                     <td class="px-4 py-2">{{ transaction.gross - transaction.cost }}</td>
                     <td class="px-4 py-2"><i class='bx bx-printer dark:text-white'></i></td>
+                </tr>
+                <tr class="bg-white font-bold dark:bg-zinc-800 border-b border-zinc-600">
+                    <td class="px-4 py-2">{{ transactions.length }}</td>
+                    <td class="px-4 py-2"></td>
+                    <td class="px-4 py-2"></td>
+                    <td class="px-4 py-2"></td>
+                    <td class="px-4 py-2"></td>
+                    <td class="px-4 py-2">{{ total.gross }}</td>
+                    <td class="px-4 py-2">{{ total.gross - total.cost }}</td>
+                    <td class="px-4 py-2"></td>
                 </tr>
             </tbody>
         </table>

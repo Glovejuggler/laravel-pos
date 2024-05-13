@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { Head } from '@inertiajs/vue3';
 import axios from 'axios';
+import OrderCard from '@/Components/OrderCard.vue';
 
 defineOptions({
     layout: null
@@ -56,26 +57,8 @@ const beforeLeave = (el) => {
         <TransitionGroup tag="div" name="list" @before-leave="beforeLeave"
             class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-2 p-4">
 
-            <div v-for="(order, index) in ordersData" :key="order.id"
-                class="bg-zinc-800 rounded-md p-4 ease-in-out duration-200 transition-all relative text-white h-min">
-                <p class="text-xs">{{ Intl.DateTimeFormat("en-US", {
-            month: 'long',
-            day: 'numeric',
-            year: 'numeric',
-            hour: 'numeric',
-            minute: 'numeric'
-        }).format(new Date(order.created_at)) }}</p>
-                <p>Customer: {{ order.name }}</p>
-                <p v-for="item in order.items">
-                    {{ `${item.item.name} x${item.quantity}` }}
-                </p>
-
-                <p>{{ order.type }}</p>
-
-                <div class="flex justify-between">
-                    <button @click="removeOrder(index, order)" class="p-2 bg-red-500 text-white text-xs">Cancel</button>
-                    <button @click="finishOrder(index, order)" class="p-2 bg-blue-500 text-white text-xs">Done</button>
-                </div>
+            <div v-for="(order, index) in ordersData" :key="order">
+                <OrderCard :id="order" :key="order" @remove="removeOrder(index, order)" @finish="finishOrder(index, order)" />
             </div>
 
         </TransitionGroup>

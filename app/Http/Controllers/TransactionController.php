@@ -30,7 +30,11 @@ class TransactionController extends Controller
 
         return inertia('Sales', [
             'transactions' => $transactions,
-            'filters' => $request->only(['search', 'date'])
+            'filters' => $request->only(['search', 'date']),
+            'total' => [
+                'gross' => $transactions->sum('gross'),
+                'cost' => $transactions->sum('cost'),
+            ]
         ]);
     }
 
@@ -62,7 +66,7 @@ class TransactionController extends Controller
                 ]);
             }
             
-            OrderPlaced::dispatch($order);
+            OrderPlaced::dispatch($order->id);
 
             return [
                 'message' => 'Order placed',
@@ -74,9 +78,11 @@ class TransactionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        //
+        if ($request->wantsJson()) {
+            return Transaction::findOrFail($id);
+        }
     }
 
     /**
@@ -98,8 +104,9 @@ class TransactionController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Transaction $transaction)
+    public function destroy($id)
     {
+        $transaction = Transaction::findOrFail($id);
         $transaction->delete();
 
         return 'Order done';
@@ -108,8 +115,9 @@ class TransactionController extends Controller
     /**
      * Force delete the specified resource
      */
-    public function raze(Transaction $transaction)
+    public function raze($id)
     {
+        $transaction = Transaction::findOrFail($id);
         SoldItem::where('transaction_id', $transaction->id)->delete();
 
         $transaction->forceDelete();

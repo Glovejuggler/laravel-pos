@@ -30,4 +30,9 @@ class Item extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
+    public function sales(): HasMany
+    {
+        return $this->hasMany(SoldItem::class);
+    }
 }

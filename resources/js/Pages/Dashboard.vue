@@ -1,8 +1,9 @@
 <script setup>
 import { Head } from '@inertiajs/vue3';
 
-defineProps({
-    items: Object
+const props = defineProps({
+    items: Number,
+    avgS: Number
 })
 </script>
 
