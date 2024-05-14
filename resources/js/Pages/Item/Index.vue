@@ -110,8 +110,8 @@ const editCatForm = useForm({
                     </div>
             </div>
         </div>
-        <div class="w-5/6 ml-4 p-4 dark:text-white">
-            <div v-if="category" class="flex items-center">
+        <div class="w-5/6 px-4 dark:text-white">
+            <div v-if="category" class="flex items-center mb-4">
                 <span class="font-semibold mr-8">Items</span>
                 <i @click="$inertia.get(route('items.create'), { category: category.id })"
                     class="bx bx-plus rounded-full hover:bg-white/20 w-8 h-8 inline-flex justify-center items-center duration-200 ease-in-out"></i>

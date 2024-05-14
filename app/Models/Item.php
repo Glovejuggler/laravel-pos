@@ -35,4 +35,11 @@ class Item extends Model
     {
         return $this->hasMany(SoldItem::class);
     }
+
+    public function scopeFilter($query, array $filters)
+    {
+        $query->when($filters['search'] ?? null, function ($query, $search) {
+            $query->where('name', 'like', "%$search%");
+        });
+    }
 }

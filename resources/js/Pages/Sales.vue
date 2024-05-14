@@ -22,13 +22,13 @@ const nextable = date < new Date(new Date().setHours(0, 0, 0, 0))
     <div class="max-w-screen-xl mx-auto mt-8">
         <div class="mb-4 flex space-x-2">
             <i @click="$inertia.get(route('sales'), { date: new Date(date.setDate(date.getDate() - 1)).toLocaleDateString() })"
-                class='bx bxs-chevron-left dark:text-white w-6 h-6 inline-flex justify-center items-center rounded-full border dark:border-white'></i>
+                class='bx bxs-chevron-left dark:text-white hover:bg-white hover:text-zinc-100 dark:hover:text-zinc-900 w-6 h-6 inline-flex justify-center items-center rounded-full border dark:border-white'></i>
             <p class="dark:text-white font-semibold">{{ date.toWordFormat() }}</p>
             <i v-if="nextable"
                 @click="$inertia.get(route('sales'), { date: new Date(date.setDate(date.getDate() + 1)).toLocaleDateString() })"
-                class='bx bxs-chevron-right dark:text-white w-6 h-6 inline-flex justify-center items-center rounded-full border dark:border-white'></i>
+                class='bx bxs-chevron-right dark:text-white hover:bg-white hover:text-zinc-100 dark:hover:text-zinc-900 w-6 h-6 inline-flex justify-center items-center rounded-full border dark:border-white'></i>
         </div>
-        <table class="dark:text-white w-full bg-white dark:bg-zinc-800 text-left">
+        <table v-if="transactions.length" class="dark:text-white w-full bg-white dark:bg-zinc-800 text-left">
             <thead class="text-xs">
                 <tr>
                     <th class="p-4">Customer</th>
@@ -68,5 +68,13 @@ const nextable = date < new Date(new Date().setHours(0, 0, 0, 0))
                 </tr>
             </tbody>
         </table>
+
+        <!-- Empty State -->
+        <div v-else class="flex justify-center mt-14">
+            <div class="flex justify-center items-center flex-col text-zinc-700 dark:text-zinc-400">
+                <i class='bx bx-ghost text-7xl'></i>
+                <p>Oohh... It's empty in here.</p>
+            </div>
+        </div>
     </div>
 </template>

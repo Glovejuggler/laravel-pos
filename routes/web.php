@@ -13,6 +13,7 @@ use Illuminate\Foundation\Application;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\TransactionController;
 
@@ -81,35 +82,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/order/{id}/cancel', [TransactionController::class, 'raze'])->name('order.cancel');
     Route::delete('/order/{id}/delete', [TransactionController::class, 'destroy'])->name('order.done');
 
-    Route::get('unit_sales/{category?}', function (Request $request, Category $category = null) {
-        // $dd = Costing::withCount(['sold' => function ($query) {
-        //     $query->whereDate('created_at', today());
-        // }])->get();
-        // dd($request);
-        // dd($date);
-        if ($category) {
-            $date = $request->date ? Carbon::parse($request->date) : today();
-            return inertia('UnitSales', [
-                'items' => Item::where('category_id',$category->id)
-                            ->withSum(['sales as total_quantity' => function ($query) use ($date) {
-                                $query->whereDate('created_at', $date);
-                            }], 'quantity')
-                            ->get(),
-                'categories' => Category::all(),
-                'filters' => $request->only(['date']),
-                'cat' => $category
-            ]);
-        } else {
-            $category = Category::first();
-            if ($category) {
-                return redirect()->route('unit.sales', $category);
-            } else {
-                return inertia('UnitSales', [
-                    'categories' => Category::all()
-                ]);
-            }
-        }
-    })->name('unit.sales');
+    Route::get('unit_sales/{category?}', [ReportsController::class, 'unitSales'])->name('unit.sales');
+    Route::get('inventory_costing', [ReportsController::class, 'costing'])->name('inventory.costing');
+
     Route::get('sales', [TransactionController::class, 'index'])->name('sales');
     Route::get('/pos', [POS::class, 'index'])->name('pos');
     Route::get('receipt/{id}', [TransactionController::class, 'show'])->name('receipt');
