@@ -20,6 +20,8 @@
         "vue": "^3.4.0"
     },
     "dependencies": {
-        "modern-screenshot": "^4.4.39"
+        "chart.js": "^4.4.2",
+        "modern-screenshot": "^4.4.39",
+        "vue-chartjs": "^5.3.1"
     }
 }

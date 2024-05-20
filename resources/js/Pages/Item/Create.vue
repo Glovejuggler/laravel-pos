@@ -3,10 +3,10 @@ import { Head, useForm } from '@inertiajs/vue3';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { ref } from 'vue';
-// import colors from 'tailwindcss/colors';
+import colors from 'tailwindcss/colors';
 
-// const tc = Object.keys(colors)
-//     .filter(key => typeof colors[key] === 'object')
+const tc = Object.keys(colors)
+    .filter(key => typeof colors[key] === 'object')
 
 const params = new URLSearchParams(window.location.search)
 
@@ -15,10 +15,11 @@ const form = useForm({
     image: '',
     name: '',
     price: '',
+    color: '',
     breakdown: []
 })
 
-// const selectedColor = ref('')
+const selectedColor = ref('')
 const newImage = ref(null)
 const imgTmp = ref(null)
 const showImage = () => {
@@ -55,25 +56,29 @@ const removeBreakdown = (index) => {
     <div class="max-w-screen-lg mx-auto mt-8">
         <p class="dark:text-white mb-8">New item</p>
         <div class="grid grid-cols-3 gap-4">
-            <div @click="newImage.click()"
-                class="h-72 w-72 rounded-lg overflow-hidden bg-zinc-700 flex justify-center items-center">
-                <i v-if="!form.image" class="bx bx-plus font-bold text-3xl text-white"></i>
-                <img v-if="form.image" :src="imgTmp" class="w-72 h-72 object-cover" alt="">
+            <div>
+                <div @click="newImage.click()"
+                    class="h-72 w-72 rounded-lg overflow-hidden bg-zinc-700 flex justify-center items-center">
+                    <i v-if="!form.image" class="bx bx-plus font-bold text-3xl text-white"></i>
+                    <img v-if="form.image" :src="imgTmp" class="w-72 h-72 object-cover" alt="">
+                </div>
+
+                <InputLabel class="mt-4" for="color" value="Color"/>
+                <div class="flex mt-2">
+                    <select v-model="form.color" id="color" name="color" @change="selectedColor = $event.target.value" class="rounded-lg border border-zinc-700 dark:bg-zinc-900 dark:text-white">
+                        <template v-for="color in tc">
+                            <option v-for="shade in colors[color]" :style="`background: ${shade} !important`" :value="shade">
+                                {{ shade }}
+                            </option>
+                        </template>
+                    </select>
+                    <div class="w-10 h-10 ml-4" :style="`background-color: ${selectedColor} !important`"></div>
+                </div>
             </div>
-            <div class="col-span-2 p-6 rounded-lg bg-zinc-800">
+            <div class="col-span-2 p-6 rounded-lg bg-white dark:bg-zinc-800 h-min">
                 <form @submit.prevent="form.post(route('items.store'))">
                     <input ref="newImage" @input="form.image = $event.target.files[0]" @change="showImage" type="file"
                         accept="image/*" hidden>
-                        <!-- <div class="flex">
-                            <select name="color" @change="selectedColor = $event.target.value">
-                                <template v-for="color in tc">
-                                    <option v-for="shade in colors[color]" :style="`background: ${shade} !important`" :value="shade">
-                                        {{ shade }}
-                                    </option>
-                                </template>
-                            </select>
-                            <div class="w-5 h-5" :style="`background-color: ${selectedColor} !important`"></div>
-                        </div> -->
                     <InputLabel for="name" value="Name" />
                     <TextInput id="name" type="text" v-model="form.name" class="mt-2 w-full block" />
 

@@ -49,7 +49,7 @@ Route::get('/dashboard', function () {
     // dd($finishedOrders->get()->sum('elapsed') / $finishedOrders->count());
     return Inertia::render('Dashboard', [
         'items' => Item::count(),
-        'avgS' => $finishedOrders->get()->sum('elapsed') / $finishedOrders->count()
+        'avgS' => $finishedOrders->count() ? $finishedOrders->get()->sum('elapsed') / $finishedOrders->count() : 0
     ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 

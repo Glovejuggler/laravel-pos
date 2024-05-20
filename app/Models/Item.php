@@ -12,7 +12,7 @@ class Item extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'price', 'pic', 'category_id'];
+    protected $fillable = ['name', 'price', 'pic', 'category_id', 'color'];
 
     protected $appends = ['cost'];
 

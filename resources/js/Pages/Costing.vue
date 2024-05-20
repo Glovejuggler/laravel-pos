@@ -2,29 +2,34 @@
 import { Head } from '@inertiajs/vue3';
 
 const props = defineProps({
-    costing: Object
+    costing: Object,
+    total: Number
 })
-
-console.log(props.costing)
 </script>
 
 <template>
 <Head>
-    <title>Inventory Costing</title>
+    <title>
+        Inventory Costing
+    </title>
 </Head>
 
-<div class="max-w-5xl mx-auto py-8">
+<div class="max-w-2xl mx-auto py-8">
     <table class="w-full table bg-white dark:bg-zinc-800 dark:text-white">
-        <thead>
+        <thead class="text-left">
             <tr>
-                <th>D</th>
-                <th>Cost</th>
+                <th class="px-4 py-2">Inventory</th>
+                <th class="px-4 py-2">Cost</th>
             </tr>
         </thead>
         <tbody>
-            <tr v-for="cost in costing">
-                <td>{{ cost.name }}</td>
-                <td>{{ (cost.cost * cost.totalSold).amountFormat() }}</td>
+            <tr class="odd:bg-zinc-700" v-for="cost in costing">
+                <td class="px-4 py-2">{{ cost.name }}</td>
+                <td class="px-4 py-2">{{ (cost.total).amountFormat() }}</td>
+            </tr>
+            <tr class="font-bold">
+                <td class="px-4 py-2">Total</td>
+                <td class="px-4 py-2">{{ total.amountFormat() }}</td>
             </tr>
         </tbody>
     </table>

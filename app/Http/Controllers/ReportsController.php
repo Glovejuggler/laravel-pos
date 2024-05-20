@@ -17,7 +17,6 @@ class ReportsController extends Controller
      */
     public function unitSales(Request $request, Category $category = null)
     {
-        // dd($request);
         if ($category) {
             $date = $request->date ? Carbon::parse($request->date) : today();
             return inertia('UnitSales', [
@@ -68,8 +67,20 @@ class ReportsController extends Controller
             });
         }],'quantity')->get();
 
+        $merged = $costing->groupBy(function ($g) {
+            return strtoupper($g->name);
+        })->map(function ($group) {
+            return [
+                'name' => $group->first()->name,
+                'total' => $group->sum(function ($c) {
+                    return $c->totalSold * $c->cost;
+                }),
+            ];
+        });
+
         return inertia('Costing', [
-            'costing' => $costing
+            'costing' => $merged,
+            'total' => $merged->sum('total')
         ]);
     }
 }

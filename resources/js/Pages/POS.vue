@@ -124,10 +124,10 @@ const printReceipt = () => {
 
     <div class="fixed w-9/12 top-0 bottom-10 left-0 select-none bg-white overflow-y-auto" @contextmenu.prevent="">
         <div class="p-4 flex flex-wrap">
-            <div class="item border flex w-48 h-48 relative active:scale-95 duration-150 ease-in-out rounded-md overflow-hidden"
+            <div :style="`background: ${item.color ?? 'white'} !important`" class="item border flex w-48 h-48 relative active:scale-95 duration-150 ease-in-out rounded-md overflow-hidden"
                 v-for="item in visibleItems" @click="addToCart(item)" ontouchstart>
-                <img draggable="false" @contextmenu.prevent="" @dragstart.prevent="" :src="`../storage/${item.pic}`"
-                    class="w-48 h-48 object-cover" height="25px" width="25px" alt="">
+                <img v-if="item.pic" draggable="false" @contextmenu.prevent="" @dragstart.prevent="" :src="`../storage/${item.pic}`"
+                    class="w-48 h-48 object-cover" height="25px" width="25px">
                 <p class="absolute bottom-0 inset-x-0 bg-black/50 p-2 text-white">{{ item.name }}</p>
                 <span class="absolute top-2 right-2 bg-black/50 text-white rounded-lg p-1">{{ item.price }}</span>
             </div>

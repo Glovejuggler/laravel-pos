@@ -43,7 +43,7 @@ const nextable = date < new Date(new Date().setHours(0, 0, 0, 0))
             </thead>
             <tbody>
                 <tr v-for="transaction in transactions" class="bg-white dark:bg-zinc-800 border-b border-zinc-600">
-                    <td class="px-4 py-2">{{ transaction.name ?? '-' }}</td>
+                    <td class="px-4 py-2">{{ transaction.name ?? `#${transaction.number}` }}</td>
                     <td class="px-4 py-2">{{ new Date(transaction.created_at).toTimeFormat() }} <span class="text-xs opacity-70">{{ transaction.elapsed }}s</span></td>
                     <td class="px-4 py-2">{{ new Date(transaction.created_at).toWordFormat() }}</td>
                     <td class="px-4 py-2">
@@ -52,8 +52,8 @@ const nextable = date < new Date(new Date().setHours(0, 0, 0, 0))
                         </div>
                     </td>
                     <td class="px-4 py-2">{{ transaction.quantity }}</td>
-                    <td class="px-4 py-2">{{ transaction.gross }}</td>
-                    <td class="px-4 py-2">{{ transaction.gross - transaction.cost }}</td>
+                    <td class="px-4 py-2">{{ transaction.gross.amountFormat() }}</td>
+                    <td class="px-4 py-2">{{ (transaction.gross - transaction.cost).amountFormat() }}</td>
                     <td class="px-4 py-2"><i class='bx bx-printer dark:text-white'></i></td>
                 </tr>
                 <tr class="bg-white font-bold dark:bg-zinc-800 border-b border-zinc-600">
@@ -62,8 +62,8 @@ const nextable = date < new Date(new Date().setHours(0, 0, 0, 0))
                     <td class="px-4 py-2"></td>
                     <td class="px-4 py-2"></td>
                     <td class="px-4 py-2"></td>
-                    <td class="px-4 py-2">{{ total.gross }}</td>
-                    <td class="px-4 py-2">{{ total.gross - total.cost }}</td>
+                    <td class="px-4 py-2">{{ total.gross.amountFormat() }}</td>
+                    <td class="px-4 py-2">{{ (total.gross - total.cost).amountFormat() }}</td>
                     <td class="px-4 py-2"></td>
                 </tr>
             </tbody>

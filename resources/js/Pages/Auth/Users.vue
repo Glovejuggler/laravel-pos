@@ -98,14 +98,14 @@ const closeModal = () => {
             <p class="font-bold mb-4">NEW USER</p>
 
             <InputLabel for="newUserEmail" value="Email" />
-            <TextInput class="w-full mb-2" v-model="newUserForm.email" name="newUserEmail" id="newUserEmail"
+            <TextInput @keyup.enter="submitNewUserForm" class="w-full mb-2" v-model="newUserForm.email" name="newUserEmail" id="newUserEmail"
                 type="email" />
 
             <InputLabel for="newUserName" value="Name" />
-            <TextInput class="w-full mb-2" v-model="newUserForm.name" name="newUserName" id="newUserName" type="text" />
+            <TextInput @keyup.enter="submitNewUserForm" class="w-full mb-2" v-model="newUserForm.name" name="newUserName" id="newUserName" type="text" />
 
             <InputLabel for="newUserPassword" value="Password" />
-            <TextInput class="w-full" v-model="newUserForm.password" name="newUserPassword" id="newUserPassword"
+            <TextInput @keyup.enter="submitNewUserForm" class="w-full" v-model="newUserForm.password" name="newUserPassword" id="newUserPassword"
                 type="password" />
 
             <button @click="submitNewUserForm"
@@ -122,15 +122,15 @@ const closeModal = () => {
             <p class="font-bold mb-4">EDIT USER</p>
 
             <InputLabel for="editUserEmail" value="Email" />
-            <TextInput class="w-full mb-2" v-model="editUserForm.email" name="editUserEmail" id="editUserEmail"
+            <TextInput @keyup.enter="submitEditUserForm" class="w-full mb-2" v-model="editUserForm.email" name="editUserEmail" id="editUserEmail"
                 type="email" />
 
             <InputLabel for="editUserName" value="Name" />
-            <TextInput class="w-full mb-2" v-model="editUserForm.name" name="editUserName" id="editUserName"
+            <TextInput @keyup.enter="submitEditUserForm" class="w-full mb-2" v-model="editUserForm.name" name="editUserName" id="editUserName"
                 type="text" />
 
             <InputLabel for="editUserPassword" value="Password" />
-            <TextInput class="w-full" v-model="editUserForm.password" name="editUserPassword" id="editUserPassword"
+            <TextInput @keyup.enter="submitEditUserForm" class="w-full" v-model="editUserForm.password" name="editUserPassword" id="editUserPassword"
                 type="password" />
 
             <button @click="submitEditUserForm"

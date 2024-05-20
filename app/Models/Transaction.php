@@ -14,11 +14,16 @@ class Transaction extends Model
 
     protected $fillable = ['name', 'payment', 'type'];
 
-    protected $appends = ['price', 'quantity', 'gross', 'cost', 'elapsed'];
+    protected $appends = ['number', 'price', 'quantity', 'gross', 'cost', 'elapsed'];
 
     public function items(): HasMany
     {
         return $this->hasMany(SoldItem::class);
+    }
+
+    public function getNumberAttribute()
+    {
+        return $this->id - Transaction::withTrashed()->whereDate('created_at', $this->created_at)->first()->id + 1;
     }
 
     public function getPriceAttribute()

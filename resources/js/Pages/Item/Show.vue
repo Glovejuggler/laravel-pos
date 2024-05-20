@@ -4,20 +4,28 @@ import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { ref } from 'vue';
 import Modal from '@/Components/Modal.vue';
+import colors from 'tailwindcss/colors';
+
+const tc = Object.keys(colors)
+    .filter(key => typeof colors[key] === 'object')
 
 const props = defineProps({
     item: Object,
     categories: Object
 })
 
+console.log(props.item)
+
 const form = useForm({
     category_id: props.item.category_id,
     image: '',
     name: props.item.name,
     price: props.item.price,
+    color: props.item.color,
     breakdown: props.item.costing
 })
 
+const selectedColor = ref(form.color)
 const newImage = ref(null)
 const imgTmp = ref(null)
 const showImage = () => {
@@ -56,15 +64,29 @@ const showDeleteConfirmationModal = ref(false)
     <div class="max-w-screen-lg mx-auto mt-8">
         <p class="dark:text-white mb-8">{{ item.name }}</p>
         <div class="lg:grid grid-cols-3 gap-4">
-            <div @click="newImage.click()"
-                class="h-72 w-72 rounded-lg overflow-hidden bg-zinc-700 flex justify-center items-center relative group">
-                <div v-if="item.pic"
-                    class="absolute inset-0 flex justify-center items-center bg-black/40 group-hover:opacity-100 opacity-0 duration-200 ease-in-out">
-                    <i class='bx bx-photo-album text-5xl text-white p-3 rounded-full'></i>
+            <div>
+                <div @click="newImage.click()"
+                    class="h-72 w-72 rounded-lg overflow-hidden bg-zinc-700 flex justify-center items-center relative group">
+                    <div v-if="item.pic"
+                        class="absolute inset-0 flex justify-center items-center bg-black/40 group-hover:opacity-100 opacity-0 duration-200 ease-in-out">
+                        <i class='bx bx-photo-album text-5xl text-white p-3 rounded-full'></i>
+                    </div>
+                    <i v-if="!form.image && !item.pic" class="bx bx-plus font-bold text-3xl text-white"></i>
+                    <img v-if="form.image || item.pic" :src="imgTmp || `../../storage/${item.pic}`"
+                        class="w-72 h-72 object-cover" alt="">
                 </div>
-                <i v-if="!form.image && !item.pic" class="bx bx-plus font-bold text-3xl text-white"></i>
-                <img v-if="form.image || item.pic" :src="imgTmp || `../../storage/${item.pic}`"
-                    class="w-72 h-72 object-cover" alt="">
+
+                <InputLabel class="mt-4" for="color" value="Color"/>
+                <div class="flex mt-2">
+                    <select v-model="form.color" id="color" name="color" @change="selectedColor = $event.target.value" class="rounded-lg border border-zinc-700 dark:bg-zinc-900 dark:text-white">
+                        <template v-for="color in tc">
+                            <option v-for="shade in colors[color]" :style="`background: ${shade} !important`" :value="shade">
+                                {{ shade }}
+                            </option>
+                        </template>
+                    </select>
+                    <div class="w-10 h-10 ml-4" :style="`background-color: ${selectedColor} !important`"></div>
+                </div>
             </div>
             <div class="col-span-2 p-6 rounded-lg bg-zinc-800">
                 <form @submit.prevent="form.post(route('items.update', item))" enctype="multipart/form-data">
