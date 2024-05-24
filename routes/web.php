@@ -5,6 +5,7 @@ use App\Models\Item;
 use Inertia\Inertia;
 use App\Models\Costing;
 use App\Models\Category;
+use App\Models\SoldItem;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Http\Controllers\POS;
@@ -46,10 +47,16 @@ Route::get('/dashboard', function () {
 
     // dd($time/$t->count());
     $finishedOrders = Transaction::onlyTrashed();
-    // dd($finishedOrders->get()->sum('elapsed') / $finishedOrders->count());
+
+    $transactionCount = $finishedOrders->count();
+    $soldItemsCount = SoldItem::whereHas('transaction', function ($query) {
+        $query->onlyTrashed();
+    })->sum('quantity');
+        // dd($finishedOrders->get()->sum('elapsed') / $finishedOrders->count());
     return Inertia::render('Dashboard', [
         'items' => Item::count(),
-        'avgS' => $finishedOrders->count() ? $finishedOrders->get()->sum('elapsed') / $finishedOrders->count() : 0
+        'avgS' => $transactionCount ? $finishedOrders->get()->sum('elapsed') / $finishedOrders->count() : 0,
+        'sold' => $soldItemsCount,
     ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 

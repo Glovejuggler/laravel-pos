@@ -11,9 +11,4 @@ class Costing extends Model
     use HasFactory;
 
     public $fillable = ['name', 'cost', 'item_id'];
-
-    public function sold(): HasMany
-    {
-        return $this->hasMany(SoldItem::class, 'item_id', 'item_id');
-    }
 }

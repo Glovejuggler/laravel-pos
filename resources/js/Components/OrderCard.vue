@@ -46,7 +46,7 @@ const finishOrder = () => {
 }).format(new Date(order.created_at)) }}</p>
         <p>Customer: {{ order.name }}</p>
         <p v-for="item in order.items">
-            {{ `${item.item.name} x${item.quantity}` }}
+            {{ `${item.name} x${item.quantity}` }}
         </p>
 
         <p>{{ order.type }}</p>

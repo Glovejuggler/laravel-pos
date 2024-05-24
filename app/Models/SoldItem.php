@@ -5,20 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SoldItem extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['transaction_id', 'item_id', 'quantity'];
+    protected $fillable = ['transaction_id', 'category', 'name', 'price', 'quantity'];
 
-    protected $with = ['item'];
+    protected $appends = ['gross', 'cost'];
 
-    protected $appends = ['price', 'cost'];
-
-    public function item(): BelongsTo
+    public function costing(): HasMany
     {
-        return $this->belongsTo(Item::class);
+        return $this->hasMany(SoldCost::class);
     }
 
     public function transaction(): BelongsTo
@@ -26,13 +25,13 @@ class SoldItem extends Model
         return $this->belongsTo(Transaction::class);
     }
 
-    public function getPriceAttribute()
+    public function getGrossAttribute()
     {
-        return $this->item->price * $this->quantity;
+        return $this->price * $this->quantity;
     }
 
     public function getCostAttribute()
     {
-        return $this->item->cost * $this->quantity;
+        return $this->costing->sum('cost') * $this->quantity;
     }
 }

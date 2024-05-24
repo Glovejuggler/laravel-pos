@@ -58,14 +58,14 @@ const removeBreakdown = (index) => {
         <div class="grid grid-cols-3 gap-4">
             <div>
                 <div @click="newImage.click()"
-                    class="h-72 w-72 rounded-lg overflow-hidden bg-zinc-700 flex justify-center items-center">
-                    <i v-if="!form.image" class="bx bx-plus font-bold text-3xl text-white"></i>
+                    class="h-72 w-72 rounded-lg overflow-hidden bg-white dark:bg-zinc-700 flex justify-center items-center">
+                    <i v-if="!form.image" class="bx bx-plus font-bold text-3xl dark:text-white"></i>
                     <img v-if="form.image" :src="imgTmp" class="w-72 h-72 object-cover" alt="">
                 </div>
 
                 <InputLabel class="mt-4" for="color" value="Color"/>
                 <div class="flex mt-2">
-                    <select v-model="form.color" id="color" name="color" @change="selectedColor = $event.target.value" class="rounded-lg border border-zinc-700 dark:bg-zinc-900 dark:text-white">
+                    <select v-model="form.color" id="color" name="color" @change="selectedColor = $event.target.value" class="rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 dark:text-white">
                         <template v-for="color in tc">
                             <option v-for="shade in colors[color]" :style="`background: ${shade} !important`" :value="shade">
                                 {{ shade }}

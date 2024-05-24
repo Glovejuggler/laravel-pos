@@ -97,11 +97,11 @@ const editCatForm = useForm({
             <div class="flex justify-between items-center px-4 dark:text-white">
                 <span>Categories</span>
                 <i @click="addNewCategory"
-                    class='bx bx-plus rounded-full hover:bg-white/20 w-8 h-8 inline-flex justify-center items-center duration-200 ease-in-out'></i>
+                    class='bx bx-plus rounded-full hover:bg-black/20 dark:hover:bg-white/20 w-8 h-8 inline-flex justify-center items-center duration-200 ease-in-out'></i>
             </div>
             <hr class="border-zinc-600 mt-1">
             <div v-for="category in categories" @click.stop="$inertia.get(route('items.index', category))"
-                :class="{ 'bg-blue-500 hover:bg-blue-500': $page.url.replace('%20', ' ') === `/items/${category.name}` }"
+                :class="{ 'bg-blue-500 hover:bg-blue-500 font-bold text-white': $page.url.replace('%20', ' ') === `/items/${category.name}` }"
                 class="dark:text-white px-4 py-2 duration-200 ease-in-out flex justify-between group cursor-pointer">
                     <span>{{ category.name }}</span>
                     <div class="invisible group-hover:visible space-x-2">
@@ -114,7 +114,7 @@ const editCatForm = useForm({
             <div v-if="category" class="flex items-center mb-4">
                 <span class="font-semibold mr-8">Products</span>
                 <i @click="$inertia.get(route('items.create'), { category: category.id })"
-                    class="bx bx-plus rounded-full hover:bg-white/20 w-8 h-8 inline-flex justify-center items-center duration-200 ease-in-out"></i>
+                    class="bx bx-plus rounded-full hover:bg-black/20 dark:hover:bg-white/20 w-8 h-8 inline-flex justify-center items-center duration-200 ease-in-out"></i>
             </div>
             <div class="grid grid-cols-4 gap-2">
                 <div @click="$inertia.get(route('items.show', item.id))" v-for="item in items"
@@ -122,7 +122,7 @@ const editCatForm = useForm({
                     <div class="bg-zinc-500">
                         <img v-if="item.pic" :src="`../storage/${item.pic}`">
                     </div>
-                    <div class="bg-zinc-800 p-4 rounded-b-lg">{{ item.name }}</div>
+                    <div class="bg-white dark:bg-zinc-800 p-4 rounded-b-lg">{{ item.name }}</div>
                 </div>
             </div>
         </div>

@@ -39,7 +39,7 @@ watch(form, (data) => {
     </Head>
 
     <div class="max-w-screen-lg flex mx-auto mt-8">
-        <div class="w-1/6 bg-white dark:bg-zinc-800 py-4 rounded-lg h-min">
+        <div class="w-1/6 bg-white dark:bg-zinc-800 border py-4 rounded-lg h-min">
             <div class="flex justify-between items-center px-4 dark:text-white">
                 <span>Categories</span>
             </div>
@@ -47,34 +47,34 @@ watch(form, (data) => {
             <div v-for="category in categories" @click.stop="$inertia.get(route('unit.sales', category), form, {
                 preserveState: true, preserveScroll: true, replace: true
             })"
-                :class="{ 'bg-blue-500 hover:bg-blue-500 font-bold': $page.url.replace('%20', ' ').indexOf(category.name) > -1 }"
+                :class="{ 'bg-blue-500 hover:bg-blue-500 font-bold text-white': $page.url.replace('%20', ' ').indexOf(category.name) > -1 }"
                 class="dark:text-white px-4 py-2 duration-200 ease-in-out flex justify-between group cursor-pointer">
                     <span>{{ category.name }}</span>
             </div>
         </div>
         <div class="w-5/6 px-4 dark:text-white">
-            <div class="flex justify-between">
-                <div class="mb-4 flex space-x-2">
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex space-x-2">
                     <i @click="form.date = new Date(date.setDate(date.getDate() - 1)).toLocaleDateString()"
-                        class='bx bxs-chevron-left dark:text-white hover:bg-white hover:text-zinc-100 dark:hover:text-zinc-900 w-6 h-6 inline-flex justify-center items-center rounded-full border dark:border-white'></i>
+                        class='bx bxs-chevron-left dark:text-white hover:bg-white hover:text-zinc-900 w-6 h-6 inline-flex justify-center items-center rounded-full border dark:border-white'></i>
                     <p class="dark:text-white font-semibold">{{ date.toWordFormat() }}</p>
                     <i v-if="nextable"
                         @click="form.date = new Date(date.setDate(date.getDate() + 1)).toLocaleDateString()"
-                        class='bx bxs-chevron-right dark:text-white hover:bg-white hover:text-zinc-100 dark:hover:text-zinc-900 w-6 h-6 inline-flex justify-center items-center rounded-full border dark:border-white'></i>
+                        class='bx bxs-chevron-right dark:text-white hover:bg-white hover:text-zinc-900 w-6 h-6 inline-flex justify-center items-center rounded-full border dark:border-white'></i>
                 </div>
 
                 <div>
                     <label class="relative block">
                     <input v-model="form.search"
-                        class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none duration-300 ease-in-out placeholder:text-xs placeholder:text-zinc-400 text-white block bg-zinc-900 w-full border-slate-300 dark:border-slate-300/20 rounded-md py-2 pl-3 pr-9 shadow-sm focus:border-indigo-300 focus:ring-indigo-200 focus:ring focus:ring-opacity-50"
+                        class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none duration-300 ease-in-out placeholder:text-xs placeholder:text-zinc-400 dark:text-white block bg-shite dark:bg-zinc-900 w-full border-slate-300 dark:border-slate-300/20 rounded-md py-2 pl-3 pr-9 shadow-sm focus:border-indigo-300 focus:ring-indigo-200 focus:ring focus:ring-opacity-50"
                         placeholder="Search" type="text" name="search" />
                     <i
-                        class='bx bx-search text-white/40 absolute text-xl inset-y-0 right-0 flex items-center pr-3 hover:text-red-500'></i>
+                        class='bx bx-search text-black/40 dark:text-white/40 absolute text-xl inset-y-0 right-0 flex items-center pr-3'></i>
                 </label>
                 </div>
             </div>
 
-            <table class="w-full bg-zinc-800">
+            <table class="w-full bg-white dark:bg-zinc-800 rounded-lg border shadow-sm">
                 <thead class="text-left">
                     <tr>
                         <th class="px-4 py-2">Item</th>
@@ -85,7 +85,7 @@ watch(form, (data) => {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="odd:bg-zinc-700" v-for="item in items">
+                    <tr class="dark:odd:bg-zinc-700" v-for="item in items">
                         <td class="px-4 py-2">{{ item.name }}</td>
                         <td class="px-4 py-2">{{ item.total_quantity }}</td>
                         <td class="px-4 py-2 text-right">{{ (item.total_quantity * item.price).amountFormat() ?? 0 }}</td>

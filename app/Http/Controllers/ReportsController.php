@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\Item;
 use App\Models\Costing;
 use App\Models\Category;
+use App\Models\SoldCost;
 use App\Models\SoldItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,6 +18,7 @@ class ReportsController extends Controller
      */
     public function unitSales(Request $request, Category $category = null)
     {
+        // dd(SoldItem::all(), SoldCost::all());
         if ($category) {
             $date = $request->date ? Carbon::parse($request->date) : today();
             return inertia('UnitSales', [
@@ -48,20 +50,7 @@ class ReportsController extends Controller
      */
     public function costing()
     {
-        // $costing = Costing::withCount(['sold' => function ($query) {
-        //     $query->whereDate('created_at', today());
-        // }])->get();
-        // $costing = Costing::withCount(['sold' => function ($q) {
-        //     return $q->sold->quantity;
-        // }])->get();
-        // $costing = SoldItem::with(['item.costing', 'item'])
-        //                     ->select('costings.name', 'items.*',
-        //                             DB::raw('SUM(sold_items.quantity) as total_quantity'))
-        //                     ->join('items', 'sold_items.item_id', '=', 'items.id')
-        //                     ->join('costings', 'items.id', '=', 'costings.item_id')
-        //                     ->groupBy('costings.name')
-        //                     ->get();
-        $costing = Costing::withSum(['sold as totalSold' => function ($q) {
+        $costing = SoldCost::withSum(['sold as totalSold' => function ($q) {
             $q->whereHas('transaction', function ($q) {
                 $q->onlyTrashed()->whereNotNull('deleted_at');
             });

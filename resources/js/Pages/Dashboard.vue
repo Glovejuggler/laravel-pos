@@ -3,7 +3,8 @@ import { Head } from '@inertiajs/vue3';
 
 const props = defineProps({
     items: Number,
-    avgS: Number
+    avgS: Number,
+    sold: Number,
 })
 </script>
 
@@ -38,12 +39,19 @@ const props = defineProps({
             </div>
 
             <p class="mt-4 font-bold uppercase dark:text-white">Stats</p>
-            <div class="grid grid-cols-6 gap-2">
+            <div class="grid lg:grid-cols-6 gap-2">
                 <div class="bg-gradient-to-br from-violet-900 to-sky-400 overflow-hidden shadow-sm rounded-lg p-2 md:p-4 relative group flex justify-center items-center">
                     <div class="flex justify-center items-center flex-col">
                         <p class="font-bold text-white text-xs lg:text-3xl">{{ avgS.toLocaleString(undefine,{minimumFractionDigits:2,maximumFractionDigits:2}) }}s</p>
                         <i class="text-white text-sm font-bold block lg:hidden bx bx-timer"></i>
                         <p class="text-white text-xs font-bold lg:block hidden">AVG SERVING TIME</p>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-br from-violet-900 to-sky-400 overflow-hidden shadow-sm rounded-lg p-2 md:p-4 relative group flex justify-center items-center">
+                    <div class="flex justify-center items-center flex-col">
+                        <p class="font-bold text-white text-xs lg:text-3xl">{{ sold }}</p>
+                        <i class="text-white text-sm font-bold block lg:hidden bx bx-money-withdraw"></i>
+                        <p class="text-white text-xs font-bold lg:block hidden">TOTAL SOLD</p>
                     </div>
                 </div>
             </div>

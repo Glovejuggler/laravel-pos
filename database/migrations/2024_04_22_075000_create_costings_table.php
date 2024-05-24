@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('name');
             $table->decimal('cost', 11, 2);
             $table->smallInteger('item_id');
-            $table->softDeletes();
             $table->timestamps();
         });
     }

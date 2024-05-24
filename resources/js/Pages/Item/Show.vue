@@ -66,19 +66,19 @@ const showDeleteConfirmationModal = ref(false)
         <div class="lg:grid grid-cols-3 gap-4">
             <div>
                 <div @click="newImage.click()"
-                    class="h-72 w-72 rounded-lg overflow-hidden bg-zinc-700 flex justify-center items-center relative group">
+                    class="h-72 w-72 rounded-lg overflow-hidden bg-white dark:bg-zinc-700 flex justify-center items-center relative group">
                     <div v-if="item.pic"
                         class="absolute inset-0 flex justify-center items-center bg-black/40 group-hover:opacity-100 opacity-0 duration-200 ease-in-out">
                         <i class='bx bx-photo-album text-5xl text-white p-3 rounded-full'></i>
                     </div>
-                    <i v-if="!form.image && !item.pic" class="bx bx-plus font-bold text-3xl text-white"></i>
+                    <i v-if="!form.image && !item.pic" class="bx bx-plus font-bold text-3xl dark:text-white"></i>
                     <img v-if="form.image || item.pic" :src="imgTmp || `../../storage/${item.pic}`"
                         class="w-72 h-72 object-cover" alt="">
                 </div>
 
                 <InputLabel class="mt-4" for="color" value="Color"/>
                 <div class="flex mt-2">
-                    <select v-model="form.color" id="color" name="color" @change="selectedColor = $event.target.value" class="rounded-lg border border-zinc-700 dark:bg-zinc-900 dark:text-white">
+                    <select v-model="form.color" id="color" name="color" @change="selectedColor = $event.target.value" class="rounded-lg border border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white">
                         <template v-for="color in tc">
                             <option v-for="shade in colors[color]" :style="`background: ${shade} !important`" :value="shade">
                                 {{ shade }}
@@ -88,7 +88,7 @@ const showDeleteConfirmationModal = ref(false)
                     <div class="w-10 h-10 ml-4" :style="`background-color: ${selectedColor} !important`"></div>
                 </div>
             </div>
-            <div class="col-span-2 p-6 rounded-lg bg-zinc-800">
+            <div class="col-span-2 p-6 rounded-lg bg-white dark:bg-zinc-800">
                 <form @submit.prevent="form.post(route('items.update', item))" enctype="multipart/form-data">
                     <input ref="newImage" @input="form.image = $event.target.files[0]" @change="showImage" type="file"
                         accept="image/*" hidden>

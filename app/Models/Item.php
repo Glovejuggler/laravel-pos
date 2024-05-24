@@ -33,7 +33,7 @@ class Item extends Model
 
     public function sales(): HasMany
     {
-        return $this->hasMany(SoldItem::class);
+        return $this->hasMany(SoldItem::class, 'name', 'name');
     }
 
     public function scopeFilter($query, array $filters)

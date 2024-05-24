@@ -14,7 +14,7 @@ class Transaction extends Model
 
     protected $fillable = ['name', 'payment', 'type'];
 
-    protected $appends = ['number', 'price', 'quantity', 'gross', 'cost', 'elapsed'];
+    protected $appends = ['number', 'quantity', 'gross', 'cost', 'elapsed'];
 
     public function items(): HasMany
     {
@@ -26,11 +26,6 @@ class Transaction extends Model
         return $this->id - Transaction::withTrashed()->whereDate('created_at', $this->created_at)->first()->id + 1;
     }
 
-    public function getPriceAttribute()
-    {
-        return $this->items->sum('item.price');
-    }
-
     public function getQuantityAttribute()
     {
         return $this->items->sum('quantity');
@@ -38,7 +33,7 @@ class Transaction extends Model
 
     public function getGrossAttribute()
     {
-        return $this->items->sum('price');
+        return $this->items->sum('gross');
     }
 
     public function getCostAttribute()

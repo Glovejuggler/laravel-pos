@@ -11,13 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sold_items', function (Blueprint $table) {
+        Schema::create('sold_costs', function (Blueprint $table) {
             $table->id();
-            $table->smallInteger('transaction_id');
-            $table->string('category');
+            $table->smallInteger('sold_item_id');
             $table->string('name');
-            $table->decimal('price', 11, 2);
-            $table->smallInteger('quantity');
+            $table->decimal('cost', 11, 2);
             $table->timestamps();
         });
     }
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sold_items');
+        Schema::dropIfExists('sold_costs');
     }
 };

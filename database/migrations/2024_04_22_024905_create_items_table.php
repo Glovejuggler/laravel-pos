@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('color')->nullable();
             $table->decimal('price', 11, 2);
             $table->smallInteger('category_id');
-            $table->softDeletes();
             $table->timestamps();
         });
     }

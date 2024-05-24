@@ -23,11 +23,11 @@ const props = defineProps({
             </tr>
         </thead>
         <tbody>
-            <tr class="odd:bg-zinc-700" v-for="cost in costing">
+            <tr class="dark:odd:bg-zinc-700 odd:bg-zinc-200" v-for="cost in costing">
                 <td class="px-4 py-2">{{ cost.name }}</td>
                 <td class="px-4 py-2">{{ (cost.total).amountFormat() }}</td>
             </tr>
-            <tr class="font-bold">
+            <tr class="font-bold dark:odd:bg-zinc-700 odd:bg-zinc-200">
                 <td class="px-4 py-2">Total</td>
                 <td class="px-4 py-2">{{ total.amountFormat() }}</td>
             </tr>

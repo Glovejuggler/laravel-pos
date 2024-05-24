@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\SoldCost;
 use App\Models\SoldItem;
 use App\Events\OrderPlaced;
 use App\Models\Transaction;
@@ -59,11 +60,21 @@ class TransactionController extends Controller
             $order = Transaction::create($request->validated());
     
             foreach ($request->items as $item) {
-                SoldItem::create([
+                $soldItem = SoldItem::create([
                     'transaction_id' => $order->id,
-                    'item_id' => $item['id'],
+                    'name' => $item['name'],
+                    'category' => $item['category']['name'],
+                    'price' => $item['price'],
                     'quantity' => $item['count']
                 ]);
+
+                foreach ($item['costing'] as $cost) {
+                    SoldCost::create([
+                        'sold_item_id' => $soldItem->id,
+                        'name' => $cost['name'],
+                        'cost' => $cost['cost'],
+                    ]);
+                }
             }
             
             OrderPlaced::dispatch($order->id);
@@ -115,13 +126,18 @@ class TransactionController extends Controller
     /**
      * Force delete the specified resource
      */
-    public function raze($id)
+    public function raze($id, Request $request)
     {
-        $transaction = Transaction::findOrFail($id);
+        $transaction = Transaction::withTrashed()->findOrFail($id);
+        SoldCost::where('sold_item_id', SoldItem::whereBelongsTo($transaction)->pluck('id'))->delete();
         SoldItem::where('transaction_id', $transaction->id)->delete();
 
         $transaction->forceDelete();
 
-        return 'Order cancelled';
+        if ($request->wantsJson()) {
+            return 'Order cancelled';
+        } else {
+            return redirect()->back();
+        }
     }
 }
