@@ -75,9 +75,12 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        Item::where('category_id', $category->id)->update([
-            'category_id' => 69420
-        ]);
+    	if (Item::where('category_id',$category->id)->exists()) {
+        	Item::where('category_id', $category->id)->update([
+        		'category_id' => 999
+    		]);
+    	}
+
         $category->delete();
 
         return redirect()->back();

@@ -39,7 +39,7 @@ watch(form, (data) => {
     </Head>
 
     <div class="max-w-screen-lg flex mx-auto mt-8">
-        <div class="w-1/6 bg-white dark:bg-zinc-800 border py-4 rounded-lg h-min">
+        <div class="w-1/6 bg-white dark:bg-zinc-800 border dark:border-zinc-700 py-4 rounded-lg h-min">
             <div class="flex justify-between items-center px-4 dark:text-white">
                 <span>Categories</span>
             </div>
@@ -74,7 +74,7 @@ watch(form, (data) => {
                 </div>
             </div>
 
-            <table class="w-full bg-white dark:bg-zinc-800 rounded-lg border shadow-sm">
+            <table class="w-full bg-white dark:bg-zinc-800 rounded-lg border dark:border-zinc-700 shadow-sm">
                 <thead class="text-left">
                     <tr>
                         <th class="px-4 py-2">Item</th>

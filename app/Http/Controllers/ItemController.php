@@ -141,13 +141,6 @@ class ItemController extends Controller
 
         Costing::where('item_id', $item->id)->delete();
         
-        $sold = SoldItem::where('item_id', $item->id)->get();
-        if ($sold) {
-            foreach ($sold as $kitchenItem) {
-                $kitchenItem->delete();
-            }
-        }
-        
         $item->delete();
 
         return redirect()->route('items.index');

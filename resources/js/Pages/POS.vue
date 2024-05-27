@@ -123,20 +123,20 @@ const printReceipt = () => {
     </Head>
 
     <div class="fixed w-9/12 top-0 bottom-10 left-0 select-none bg-white overflow-y-auto" @contextmenu.prevent="">
-        <div class="p-4 flex flex-wrap">
-            <div :style="`background: ${item.color ?? 'white'} !important`" class="item border flex w-48 h-48 relative active:scale-95 duration-150 ease-in-out rounded-md overflow-hidden"
+        <div class="p-4 grid grid-cols-4 lg:grid-cols-5 gap-2">
+            <div :style="`background: ${item.color ?? 'white'} !important`" class="item border flex w-full aspect-square relative active:scale-95 duration-150 ease-in-out rounded-md overflow-hidden"
                 v-for="item in visibleItems" @click="addToCart(item)" ontouchstart>
                 <img v-if="item.pic" draggable="false" @contextmenu.prevent="" @dragstart.prevent="" :src="`../storage/${item.pic}`"
-                    class="w-48 h-48 object-cover" height="25px" width="25px">
-                <p class="absolute bottom-0 inset-x-0 bg-black/50 p-2 text-white">{{ item.name }}</p>
+                    class="w-full aspect-square object-cover" height="25px" width="25px">
+                <p class="absolute bottom-0 inset-x-0 bg-black/50 p-2 text-white text-xs md:text-sm lg:text-base">{{ item.name }}</p>
                 <span class="absolute top-2 right-2 bg-black/50 text-white rounded-lg p-1">{{ item.price }}</span>
             </div>
         </div>
 
-        <div class="fixed bottom-0 w-full bg-zinc-800 flex">
+        <div class="fixed bottom-0 left-0 w-9/12 bg-zinc-800 flex overflow-x-auto text-xs md:text-sm lg:text-base">
             <div v-for="category in categories"
                 :class="{ 'bg-blue-500 text-white font-bold': currentTab === category.name }"
-                @click="changeCat(category.name)" class="py-2 px-4 text-zinc-300 border-r border-zinc-700">{{
+                @click="changeCat(category.name)" class="py-2 px-4 text-zinc-300 border-r border-zinc-700 text-nowrap">{{
         category.name }}</div>
         </div>
     </div>

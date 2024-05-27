@@ -129,7 +129,7 @@ class TransactionController extends Controller
     public function raze($id, Request $request)
     {
         $transaction = Transaction::withTrashed()->findOrFail($id);
-        SoldCost::where('sold_item_id', SoldItem::whereBelongsTo($transaction)->pluck('id'))->delete();
+        SoldCost::whereIn('sold_item_id', SoldItem::whereBelongsTo($transaction)->pluck('id'))->delete();
         SoldItem::where('transaction_id', $transaction->id)->delete();
 
         $transaction->forceDelete();
