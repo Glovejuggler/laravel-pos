@@ -122,8 +122,15 @@ const printReceipt = () => {
         </title>
     </Head>
 
-    <div class="fixed w-9/12 top-0 bottom-10 left-0 select-none bg-white overflow-y-auto" @contextmenu.prevent="">
-        <div class="p-4 grid grid-cols-4 lg:grid-cols-5 gap-2">
+    <aside class="bg-zinc-800 flex flex-col space-y-2 w-2/12 p-2 text-xs md:text-sm float-left min-h-screen">
+            <div v-for="category in categories"
+                :class="{ 'bg-blue-500 font-bold px-5 hover:bg-blue-600': currentTab === category.name }"
+                @click="changeCat(category.name)" class="py-2 px-4 text-white hover:bg-zinc-900 rounded-lg duration-200 ease-in-out">{{
+        category.name }}</div>
+    </aside>
+
+    <div class="w-7/12 float-left select-none bg-white overflow-y-auto" @contextmenu.prevent="">
+        <div class="grid grid-cols-4 gap-2 p-2">
             <div :style="`background: ${item.color ?? 'white'} !important`" class="item border flex w-full aspect-square relative active:scale-95 duration-150 ease-in-out rounded-md overflow-hidden"
                 v-for="item in visibleItems" @click="addToCart(item)" ontouchstart>
                 <img v-if="item.pic" draggable="false" @contextmenu.prevent="" @dragstart.prevent="" :src="`../storage/${item.pic}`"
@@ -133,12 +140,6 @@ const printReceipt = () => {
             </div>
         </div>
 
-        <div class="fixed bottom-0 left-0 w-9/12 bg-zinc-800 flex overflow-x-auto text-xs md:text-sm lg:text-base">
-            <div v-for="category in categories"
-                :class="{ 'bg-blue-500 text-white font-bold': currentTab === category.name }"
-                @click="changeCat(category.name)" class="py-2 px-4 text-zinc-300 border-r border-zinc-700 text-nowrap">{{
-        category.name }}</div>
-        </div>
     </div>
 
     <div class="fixed w-3/12 inset-y-0 right-0 bg-zinc-800 p-4 no-print">
@@ -195,15 +196,11 @@ const printReceipt = () => {
             </div>
 
             <p v-if="payment > cartValue" class="text-white mt-2">Change: {{ cartValue && payment - cartValue }}</p>
-            <div class="flex justify-between text-white">
-                <div class="w-full">
-                    <input type="radio" name="type" id="dinein" value="Dine-in" v-model="type">
-                    <label class="ml-2 text-sm" for="dinein">Dine-in</label>
-                </div>
-                <div class="w-full">
-                    <input type="radio" name="type" id="takeout" value="Take-out" v-model="type">
-                    <label class="ml-2 text-sm" for="takeout">Take-out</label>
-                </div>
+            <input type="radio" name="type" id="dinein" value="Dine-in" class="hidden" v-model="type">
+            <input type="radio" name="type" id="takeout" value="Take-out" class="hidden" v-model="type">
+            <div class="flex justify-between text-white space-x-2">
+                    <label class="text-sm rounded-2xl py-1 w-full inline-flex justify-center duration-200 ease-in-out" :class="type === 'Dine-in' ? 'bg-white font-bold text-zinc-800' : 'bg-zinc-600 text-zinc-200'" for="dinein">Dine-in</label>
+                    <label class="text-sm rounded-2xl py-1 w-full inline-flex justify-center duration-200 ease-in-out" :class="type === 'Take-out' ? 'bg-white font-bold text-zinc-800' : 'bg-zinc-600 text-zinc-200'" for="takeout">Take-out</label>
             </div>
 
             <button
