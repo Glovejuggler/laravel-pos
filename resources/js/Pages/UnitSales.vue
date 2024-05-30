@@ -17,7 +17,6 @@ const form = ref({
 const date = form.value.date ? new Date(form.value.date) : new Date()
 const nextable = ref(date.getTime() < new Date(new Date().setHours(0,0,0,0)).getTime())
 
-
 watch(form, (data) => {
     nextable.value = new Date(data.date).getTime() < new Date(new Date().setHours(0,0,0,0)).getTime()
     router.get(route('unit.sales', props.cat), data, {
@@ -31,15 +30,14 @@ watch(form, (data) => {
 </script>
 
 <template>
-
     <Head>
         <title>
             Items
         </title>
     </Head>
 
-    <div class="max-w-screen-lg flex mx-auto mt-8">
-        <div class="w-1/6 bg-white dark:bg-zinc-800 border dark:border-zinc-700 py-4 rounded-lg h-min">
+    <div class="max-w-7xl md:flex mx-auto mt-8 px-6 lg:px-8">
+        <div class="w-full md:w-1/6 bg-white dark:bg-zinc-800 border dark:border-zinc-700 py-4 rounded-lg h-min mb-6">
             <div class="flex justify-between items-center px-4 dark:text-white">
                 <span>Categories</span>
             </div>
@@ -52,7 +50,7 @@ watch(form, (data) => {
                     <span>{{ category.name }}</span>
             </div>
         </div>
-        <div class="w-5/6 px-4 dark:text-white">
+        <div class="w-full md:w-5/6 md:px-4 dark:text-white">
             <div class="flex justify-between items-center mb-4">
                 <div class="flex space-x-2">
                     <i @click="form.date = new Date(date.setDate(date.getDate() - 1)).toLocaleDateString()"

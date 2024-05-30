@@ -92,8 +92,8 @@ const editCatForm = useForm({
         </title>
     </Head>
 
-    <div class="max-w-screen-lg flex mx-auto mt-8">
-        <div class="w-1/6 bg-white dark:bg-zinc-800 py-4 rounded-lg h-min border dark:border-zinc-700">
+    <div class="max-w-7xl md:flex mx-auto mt-8 px-6 lg:px-8">
+        <div class="w-full md:w-1/6 bg-white dark:bg-zinc-800 py-4 rounded-lg h-min border dark:border-zinc-700 mb-6">
             <div class="flex justify-between items-center px-4 dark:text-white">
                 <span>Categories</span>
                 <i @click="addNewCategory"
@@ -101,8 +101,8 @@ const editCatForm = useForm({
             </div>
             <hr class="border-zinc-600 mt-1">
             <div v-for="category in categories" @click.stop="$inertia.get(route('items.index', category))"
-                :class="{ 'bg-blue-500 hover:bg-blue-500 font-bold text-white': $page.url.replace('%20', ' ') === `/items/${category.name}` }"
-                class="dark:text-white px-4 py-2 duration-200 ease-in-out flex justify-between group cursor-pointer text-sm">
+                :class="{ 'bg-blue-500 hover:bg-blue-500 font-bold text-white': $page.url.replaceAll('%20', ' ') === `/items/${category.name}` }"
+                class="dark:text-white px-4 py-2 duration-200 ease-in-out flex justify-between group cursor-pointer">
                     <span>{{ category.name }}</span>
                     <div class="invisible group-hover:visible space-x-2">
                         <i class="bx bx-edit opacity-70 hover:opacity-100" @click.stop="editCategory(category)"></i>
@@ -110,13 +110,13 @@ const editCatForm = useForm({
                     </div>
             </div>
         </div>
-        <div class="w-5/6 px-4 dark:text-white">
+        <div class="w-full md:w-5/6 md:px-4 dark:text-white">
             <div v-if="category" class="flex items-center mb-4">
                 <span class="font-semibold mr-8">Products</span>
                 <i @click="$inertia.get(route('items.create'), { category: category.id })"
                     class="bx bx-plus rounded-full hover:bg-black/20 dark:hover:bg-white/20 w-8 h-8 inline-flex justify-center items-center duration-200 ease-in-out"></i>
             </div>
-            <div class="grid grid-cols-5 gap-2">
+            <div class="grid grid-cols-3 lg:grid-cols-5 gap-2">
                 <div @click="$inertia.get(route('items.show', item.id))" v-for="item in items"
                     class="flex flex-col rounded-lg overflow-hidden border dark:border-zinc-700 relative">
                     <div class="bg-zinc-500 w-full aspect-square" :style="`background: ${item.color ?? 'rgb(113, 113, 122)'} !important`">

@@ -11,7 +11,8 @@ const tc = Object.keys(colors)
 
 const props = defineProps({
     item: Object,
-    categories: Object
+    categories: Object,
+    suggestions: Object,
 })
 
 console.log(props.item)
@@ -106,7 +107,7 @@ const showDeleteConfirmationModal = ref(false)
                     <p class="block font-medium text-sm text-zinc-700 dark:text-zinc-300 mt-4 select-none">Breakdown of
                         cost</p>
                     <div v-for="(ing, index) in form.breakdown" :key="index" class="grid grid-cols-11 gap-2 m-2">
-                        <TextInput type="text" v-model="ing.name" class="w-full block col-span-5" placeholder="Item" />
+                        <TextInput list="costings" type="text" v-model="ing.name" class="w-full block col-span-5" placeholder="Item" />
                         <TextInput type="number" v-model="ing.cost" class="w-full block col-span-5"
                             placeholder="Cost" />
                         <i @click="removeBreakdown(index)"
@@ -141,4 +142,9 @@ const showDeleteConfirmationModal = ref(false)
             </div>
         </div>
     </Modal>
+
+    <!-- Suggestions -->
+    <datalist id="costings">
+        <option v-for="s in suggestions" :value="s"></option>
+    </datalist>
 </template>

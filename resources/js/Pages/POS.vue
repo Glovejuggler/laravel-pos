@@ -61,11 +61,13 @@ const decreaseCount = (item) => {
     if (cart.value[cartItem].count === 0) {
         cart.value.splice(cartItem, 1)
     }
+    if (!cart.value.length) payment.value = 0
 }
 
 const removeItem = (item) => {
     var cartItem = cart.value.findIndex((i) => i.id === item.id)
     cart.value.splice(cartItem, 1)
+    if (!cart.value.length) payment.value = 0
 }
 
 const saveTransaction = () => {
@@ -113,6 +115,11 @@ const printReceipt = () => {
         }
     })
 }
+
+Echo.private('done-orders')
+    .listen('OrderDone', (e) => {
+        console.log(e)
+    });
 </script>
 
 <template>
@@ -122,18 +129,18 @@ const printReceipt = () => {
         </title>
     </Head>
 
-    <main class="fixed inset-0 overflow-hidden min-h-screen max-h-screen">
-        <div class="grid grid-cols-12 bg-white">
-            <aside class="bg-zinc-800 flex flex-col space-y-2 col-span-2 p-2 text-xs md:text-sm min-h-screen max-h-screen z-50">
+    <main class="fixed inset-0 overflow-hidden min-h-screen max-h-screen bg-zinc-900">
+        <div class="grid grid-cols-12">
+            <aside class="bg-zinc-900 flex flex-col space-y-2 col-span-2 p-2 text-xs md:text-sm min-h-screen max-h-screen z-50">
                     <div v-for="category in categories"
-                        :class="{ 'bg-blue-500 font-bold px-5 hover:bg-blue-600': currentTab === category.name }"
-                        @click="changeCat(category.name)" class="py-2 px-4 text-white hover:bg-zinc-900 rounded-lg duration-200 ease-in-out">{{
+                        :class="{ 'bg-zinc-600 font-bold px-5': currentTab === category.name }"
+                        @click="changeCat(category.name)" class="py-2 px-4 text-white hover:bg-zinc-700 rounded-lg duration-200 ease-in-out">{{
                 category.name }}</div>
             </aside>
         
-            <div class="select-none bg-white overflow-y-auto col-span-7 max-h-screen min-h-screen z-50" @contextmenu.prevent="">
+            <div class="select-none overflow-y-auto col-span-7 max-h-screen min-h-screen z-50" @contextmenu.prevent="">
                 <div class="grid grid-cols-4 gap-2 p-2">
-                    <div :style="`background: ${item.color ?? 'white'} !important`" class="item border flex w-full aspect-square relative active:scale-95 duration-150 ease-in-out rounded-md overflow-hidden"
+                    <div :style="`background: ${item.color ?? '#121212'} !important`" class="item flex w-full aspect-square relative active:scale-95 duration-150 ease-in-out rounded-md overflow-hidden"
                         v-for="item in visibleItems" @click="addToCart(item)" ontouchstart>
                         <img v-if="item.pic" draggable="false" @contextmenu.prevent="" @dragstart.prevent="" :src="`../storage/${item.pic}`"
                             class="w-full aspect-square object-cover" height="25px" width="25px">
@@ -144,71 +151,73 @@ const printReceipt = () => {
         
             </div>
         
-            <div class="bg-zinc-800 p-4 col-span-3 min-h-screen max-h-screen">
-                <div class="h-1/2 relative overflow-y-auto">
-                    <div class="text-white flex justify-between" v-for="item in cart">
-                        <div class="flex space-x-1">
-                            <button @click="decreaseCount(item)"
-                                class="w-4 h-4 bg-blue-500 inline-flex justify-center items-center">-</button>
-                            <span>{{ `${item.name} x${item.count}` }}</span>
-                        </div>
-                        <div class="flex space-x-1">
-                            <span>{{ item.price * item.count }}</span>
-                            <button @click="removeItem(item)"
-                                class="w-5 h-5 bg-red-500 inline-flex justify-center items-center"><i
-                                    class="bx bx-trash"></i></button>
+            <div class="bg-zinc-900 p-4 col-span-3 min-h-screen max-h-screen">
+                <div class="h-1/2 relative">
+                    <div class="h-5/6 overflow-y-auto px-2 text-white">
+                        <div class="rounded-lg flex justify-between bg-zinc-700 p-2 mb-2" v-for="item in cart">
+                            <div class="flex space-x-2 items-center">
+                                <i @click="decreaseCount(item)" class="bx bx-minus inline-flex justify-center items-center min-w-6 min-h-6 rounded-full bg-blue-500 hover:bg-blue-600 acive:bg-blue-800 duration-200 ease-in-out cursor-pointer"></i>
+                                <p>{{ item.name }} x{{ item.count }}</p>
+                            </div>
+
+                            <div class="flex space-x-2 items-center">
+                                <p>{{ item.price * item.count }}</p>
+                                <i @click="removeItem(item)" class="bx bx-trash inline-flex justify-center items-center min-w-6 min-h-6 rounded-full bg-red-500 hover:bg-red-600 acive:bg-red-800 duration-200 ease-in-out cursor-pointer"></i>
+                            </div>
                         </div>
                     </div>
-        
-                    <p v-if="cartValue > 0" class="font-bold text-white absolute bottom-2">Total: <span
-                            class="text-2xl font-black">{{ cartValue }}</span></p>
+                    
+                    <div v-if="cartValue > 0" class="absolute bottom-2 text-white w-full">
+                        <div class="flex justify-between">
+                            <p class="font-bold">Total: <span
+                                    class="text-xl font-black">{{ cartValue }}</span></p>
+                            <p v-if="payment > cartValue" class="font-bold">Change: <span
+                                class="text-xl font-black">{{ cartValue && payment - cartValue }}</span></p>
+                        </div>
+                    </div>
                 </div>
         
-                <hr class="border-zinc-500">
-        
-                <div class="h-1/2 relative" v-if="cartValue">
-                    <span class="mt-4 text-white">Payment</span>
-                    <label class="relative block">
-                        <input v-model="customer"
+                <div class="h-1/2 relative">
+                    <label class="relative block mb-1">
+                        <input :disabled="!cartValue" v-model="customer"
                             class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none duration-300 ease-in-out placeholder:text-xs placeholder:text-zinc-400 text-white block bg-zinc-900 w-full border-slate-300 dark:border-slate-300/20 rounded-md py-2 pl-3 pr-9 shadow-sm focus:border-indigo-300 focus:ring-indigo-200 focus:ring focus:ring-opacity-50"
                             placeholder="Customer" type="text" name="customer" />
                         <i @click.self="customer = null"
                             class='bx bx-x-circle text-white/40 absolute text-xl inset-y-0 right-0 flex items-center pr-3 hover:text-red-500'></i>
                     </label>
                     <label class="relative block">
-                        <input v-model="payment"
+                        <input :disabled="!cartValue" v-model="payment"
                             class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none duration-300 ease-in-out placeholder:text-xs placeholder:text-zinc-400 text-white block bg-zinc-900 w-full border-slate-300 dark:border-slate-300/20 rounded-md py-2 pl-3 pr-9 shadow-sm focus:border-indigo-300 focus:ring-indigo-200 focus:ring focus:ring-opacity-50"
-                            placeholder="P 0.00" type="number" name="payment" />
+                            placeholder="Payment" type="number" name="payment" />
                         <i @click.self="payment = null"
                             class='bx bx-x-circle text-white/40 absolute text-xl inset-y-0 right-0 flex items-center pr-3 hover:text-red-500'></i>
                     </label>
                     <div class="grid grid-cols-2 md:grid-cols-5 gap-2 my-2">
-                        <button class="p-2 text-sm font-bold text-zinc-800 bg-white rounded-md active:scale-95"
+                        <button :disabled="!cartValue" class="p-2 text-sm font-bold text-zinc-800 bg-white rounded-md enabled:active:scale-95 disabled:opacity-50"
                             @click="payment += 50">50</button>
-                        <button class="p-2 text-sm font-bold text-zinc-800 bg-white rounded-md active:scale-95"
+                        <button :disabled="!cartValue" class="p-2 text-sm font-bold text-zinc-800 bg-white rounded-md enabled:active:scale-95 disabled:opacity-50"
                             @click="payment += 100">100</button>
-                        <button class="p-2 text-sm font-bold text-zinc-800 bg-white rounded-md active:scale-95"
+                        <button :disabled="!cartValue" class="p-2 text-sm font-bold text-zinc-800 bg-white rounded-md enabled:active:scale-95 disabled:opacity-50"
                             @click="payment += 200">200</button>
-                        <button class="p-2 text-sm font-bold text-zinc-800 bg-white rounded-md active:scale-95"
+                        <button :disabled="!cartValue" class="p-2 text-sm font-bold text-zinc-800 bg-white rounded-md enabled:active:scale-95 disabled:opacity-50"
                             @click="payment += 500">500</button>
-                        <button class="p-2 text-xs font-bold text-zinc-800 bg-white rounded-md active:scale-95"
+                        <button :disabled="!cartValue" class="p-2 text-xs font-bold text-zinc-800 bg-white rounded-md enabled:active:scale-95 disabled:opacity-50"
                             @click="payment += 1000">1000</button>
-                        <button class="bg-white rounded-md w-full p-2 font-bold text-sm active:scale-[0.98] col-span-5"
+                        <button :disabled="!cartValue" class="bg-white rounded-md w-full p-2 font-bold text-sm enabled:active:scale-[0.98] disabled:opacity-50 col-span-5"
                             @click="payment = cartValue">Exact amount</button>
                     </div>
         
-                    <p v-if="payment > cartValue" class="text-white mt-2">Change: {{ cartValue && payment - cartValue }}</p>
-                    <input type="radio" name="type" id="dinein" value="Dine-in" class="hidden" v-model="type">
-                    <input type="radio" name="type" id="takeout" value="Take-out" class="hidden" v-model="type">
+                    <input :disabled="!cartValue" type="radio" name="type" id="dinein" value="Dine-in" class="hidden" v-model="type">
+                    <input :disabled="!cartValue" type="radio" name="type" id="takeout" value="Take-out" class="hidden" v-model="type">
                     <div class="flex justify-between text-white space-x-2">
-                            <label class="text-sm rounded-2xl py-1 w-full inline-flex justify-center duration-200 ease-in-out" :class="type === 'Dine-in' ? 'bg-white font-bold text-zinc-800' : 'bg-zinc-600 text-zinc-200'" for="dinein">Dine-in</label>
-                            <label class="text-sm rounded-2xl py-1 w-full inline-flex justify-center duration-200 ease-in-out" :class="type === 'Take-out' ? 'bg-white font-bold text-zinc-800' : 'bg-zinc-600 text-zinc-200'" for="takeout">Take-out</label>
+                            <label class="text-sm rounded-2xl py-1 w-full inline-flex justify-center duration-200 ease-in-out" :class="type === 'Dine-in' ? 'bg-white font-bold text-zinc-800' : 'bg-zinc-600 text-zinc-200', {'opacity-50': !cartValue}" for="dinein">Dine-in</label>
+                            <label class="text-sm rounded-2xl py-1 w-full inline-flex justify-center duration-200 ease-in-out" :class="type === 'Take-out' ? 'bg-white font-bold text-zinc-800' : 'bg-zinc-600 text-zinc-200', {'opacity-50': !cartValue}" for="takeout">Take-out</label>
                     </div>
         
                     <button
                         class="bg-white disabled:opacity-50 rounded-md text-sm w-full p-2 font-bold enabled:active:scale-[0.98] absolute bottom-0 right-0"
                         @click="saveTransaction"
-                        :disabled="!type || cartValue && payment < cartValue || isProcessing">{{ isProcessing ? 'Processing...' : 'Place order' }}</button>
+                        :disabled="!type || !cartValue || payment < cartValue || !payment || isProcessing">{{ isProcessing ? 'Processing...' : 'Place order' }}</button>
                 </div>
             </div>
         </div>
@@ -286,3 +295,25 @@ const printReceipt = () => {
         </div>
     </Modal>
 </template>
+
+<style scoped>
+/* width */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #18181b;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #555;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
+</style>

@@ -83,7 +83,8 @@ class ItemController extends Controller
 
         return inertia('Item/Show', [
             'item' => $item,
-            'categories' => Category::all()
+            'categories' => Category::all(),
+            'suggestions' => Costing::selectRaw('DISTINCT UPPER(name) as name')->pluck('name'),
         ]);
     }
 

@@ -22,6 +22,6 @@ Broadcast::channel('kitchen', function () {
     return Auth::id();
 });
 
-Broadcast::channel('doneOrders', function () {
+Broadcast::channel('done-orders', function () {
     return Auth::id();
 });

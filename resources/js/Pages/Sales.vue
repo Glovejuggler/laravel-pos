@@ -1,6 +1,6 @@
 <script setup>
-import { Head, router } from '@inertiajs/vue3';
-import { ref, nextTick } from 'vue';
+import { Head, router, useForm } from '@inertiajs/vue3';
+import { ref, nextTick, watch } from 'vue';
 import Modal from '@/Components/Modal.vue';
 
 const props = defineProps({
@@ -38,18 +38,53 @@ const checkAndSubmit = (e) => {
 
 const date = props.filters.date ? new Date(props.filters.date) : new Date()
 const nextable = date < new Date(new Date().setHours(0, 0, 0, 0))
+
+const form = useForm({
+    search: props.filters.search,
+    date: props.filters.date,
+})
+
+watch(form, (data) => {
+    router.get(route('sales'), data, {
+        preserveState: true,
+        preserveScroll: true, 
+        replace: true,
+    })
+}, {
+    deep: true
+})
+
+const secToTime = (seconds) => {
+    var seconds = parseInt(seconds, 10)
+    var hours   = Math.floor(seconds / 3600)
+    var minutes = Math.floor((seconds - (hours * 3600)) / 60)
+    var seconds = seconds - (hours * 3600) - (minutes * 60)
+
+    if ( !!hours ) {
+        if ( !!minutes ) {
+        return `${hours}h ${minutes}m ${seconds}s`
+        } else {
+        return `${hours}h ${seconds}s`
+        }
+    }
+
+    if ( !!minutes ) {                                       
+        return `${minutes}m ${seconds}s`                       
+    }
+
+    return `${seconds}s`
+}
 </script>
 
 <template>
-
     <Head>
         <title>
             Sales
         </title>
     </Head>
 
-    <div class="max-w-screen-xl mx-auto mt-8">
-        <div class="mb-4 flex space-x-2">
+    <div class="max-w-7xl mx-auto mt-8 px-6 lg:px-8">
+        <div class="flex space-x-2 items-center mb-4">
             <i @click="$inertia.get(route('sales'), { date: new Date(date.setDate(date.getDate() - 1)).toLocaleDateString() })"
                 class='bx bxs-chevron-left dark:text-white hover:bg-white hover:text-zinc-900 w-6 h-6 inline-flex justify-center items-center rounded-full border dark:border-white'></i>
             <p class="dark:text-white font-semibold">{{ date.toWordFormat() }}</p>
@@ -57,8 +92,8 @@ const nextable = date < new Date(new Date().setHours(0, 0, 0, 0))
                 @click="$inertia.get(route('sales'), { date: new Date(date.setDate(date.getDate() + 1)).toLocaleDateString() })"
                 class='bx bxs-chevron-right dark:text-white hover:bg-white hover:text-zinc-900 w-6 h-6 inline-flex justify-center items-center rounded-full border dark:border-white'></i>
         </div>
-        <table v-if="transactions.length" class="dark:text-white w-full bg-white dark:bg-zinc-800 text-left">
-            <thead class="text-xs">
+        <table v-if="transactions.length" class="dark:text-white w-full bg-white dark:bg-zinc-800 text-left text-sm">
+            <thead>
                 <tr>
                     <th class="p-4">Customer</th>
                     <th class="p-4">Time</th>
@@ -73,7 +108,7 @@ const nextable = date < new Date(new Date().setHours(0, 0, 0, 0))
             <tbody>
                 <tr v-for="transaction in transactions" class="bg-white dark:bg-zinc-800 border-b border-zinc-600">
                     <td class="px-4 py-2">{{ transaction.name ?? `#${transaction.number}` }}</td>
-                    <td class="px-4 py-2">{{ new Date(transaction.created_at).toTimeFormat() }} <span class="text-xs opacity-70">{{ transaction.elapsed }}s</span></td>
+                    <td class="px-4 py-2">{{ new Date(transaction.created_at).toTimeFormat() }} <span class="text-xs opacity-70">{{ secToTime(transaction.elapsed) }}</span></td>
                     <td class="px-4 py-2">{{ new Date(transaction.created_at).toWordFormat() }}</td>
                     <td class="px-4 py-2">
                         <div>

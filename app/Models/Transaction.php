@@ -53,7 +53,11 @@ class Transaction extends Model
                 $query->where('name', 'like', '%'.$search.'%');
             });
         })->when($filters['date'] ?? null, function ($query, $date) {
-            $query->whereDate('deleted_at', Carbon::parse($date));
+            if ($date == 'alltime') {
+                // $query->all();
+            } else {
+                $query->whereDate('deleted_at', Carbon::parse($date));
+            }
         });
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\OrderDone;
 use App\Models\SoldCost;
 use App\Models\SoldItem;
 use App\Events\OrderPlaced;
@@ -22,12 +23,6 @@ class TransactionController extends Controller
                             'search' => $request->search
                         ])
                         ->get();
-        // $sold = SoldItem::whereBelongsTo($transactions)
-        //                 ->selectRaw('item_id, sum(quantity) as total_sold')
-        //                 ->groupBy('item_id')
-        //                 ->get();
-
-        // dd($sold);
 
         return inertia('Sales', [
             'transactions' => $transactions,
@@ -119,6 +114,8 @@ class TransactionController extends Controller
     {
         $transaction = Transaction::findOrFail($id);
         $transaction->delete();
+
+        OrderDone::dispatch($id);
 
         return 'Order done';
     }
