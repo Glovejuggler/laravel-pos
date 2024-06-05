@@ -5,6 +5,10 @@ import TextInput from '@/Components/TextInput.vue';
 import { ref } from 'vue';
 import colors from 'tailwindcss/colors';
 
+const props = defineProps({
+    suggestions: Object
+})
+
 const tc = Object.keys(colors)
     .filter(key => typeof colors[key] === 'object')
 
@@ -88,7 +92,7 @@ const removeBreakdown = (index) => {
                     <p class="block font-medium text-sm text-zinc-700 dark:text-zinc-300 mt-4 select-none">Breakdown of
                         cost</p>
                     <div v-for="(ing, index) in form.breakdown" :key="index" class="grid grid-cols-11 gap-2 m-2">
-                        <TextInput type="text" v-model="ing.name" class="w-full block col-span-5" placeholder="Item" />
+                        <TextInput list="costings" type="text" v-model="ing.name" class="w-full block col-span-5" placeholder="Item" />
                         <TextInput type="number" v-model="ing.cost" class="w-full block col-span-5"
                             placeholder="Cost" />
                         <i @click="removeBreakdown(index)"
@@ -104,4 +108,9 @@ const removeBreakdown = (index) => {
             </div>
         </div>
     </div>
+
+    <!-- Suggestions -->
+    <datalist id="costings">
+        <option v-for="s in suggestions" :value="s"></option>
+    </datalist>
 </template>

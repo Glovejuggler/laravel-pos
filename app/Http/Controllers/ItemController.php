@@ -41,7 +41,9 @@ class ItemController extends Controller
      */
     public function create()
     {
-        return inertia('Item/Create');
+        return inertia('Item/Create', [
+            'suggestions' => Costing::selectRaw('DISTINCT UPPER(name) as name')->pluck('name'),
+        ]);
     }
 
     /**
