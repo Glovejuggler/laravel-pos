@@ -2,7 +2,7 @@
 import { Head, useForm } from '@inertiajs/vue3';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import Modal from '@/Components/Modal.vue';
 import colors from 'tailwindcss/colors';
 
@@ -15,8 +15,6 @@ const props = defineProps({
     suggestions: Object,
 })
 
-console.log(props.item)
-
 const form = useForm({
     category_id: props.item.category_id,
     image: '',
@@ -25,6 +23,11 @@ const form = useForm({
     color: props.item.color,
     breakdown: props.item.costing
 })
+
+const costValue = computed(() => {
+    return form.breakdown.reduce((acc, item) => acc + item.cost, 0)
+})
+const profit = computed(() => form.price - costValue.value)
 
 const selectedColor = ref(form.color)
 const newImage = ref(null)
@@ -100,9 +103,21 @@ const showDeleteConfirmationModal = ref(false)
                     </select>
                     <InputLabel class="mt-4" for="name" value="Name" />
                     <TextInput id="name" type="text" v-model="form.name" class="mt-2 w-full block" />
-
-                    <InputLabel class="mt-4" for="price" value="Price" />
-                    <TextInput id="price" type="number" v-model="form.price" class="mt-2 w-full block" />
+                    
+                    <div class="grid grid-cols-3 gap-1">
+                        <div>
+                            <InputLabel class="mt-4" for="price" value="Price" />
+                            <TextInput id="price" type="number" v-model="form.price" class="mt-2 w-full block" />
+                        </div>
+                        <div>
+                            <InputLabel class="mt-4" for="cost" value="Cost" />
+                            <TextInput disabled id="cost" type="number" v-model="costValue" class="mt-2 w-full block disabled:bg-zinc-700" />
+                        </div>
+                        <div>
+                            <InputLabel class="mt-4" for="profit" value="Profit" />
+                            <TextInput disabled id="profit" type="number" v-model="profit" class="mt-2 w-full block disabled:bg-zinc-700" />
+                        </div>
+                    </div>
 
                     <p class="block font-medium text-sm text-zinc-700 dark:text-zinc-300 mt-4 select-none">Breakdown of
                         cost</p>
