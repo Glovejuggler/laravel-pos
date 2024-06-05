@@ -25,7 +25,7 @@ const form = useForm({
 })
 
 const costValue = computed(() => {
-    return form.breakdown.reduce((acc, item) => acc + item.cost, 0)
+    return form.breakdown.reduce((acc, item) => acc + Number(item.cost), 0)
 })
 const profit = computed(() => form.price - costValue.value)
 
