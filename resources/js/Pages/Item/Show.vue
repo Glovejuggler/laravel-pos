@@ -27,7 +27,7 @@ const form = useForm({
 const costValue = computed(() => {
     return form.breakdown.reduce((acc, item) => acc + Number(item.cost), 0)
 })
-const profit = computed(() => form.price - costValue.value)
+const profit = computed(() => (Number(form.price) - costValue.value).toFixed(2))
 
 const selectedColor = ref(form.color)
 const newImage = ref(null)
