@@ -27,6 +27,7 @@ watch(ordersData.value, () => {
     if (ordersData.value.length === 0) empty.value = getRandomInt(1, 14)
 })
 
+const notif = new Audio('../genshin_mail.mp3')
 Echo.private('kitchen')
     .listen('OrderPlaced', (e) => {
         if (ordersData.value) {
@@ -34,6 +35,7 @@ Echo.private('kitchen')
         } else {
             ordersData.value = [e.order]
         }
+        notif.play()
     });
 
 const selectedOrder = ref({
