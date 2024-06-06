@@ -116,9 +116,10 @@ const printReceipt = () => {
     })
 }
 
+const notif = new Audio('../notif.mp3');
 Echo.private('done-orders')
     .listen('OrderDone', (e) => {
-        console.log(e)
+        notif.play()
     });
 </script>
 
