@@ -132,7 +132,7 @@ Echo.private('done-orders')
 
     <main class="fixed inset-0 overflow-hidden min-h-screen max-h-screen bg-zinc-900">
         <div class="grid grid-cols-12">
-            <aside class="bg-zinc-900 flex flex-col space-y-2 col-span-2 p-2 text-xs md:text-sm min-h-screen max-h-screen z-50">
+            <aside class="bg-zinc-900 flex flex-col space-y-2 col-span-2 p-2 text-xs md:text-sm min-h-screen max-h-screen z-50 overflow-y-auto">
                     <div v-for="category in categories"
                         :class="{ 'bg-zinc-600 font-bold px-5': currentTab === category.name }"
                         @click="changeCat(category.name)" class="py-2 px-4 text-white hover:bg-zinc-700 rounded-lg duration-200 ease-in-out">{{

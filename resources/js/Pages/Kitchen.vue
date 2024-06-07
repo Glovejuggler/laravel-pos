@@ -36,7 +36,8 @@ Echo.private('kitchen')
             ordersData.value = [e.order]
         }
         notif.play()
-    });
+    }
+)
 
 const selectedOrder = ref({
     index: '',

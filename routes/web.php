@@ -39,20 +39,12 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    // $t = Transaction::onlyTrashed()->get();
-    // $time = 0;
-    // foreach ($t as $tr) {
-    //     $time += $tr->deleted_at->diffInSeconds($tr->created_at);
-    // }
-
-    // dd($time/$t->count());
     $finishedOrders = Transaction::onlyTrashed();
 
     $transactionCount = $finishedOrders->count();
     $soldItemsCount = SoldItem::whereHas('transaction', function ($query) {
         $query->onlyTrashed();
     })->sum('quantity');
-        // dd($finishedOrders->get()->sum('elapsed') / $finishedOrders->count());
     return Inertia::render('Dashboard', [
         'items' => Item::count(),
         'avgS' => $transactionCount ? $finishedOrders->get()->sum('elapsed') / $finishedOrders->count() : 0,

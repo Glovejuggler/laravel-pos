@@ -92,7 +92,7 @@ const secToTime = (seconds) => {
                 @click="$inertia.get(route('sales'), { date: new Date(date.setDate(date.getDate() + 1)).toLocaleDateString() })"
                 class='bx bxs-chevron-right dark:text-white hover:bg-white hover:text-zinc-900 w-6 h-6 inline-flex justify-center items-center rounded-full border dark:border-white'></i>
         </div>
-        <table v-if="transactions.length" class="dark:text-white w-full bg-white dark:bg-zinc-800 text-left text-sm">
+        <table v-if="transactions.length" class="dark:text-white w-full bg-white dark:bg-zinc-800 text-left text-sm rounded-lg overflow-hidden">
             <thead>
                 <tr>
                     <th class="p-4">Customer</th>
@@ -106,7 +106,7 @@ const secToTime = (seconds) => {
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="transaction in transactions" class="bg-white dark:bg-zinc-800 border-b border-zinc-600">
+                <tr v-for="transaction in transactions" class="bg-white dark:bg-zinc-800 border-b border-zinc-700">
                     <td class="px-4 py-2">{{ transaction.name ?? `#${transaction.number}` }}</td>
                     <td class="px-4 py-2">{{ new Date(transaction.created_at).toTimeFormat() }} <span class="text-xs opacity-70">{{ secToTime(transaction.elapsed) }}</span></td>
                     <td class="px-4 py-2">{{ new Date(transaction.created_at).toWordFormat() }}</td>
@@ -125,7 +125,7 @@ const secToTime = (seconds) => {
                         </div>
                     </td>
                 </tr>
-                <tr class="bg-white font-bold dark:bg-zinc-800 border-b border-zinc-600">
+                <tr class="bg-white font-bold dark:bg-zinc-800">
                     <td class="px-4 py-2">{{ transactions.length }}</td>
                     <td class="px-4 py-2"></td>
                     <td class="px-4 py-2"></td>
@@ -155,7 +155,7 @@ const secToTime = (seconds) => {
             <div class="flex justify-center mt-4 font-bold tracking-wider text-4xl">
                 {{ confirmCode }}
             </div>
-            <input ref="codeInput" @keyup="checkAndSubmit($event.target.value)" class="bg-zinc-900 w-full rounded-lg mt-2" type="text">
+            <input ref="codeInput" @keyup="checkAndSubmit($event.target.value)" class="bg-zinc-900 w-full rounded-lg mt-2 disabled:opacity-50" type="text">
         </div>
     </Modal>
 </template>

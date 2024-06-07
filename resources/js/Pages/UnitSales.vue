@@ -32,12 +32,12 @@ watch(form, (data) => {
 <template>
     <Head>
         <title>
-            Items
+            Unit Sales
         </title>
     </Head>
 
     <div class="max-w-7xl md:flex mx-auto mt-8 px-6 lg:px-8">
-        <div class="w-full md:w-1/6 bg-white dark:bg-zinc-800 border dark:border-zinc-700 py-4 rounded-lg h-min mb-6">
+        <div class="w-full md:w-1/6 bg-white dark:bg-zinc-900 border dark:border-zinc-700 py-4 rounded-lg h-min mb-6 text-sm">
             <div class="flex justify-between items-center px-4 dark:text-white">
                 <span>Categories</span>
             </div>
@@ -72,7 +72,7 @@ watch(form, (data) => {
                 </div>
             </div>
 
-            <table class="w-full bg-white dark:bg-zinc-800 rounded-lg border dark:border-zinc-700 shadow-sm">
+            <table class="w-full bg-white dark:bg-zinc-900 rounded-lg border dark:border-zinc-700 shadow-sm">
                 <thead class="text-left">
                     <tr>
                         <th class="px-4 py-2">Item</th>
@@ -83,7 +83,7 @@ watch(form, (data) => {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="dark:odd:bg-zinc-700" v-for="item in items">
+                    <tr class="dark:odd:bg-zinc-800" v-for="item in items">
                         <td class="px-4 py-2">{{ item.name }}</td>
                         <td class="px-4 py-2">{{ item.total_quantity }}</td>
                         <td class="px-4 py-2 text-right">{{ (item.total_quantity * item.price).amountFormat() ?? 0 }}</td>
