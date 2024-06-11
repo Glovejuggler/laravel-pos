@@ -98,7 +98,7 @@ const beforeLeave = (el) => {
 
     <div class="bg-zinc-950 min-h-screen">
         <TransitionGroup v-if="ordersData.length" tag="div" name="list" @before-leave="beforeLeave"
-            class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-2 p-4">
+            class="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-2 p-4">
 
             <div v-for="(order, index) in ordersData" :key="order">
                 <OrderCard :id="order" :key="order" @remove="confirmRemoveOrder(index, order)" @finish="confirmFinishOrder(index, order)" />
