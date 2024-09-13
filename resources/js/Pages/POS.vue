@@ -33,6 +33,7 @@ const customer = ref('')
 const type = ref('')
 
 const receipt = ref(null)
+const askReceipt = ref(null)
 
 const showConfirmation = ref(false)
 const confirmationMessage = ref(null)
@@ -70,8 +71,9 @@ const removeItem = (item) => {
     if (!cart.value.length) payment.value = 0
 }
 
-const saveTransaction = () => {
+const saveTransaction = (print) => {
     isProcessing.value = true
+    askReceipt.value = false
     axios.post(route('transaction.save'), {
         items: cart.value,
         payment: payment.value,
@@ -83,7 +85,6 @@ const saveTransaction = () => {
     }).then((d) => {
         confirmationMessage.value = d.data.message
         receipt.value = d.data.transaction
-        console.log(d.data.usage)
     }).catch((err) => {
         console.log(err)
     }).finally(() => {
@@ -92,7 +93,9 @@ const saveTransaction = () => {
         customer.value = null
         type.value = null
         isProcessing.value = false
-        printReceipt()
+        if (print) {
+            printReceipt()
+        }
         showMessage()
     })
 }
@@ -217,7 +220,7 @@ Echo.private('done-orders')
         
                     <button
                         class="bg-white disabled:opacity-50 rounded-md text-sm w-full p-2 font-bold enabled:active:scale-[0.98] absolute bottom-0 right-0"
-                        @click="saveTransaction"
+                        @click="askReceipt = true"
                         :disabled="!type || !cartValue || payment < cartValue || !payment || isProcessing">{{ isProcessing ? 'Processing...' : 'Place order' }}</button>
                 </div>
             </div>
@@ -293,6 +296,17 @@ Echo.private('done-orders')
     <Modal :max-width="'sm'" :show="showConfirmation" @close="showConfirmation = false">
         <div class="flex justify-center p-4 bg-white  text-zinc-900 text-3xl font-bold uppercase">
             {{ confirmationMessage }}
+        </div>
+    </Modal>
+
+    <!-- Ask to print receipt -->
+    <Modal max-width="sm" :show="askReceipt" @close="askReceipt = false">
+        <div class="p-4 bg-zinc-800 text-white">
+            <span class="text-lg">Do you want to print receipt?</span>
+            <div class="grid grid-cols-2 gap-2 mt-4">
+                <button @click="saveTransaction(true)" class="w-full py-2 text-lg bg-blue-500 rounded-lg">Yes</button>
+                <button @click="saveTransaction(false)" class="w-full py-2 text-lg bg-red-500 rounded-lg">No</button>
+            </div>
         </div>
     </Modal>
 </template>
