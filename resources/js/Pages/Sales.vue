@@ -97,7 +97,7 @@ const secToTime = (seconds) => {
                 <tr>
                     <th class="p-4">Customer</th>
                     <th class="p-4">Time</th>
-                    <th class="p-4">Date</th>
+                    <th class="p-4">Order Type</th>
                     <th class="p-4">Orders</th>
                     <th class="p-4">Quantity</th>
                     <th class="p-4">Gross Sales</th>
@@ -109,7 +109,7 @@ const secToTime = (seconds) => {
                 <tr v-for="transaction in transactions" class="bg-white dark:bg-zinc-800 border-b border-zinc-700">
                     <td class="px-4 py-2">{{ transaction.name ?? `#${transaction.number}` }}</td>
                     <td class="px-4 py-2">{{ new Date(transaction.created_at).toTimeFormat() }} <span class="text-xs opacity-70">{{ secToTime(transaction.elapsed) }}</span></td>
-                    <td class="px-4 py-2">{{ new Date(transaction.created_at).toWordFormat() }}</td>
+                    <td class="px-4 py-2">{{ transaction.type }}</td>
                     <td class="px-4 py-2">
                         <div>
                             <p v-for="item in transaction.items">{{ `${item.name} x${item.quantity}` }}</p>

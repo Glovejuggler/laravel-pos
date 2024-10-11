@@ -50,6 +50,10 @@ const finishOrder = () => {
         </p>
 
         <span class="rounded-full px-5 border text-sm">{{ order.type }}</span>
+        
+        <div class="my-4 rounded-md p-3 bg-zinc-900 text-zinc-200" v-if="order.note">
+            {{ order.note }}
+        </div>
 
         <div class="flex justify-between space-x-2 mt-2">
             <button @click="removeOrder" class="p-2 bg-red-500 rounded-2xl text-white text-xs w-full">Cancel</button>

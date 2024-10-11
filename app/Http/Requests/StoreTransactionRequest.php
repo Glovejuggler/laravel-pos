@@ -27,6 +27,7 @@ class StoreTransactionRequest extends FormRequest
         return [
             'name' => 'nullable',
             'payment' => 'required',
+            'note' => 'nullable',
             'type' => [Rule::enum(OrderType::class)]
         ];
     }

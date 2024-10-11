@@ -31,10 +31,11 @@ const cartValue = computed(() => {
 const payment = ref(0)
 const customer = ref('')
 const type = ref('')
+const note = ref('')
 
 const receipt = ref(null)
-const askReceipt = ref(null)
-
+const askReceipt = ref(false)
+const noteModal = ref(false)
 const showConfirmation = ref(false)
 const confirmationMessage = ref(null)
 const showMessage = () => {
@@ -78,7 +79,8 @@ const saveTransaction = (print) => {
         items: cart.value,
         payment: payment.value,
         name: customer.value,
-        type: type.value
+        type: type.value,
+        note: note.value
     }, {
         maxBodyLength: 2048,
         maxContentLength: 2048,
@@ -92,6 +94,7 @@ const saveTransaction = (print) => {
         payment.value = null
         customer.value = null
         type.value = null
+        note.value = null
         isProcessing.value = false
         if (print) {
             printReceipt()
@@ -220,7 +223,7 @@ Echo.private('done-orders')
         
                     <button
                         class="bg-white disabled:opacity-50 rounded-md text-sm w-full p-2 font-bold enabled:active:scale-[0.98] absolute bottom-0 right-0"
-                        @click="askReceipt = true"
+                        @click="noteModal = true"
                         :disabled="!type || !cartValue || payment < cartValue || !payment || isProcessing">{{ isProcessing ? 'Processing...' : 'Place order' }}</button>
                 </div>
             </div>
@@ -298,6 +301,24 @@ Echo.private('done-orders')
             {{ confirmationMessage }}
         </div>
     </Modal>
+
+    <!-- Note Modal -->
+     <Modal :max-width="sm" :show="noteModal">
+        <div class="p-6 bg-zinc-800 text-white">
+            <label for="note">Note</label>
+            <div class="flex w-full">
+                <textarea name="note" id="note" rows="5" v-model="note"
+                    class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none w-full border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"></textarea>
+            </div>
+            <div class="flex justify-end items-center space-x-4 mt-4">
+                <span class="hover:underline cursor-pointer" @click="noteModal = false">Cancel</span>
+                <button @click="() => {
+                    askReceipt = true
+                    noteModal = false
+                }" class="px-8 py-2 bg-green-500 hover:bg-green-600 active:bg-green-800 rounded-lg ease-in-out duration-200">Next</button>
+            </div>
+        </div>
+     </Modal>
 
     <!-- Ask to print receipt -->
     <Modal max-width="sm" :show="askReceipt" @close="askReceipt = false">

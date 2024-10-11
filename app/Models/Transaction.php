@@ -12,7 +12,7 @@ class Transaction extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['name', 'payment', 'type'];
+    protected $fillable = ['name', 'payment', 'type', 'note'];
 
     protected $appends = ['number', 'quantity', 'gross', 'cost', 'elapsed'];
 
