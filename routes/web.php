@@ -82,7 +82,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/order/{id}/delete', [TransactionController::class, 'destroy'])->name('order.done');
 
     Route::get('unit_sales/{category?}', [ReportsController::class, 'unitSales'])->name('unit.sales');
-    Route::get('inventory_costing', [ReportsController::class, 'costing'])->name('inventory.costing');
+    Route::get('inventory_costing/{month?}', [ReportsController::class, 'costing'])->name('inventory.costing');
 
     Route::get('sales', [TransactionController::class, 'index'])->name('sales');
     Route::get('/pos', [POS::class, 'index'])->name('pos');

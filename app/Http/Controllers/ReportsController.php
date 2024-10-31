@@ -48,11 +48,16 @@ class ReportsController extends Controller
     /**
      * Inventory costing report
      */
-    public function costing()
+    public function costing($month = null)
     {
-        $costing = SoldCost::withSum(['sold as totalSold' => function ($q) {
-            $q->whereHas('transaction', function ($q) {
-                $q->onlyTrashed()->whereNotNull('deleted_at');
+        $m = Carbon::parse($month) ?: today();
+
+        $costing = SoldCost::withSum(['sold as totalSold' => function ($q) use ($m) {
+            $q->whereHas('transaction', function ($q) use ($m) {
+                $q->onlyTrashed()
+                    ->whereNotNull('deleted_at')
+                    ->whereMonth('deleted_at', $m->month)
+                    ->whereYear('deleted_at', $m->year);
             });
         }],'quantity')->get();
 
