@@ -37,19 +37,28 @@ const finishOrder = () => {
 <template>
     <div v-if="!isFetching && order"
         class="bg-zinc-800 rounded-lg p-4 ease-in-out duration-200 transition-all relative text-white h-min">
-        <p class="text-xs">{{ Intl.DateTimeFormat("en-US", {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric'
-}).format(new Date(order.created_at)) }}</p>
-        <p v-if="order.name">Customer: {{ order.name }}</p>
-        <p class="rounded-lg p-2 bg-zinc-700 mb-2" v-for="item in order.items">
+
+        <div class="flex justify-between">
+            <div>
+                <p class="text-xs">{{ Intl.DateTimeFormat("en-US", {
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric'
+        }).format(new Date(order.created_at)) }}</p>
+                <p v-if="order.name">Customer: {{ order.name }}</p>
+
+            </div>
+
+            <span class="rounded-full px-5 border text-lg font-bold h-min" :class="order.type === 'Dine-in' ? 'bg-green-500 border-green-950 text-green-950' : 'bg-red-500 border-red-950 text-red-950'">{{ order.type }}</span>
+        </div>
+
+
+        <p class="rounded-lg p-2 bg-zinc-700 mt-2" v-for="item in order.items">
             {{ `${item.name} x${item.quantity}` }}
         </p>
 
-        <span class="rounded-full px-5 border text-sm">{{ order.type }}</span>
         
         <div class="my-4 rounded-md p-3 bg-zinc-900 text-zinc-200" v-if="order.note">
             {{ order.note }}
