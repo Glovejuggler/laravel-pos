@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 
 const props = defineProps({
     data: {
@@ -18,10 +18,14 @@ const isFetching = ref(false)
 onMounted(() => {
     if (props.id) {
         isFetching.value = true
-        axios.get(route('order.get', props.id)).then((res) => order.value = res.data)
-        .finally(() => {
-            isFetching.value = false
-        })
+        axios.get(route('order.get', props.id))
+            .then((res) => {
+                res.data.items.forEach(i => i.done = false)
+                order.value = res.data
+            })
+            .finally(() => {
+                isFetching.value = false
+            })
     }
 })
 
@@ -55,7 +59,7 @@ const finishOrder = () => {
         </div>
 
 
-        <p class="rounded-lg p-2 bg-zinc-700 mt-2" v-for="item in order.items">
+        <p class="rounded-lg p-2 bg-zinc-700 mt-2" :class="{'opacity-50 line-through': item.done}" @click="item.done = !item.done" v-for="item in order.items">
             {{ `${item.name} x${item.quantity}` }}
         </p>
 
@@ -66,7 +70,7 @@ const finishOrder = () => {
 
         <div class="flex justify-between space-x-2 mt-2">
             <button @click="removeOrder" class="p-2 bg-red-500 rounded-2xl text-white text-xs w-full">Cancel</button>
-            <button @click="finishOrder" class="p-2 bg-blue-500 rounded-2xl text-white text-xs w-full">Done</button>
+            <button @click="finishOrder" class="p-2 bg-blue-500 rounded-2xl text-white text-xs w-full disabled:opacity-25 disabled:cursor-not-allowed" :disabled="!order.items.every(i => i.done)">Done</button>
         </div>
     </div>
 

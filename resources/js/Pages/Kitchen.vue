@@ -36,8 +36,10 @@ Echo.private('kitchen')
             ordersData.value = [e.order]
         }
         notif.play()
-    }
-)
+    })
+    .listen('OrderDone', (e) => {
+        ordersData.value.splice(ordersData.value.findIndex(o => o == e.order), 1)
+    })
 
 const selectedOrder = ref({
     index: '',
@@ -65,14 +67,14 @@ const closeModals = () => {
 }
 
 const removeOrder = () => {
-    ordersData.value.splice(selectedOrder.value.index, 1)
+    // ordersData.value.splice(selectedOrder.value.index, 1)
     closeModals()
 
     axios.delete(route('order.cancel', selectedOrder.value.order)).then((e) => console.log(e.data))
 }
 
 const finishOrder = () => {
-    ordersData.value.splice(selectedOrder.value.index, 1)
+    // ordersData.value.splice(selectedOrder.value.index, 1)
     closeModals()
 
     axios.delete(route('order.done', selectedOrder.value.order)).then((e) => console.log(e.data))

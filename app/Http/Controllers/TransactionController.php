@@ -131,6 +131,8 @@ class TransactionController extends Controller
 
         $transaction->forceDelete();
 
+        OrderDone::dispatch($id);
+
         if ($request->wantsJson()) {
             return 'Order cancelled';
         } else {

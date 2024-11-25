@@ -30,6 +30,6 @@ class OrderDone implements ShouldBroadcast
      */
     public function broadcastOn(): Channel
     {
-        return new PrivateChannel('done-orders');
+        return new PrivateChannel('kitchen');
     }
 }
