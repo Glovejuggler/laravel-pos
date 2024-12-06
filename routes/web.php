@@ -29,14 +29,32 @@ use App\Http\Controllers\TransactionController;
 |
 */
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
+Route::get('/', function() {
+    // return Inertia::render('Welcome', [
+    //     'canLogin' => Route::has('login'),
+    //     'canRegister' => Route::has('register'),
+    //     'laravelVersion' => Application::VERSION,
+    //     'phpVersion' => PHP_VERSION,
+    // ]);
+
+    return view('home.index');
+})->name('home');
+
+Route::get('/menu', function() {
+    $menuPath = public_path('menu.json');
+    $menuContents = file_get_contents($menuPath);
+    $menu = json_decode($menuContents);
+
+    // dd($menu->products);
+
+    return view('home.menu', [
+        'menu' => $menu->products
     ]);
-});
+})->name('menu');
+
+Route::get('/contacts', function() {
+    return view('home.contacts');
+})->name('contacts');
 
 Route::get('/dashboard', function () {
     $finishedOrders = Transaction::onlyTrashed();
