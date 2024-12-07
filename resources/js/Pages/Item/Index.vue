@@ -122,7 +122,7 @@ const editCatForm = useForm({
                     <div class="w-full aspect-square" :style="`background: ${item.color ?? 'rgb(56, 56, 65)'} !important`">
                         <img class="object-fit" v-if="item.pic" :src="`../storage/${item.pic}`">
                     </div>
-                    <div class="bg-black/50 p-2 inset-x-0 bottom-0 absolute text-sm">{{ item.name }}</div>
+                    <div class="bg-black/50 p-2 inset-x-0 bottom-0 absolute text-sm text-white">{{ item.name }}</div>
                 </div>
             </div>
         </div>

@@ -19,6 +19,8 @@ const currentTab = ref(null)
 const isProcessing = ref(false)
 const isAndroid = ref(false)
 
+const openCart = ref(false)
+
 const changeCat = (cat) => {
     currentTab.value = cat
     visibleItems.value = props.items[cat]
@@ -136,7 +138,7 @@ Echo.private('done-orders')
         </title>
     </Head>
 
-    <main class="fixed inset-0 overflow-hidden min-h-screen max-h-screen bg-zinc-900">
+    <main class="fixed inset-0 overflow-hidden min-h-screen max-h-screen bg-zinc-900 hidden lg:block">
         <div class="grid grid-cols-12">
             <aside class="bg-zinc-900 flex flex-col space-y-2 col-span-2 p-2 text-xs md:text-sm min-h-screen max-h-screen z-50 overflow-y-auto">
                     <div v-for="category in categories"
@@ -295,6 +297,100 @@ Echo.private('done-orders')
         </div>
     </main>
 
+    <main class="lg:hidden block bg-zinc-900 min-h-screen">
+        <nav class="p-2 flex space-x-2 overflow-x-scroll">
+            <span @click="changeCat(category.name)" class="inline-flex font-semibold px-2 rounded-full border-white border whitespace-nowrap text-clip h-min" :class="currentTab === category.name ? 'text-zinc-900 bg-white' : 'text-white bg-zinc-900'" v-for="category in categories">
+                {{ category.name }}
+            </span>
+        </nav>
+
+        <div class="grid grid-cols-2 gap-2 p-2">
+            <div :style="`background: ${item.color ?? '#121212'} !important`" class="item flex w-full aspect-square relative active:scale-95 duration-150 ease-in-out rounded-md overflow-hidden"
+                v-for="item in visibleItems" @click="addToCart(item)" ontouchstart>
+                <img v-if="item.pic" draggable="false" @contextmenu.prevent="" @dragstart.prevent="" :src="`../storage/${item.pic}`"
+                    class="w-full aspect-square object-cover" height="25px" width="25px">
+                <p class="absolute bottom-0 inset-x-0 bg-black/50 p-2 text-white text-xs md:text-sm lg:text-base">{{ item.name }}</p>
+                <span class="absolute top-2 right-2 bg-black/50 text-white rounded-lg p-1">{{ item.price }}</span>
+            </div>
+        </div>
+
+        <div v-if="!openCart" class="fixed z-40 w-full bottom-0 inset-x-0" @click="openCart = true">
+            <div class="flex justify-center">
+                <i class='bx bx-caret-up text-zinc-900 bg-white px-10 rounded-t-3xl'></i>
+            </div>
+        </div>
+
+        <!-- Cart -->
+        <Transition enter-from-class="translate-y-full" enter-active-class="ease-in-out duration-100" leave-active-class="ease-in-out duration-100"leave-to-class="translate-y-full">
+            <div class="fixed inset-0 bg-zinc-900" v-if="openCart">
+                <div class="fixed z-40 w-full top-0 inset-x-0" @click="openCart = false">
+                    <div class="flex justify-center">
+                        <i class='bx bx-caret-down text-zinc-900 bg-white px-10 rounded-b-3xl'></i>
+                    </div>
+                </div>
+                
+
+                <div class="pt-8 px-2 text-white">
+                    <p class="font-semibold mb-2">Cart</p>
+                    <div class="rounded-lg flex justify-between bg-zinc-700 p-2 mb-2 text-white" v-for="item in cart">
+                        <div class="flex space-x-2 items-center">
+                            <i @click="decreaseCount(item)" class="bx bx-minus inline-flex justify-center items-center min-w-6 min-h-6 rounded-full bg-blue-500 hover:bg-blue-600 acive:bg-blue-800 duration-200 ease-in-out cursor-pointer"></i>
+                            <p>{{ item.name }} x{{ item.count }}</p>
+                        </div>
+    
+                        <div class="flex space-x-2 items-center">
+                            <p>{{ item.price * item.count }}</p>
+                            <i @click="removeItem(item)" class="bx bx-trash inline-flex justify-center items-center min-w-6 min-h-6 rounded-full bg-red-500 hover:bg-red-600 acive:bg-red-800 duration-200 ease-in-out cursor-pointer"></i>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="fixed inset-x-0 bottom-0 p-2">
+                    <label class="relative block mb-1">
+                        <input :disabled="!cartValue" v-model="customer"
+                            class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none duration-300 ease-in-out placeholder:text-xs placeholder:text-zinc-400 text-white block bg-zinc-900 w-full border-slate-300 dark:border-slate-300/20 rounded-md py-2 pl-3 pr-9 shadow-sm focus:border-indigo-300 focus:ring-indigo-200 focus:ring focus:ring-opacity-50"
+                            placeholder="Customer" type="text" name="customer" />
+                        <i @click.self="customer = null"
+                            class='bx bx-x-circle text-white/40 absolute text-xl inset-y-0 right-0 flex items-center pr-3 hover:text-red-500'></i>
+                    </label>
+                    <label class="relative block">
+                        <input :disabled="!cartValue" v-model="payment"
+                            class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none duration-300 ease-in-out placeholder:text-xs placeholder:text-zinc-400 text-white block bg-zinc-900 w-full border-slate-300 dark:border-slate-300/20 rounded-md py-2 pl-3 pr-9 shadow-sm focus:border-indigo-300 focus:ring-indigo-200 focus:ring focus:ring-opacity-50"
+                            placeholder="Payment" type="number" name="payment" />
+                        <i @click.self="payment = null"
+                            class='bx bx-x-circle text-white/40 absolute text-xl inset-y-0 right-0 flex items-center pr-3 hover:text-red-500'></i>
+                    </label>
+                    <div class="grid grid-cols-5 gap-2 my-2">
+                        <button :disabled="!cartValue" class="p-2 text-sm font-bold text-zinc-800 bg-white rounded-md enabled:active:scale-95 disabled:opacity-50"
+                            @click="payment += 50">50</button>
+                        <button :disabled="!cartValue" class="p-2 text-sm font-bold text-zinc-800 bg-white rounded-md enabled:active:scale-95 disabled:opacity-50"
+                            @click="payment += 100">100</button>
+                        <button :disabled="!cartValue" class="p-2 text-sm font-bold text-zinc-800 bg-white rounded-md enabled:active:scale-95 disabled:opacity-50"
+                            @click="payment += 200">200</button>
+                        <button :disabled="!cartValue" class="p-2 text-sm font-bold text-zinc-800 bg-white rounded-md enabled:active:scale-95 disabled:opacity-50"
+                            @click="payment += 500">500</button>
+                        <button :disabled="!cartValue" class="p-2 text-xs font-bold text-zinc-800 bg-white rounded-md enabled:active:scale-95 disabled:opacity-50"
+                            @click="payment += 1000">1000</button>
+                        <button :disabled="!cartValue" class="bg-white rounded-md w-full p-2 font-bold text-sm enabled:active:scale-[0.98] disabled:opacity-50 col-span-5"
+                            @click="payment = cartValue">Exact amount</button>
+                    </div>
+        
+                    <input :disabled="!cartValue" type="radio" name="type" id="dinein" value="Dine-in" class="hidden" v-model="type">
+                    <input :disabled="!cartValue" type="radio" name="type" id="takeout" value="Take-out" class="hidden" v-model="type">
+                    <div class="flex justify-between text-white space-x-2 my-2">
+                            <label class="text-sm rounded-2xl py-1 w-full inline-flex justify-center duration-200 ease-in-out" :class="type === 'Dine-in' ? 'bg-white font-bold text-zinc-800' : 'bg-zinc-600 text-zinc-200', {'opacity-50': !cartValue}" for="dinein">Dine-in</label>
+                            <label class="text-sm rounded-2xl py-1 w-full inline-flex justify-center duration-200 ease-in-out" :class="type === 'Take-out' ? 'bg-white font-bold text-zinc-800' : 'bg-zinc-600 text-zinc-200', {'opacity-50': !cartValue}" for="takeout">Take-out</label>
+                    </div>
+        
+                    <button
+                        class="bg-white disabled:opacity-50 rounded-md text-sm w-full p-2 font-bold enabled:active:scale-[0.98]"
+                        @click="noteModal = true"
+                        :disabled="!type || !cartValue || payment < cartValue || !payment || isProcessing">{{ isProcessing ? 'Processing...' : 'Place order' }}</button>
+                </div>
+            </div>
+        </Transition>
+    </main>
+
     <!-- Messages Modal -->
     <Modal :max-width="'sm'" :show="showConfirmation" @close="showConfirmation = false">
         <div class="flex justify-center p-4 bg-white  text-zinc-900 text-3xl font-bold uppercase">
@@ -308,7 +404,7 @@ Echo.private('done-orders')
             <label for="note">Note</label>
             <div class="flex w-full">
                 <textarea name="note" id="note" rows="5" v-model="note"
-                    class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none w-full border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"></textarea>
+                    class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none w-full border-zinc-700 bg-zinc-900 text-zinc-300 focus:border-indigo-600 focus:ring-indigo-600 rounded-md shadow-sm"></textarea>
             </div>
             <div class="flex justify-end items-center space-x-4 mt-4">
                 <span class="hover:underline cursor-pointer" @click="noteModal = false">Cancel</span>
