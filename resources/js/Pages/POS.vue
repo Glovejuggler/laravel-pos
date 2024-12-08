@@ -138,7 +138,7 @@ Echo.private('done-orders')
         </title>
     </Head>
 
-    <main class="fixed inset-0 overflow-hidden min-h-screen max-h-screen bg-zinc-900 hidden md:block">
+    <main class="fixed inset-0 overflow-hidden min-h-screen max-h-screen bg-zinc-900 sm:hidden md:block">
         <div class="grid grid-cols-12">
             <aside class="bg-zinc-900 flex flex-col space-y-2 col-span-2 p-2 text-xs md:text-sm min-h-screen max-h-screen z-50 overflow-y-auto">
                     <div v-for="category in categories"
@@ -230,9 +230,74 @@ Echo.private('done-orders')
                 </div>
             </div>
         </div>
+
+        <!-- Receipt -->
+        <div v-if="receipt" id="receipt" class="w-64 bg-white pb-6 z-10">
+            <div class="flex justify-center">
+                <img src="logo.jpg" class="w-32" alt="">
+            </div>
+            <div class="grid grid-cols-2">
+                <p>{{ receipt.name ?? ' ' }}</p>
+                <p class="text-right">{{ `Order #${receipt.number}` }}</p>
+            </div>
+            <div class="grid grid-cols-2">
+                <b>Type</b>
+                <b class="text-right">{{ receipt.type }}</b>
+            </div>
+            <hr class="border-black mt-2">
+            <div class="flex justify-between">
+                <p>Item</p>
+                <p>Subtotal</p>
+            </div>
+            <hr class="border-black mb-2">
+            <div>
+                <div v-for="item in receipt.items">
+                    <p>{{ item.name }}</p>
+                    <div class="flex justify-between pl-4 w-full">
+                        <p class="w-full">{{ Number(item.price).amountFormat() }} x{{ item.quantity }}</p>
+                        <p>{{ (item.quantity * item.price).amountFormat() }}</p>
+                    </div>
+                </div>
+                <hr class="border-black my-2">
+                <div>
+                    <div class="font-bold text-lg flex justify-between">
+                        <p>TOTAL</p>
+                        <p>{{ receipt.gross.amountFormat() }}</p>
+                    </div>
+                    <div class="pl-4">
+                        <p>CASH: {{ receipt.payment.amountFormat() }}</p>
+                        <p>CHANGE: {{ (receipt.payment - receipt.gross).amountFormat() }}</p>
+                    </div>
+                </div>
+                <hr class="border-black my-2">
+                <div class="flex justify-center">
+                    <p>Thank you. Come again.</p>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <p>Cashier</p>
+                    <p>{{ $page.props.auth.user.name }}</p>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <p>Order ID</p>
+                    <p class="text-right">{{ `dQw4w9WgXcQ${receipt.id.pad(4)}` }}</p>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <p class="w-max">Order Time</p>
+                    <p class="w-max">{{ Intl.DateTimeFormat('en-US', {month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: 'numeric', hour12: true}).format(new Date(receipt.created_at)) }}</p>
+                </div>
+                    <div class="flex flex-col items-center justify-center text-sm mt-2 w-full">
+                        <b>UPTop Diner</b>
+                        <p>25 L. Geirosa Ave., Brgy. Silangan</p>
+                        <p>Calauan, Laguna</p>
+                        <p>La Famiglia Building 2nd Floor</p>
+                    </div>
+                <hr class="border-black my-2">
+                <p>THIS IS NOT AN OFFICIAL RECEIPT</p>
+            </div>
+        </div>
     </main>
 
-    <main class="md:hidden block fixed inset-0 bg-zinc-900 min-h-screen">
+    <main class="md:hidden sm:block fixed inset-0 bg-zinc-900 min-h-screen">
         <nav class="p-2 flex space-x-2 overflow-x-scroll">
             <span @click="changeCat(category.name)" class="inline-flex font-semibold px-2 rounded-full border-white border whitespace-nowrap text-clip h-min" :class="currentTab === category.name ? 'text-zinc-900 bg-white' : 'text-white bg-zinc-900'" v-for="category in categories">
                 {{ category.name }}
@@ -263,9 +328,8 @@ Echo.private('done-orders')
                         <i class='bx bx-caret-down text-zinc-900 bg-white px-10 rounded-b-3xl'></i>
                     </div>
                 </div>
-                
 
-                <div class="pt-8 px-2 text-white">
+                <div class="pt-8 px-2 bg-zinc-900 text-white z-50">
                     <p class="font-semibold mb-2">Cart</p>
                     <div class="rounded-lg flex justify-between bg-zinc-700 p-2 mb-2 text-white" v-for="item in cart">
                         <div class="flex space-x-2 items-center">
@@ -280,7 +344,7 @@ Echo.private('done-orders')
                     </div>
                 </div>
     
-                <div class="fixed inset-x-0 bottom-0 p-2">
+                <div class="fixed inset-x-0 bottom-0 p-2 z-50">
                     <label class="relative block mb-1">
                         <input :disabled="!cartValue" v-model="customer"
                             class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none duration-300 ease-in-out placeholder:text-xs placeholder:text-zinc-400 text-white block bg-zinc-900 w-full border-slate-300 dark:border-slate-300/20 rounded-md py-2 pl-3 pr-9 shadow-sm focus:border-indigo-300 focus:ring-indigo-200 focus:ring focus:ring-opacity-50"
@@ -324,72 +388,72 @@ Echo.private('done-orders')
                 </div>
             </div>
         </Transition>
-    </main>
-
-    <!-- Receipt -->
-    <div v-if="receipt" id="receipt" class="w-64 bg-white pb-6 z-10">
-        <div class="flex justify-center">
-            <img src="logo.jpg" class="w-32" alt="">
-        </div>
-        <div class="grid grid-cols-2">
-            <p>{{ receipt.name ?? ' ' }}</p>
-            <p class="text-right">{{ `Order #${receipt.number}` }}</p>
-        </div>
-        <div class="grid grid-cols-2">
-            <b>Type</b>
-            <b class="text-right">{{ receipt.type }}</b>
-        </div>
-        <hr class="border-black mt-2">
-        <div class="flex justify-between">
-            <p>Item</p>
-            <p>Subtotal</p>
-        </div>
-        <hr class="border-black mb-2">
-        <div>
-            <div v-for="item in receipt.items">
-                <p>{{ item.name }}</p>
-                <div class="flex justify-between pl-4 w-full">
-                    <p class="w-full">{{ Number(item.price).amountFormat() }} x{{ item.quantity }}</p>
-                    <p>{{ (item.quantity * item.price).amountFormat() }}</p>
-                </div>
-            </div>
-            <hr class="border-black my-2">
-            <div>
-                <div class="font-bold text-lg flex justify-between">
-                    <p>TOTAL</p>
-                    <p>{{ receipt.gross.amountFormat() }}</p>
-                </div>
-                <div class="pl-4">
-                    <p>CASH: {{ receipt.payment.amountFormat() }}</p>
-                    <p>CHANGE: {{ (receipt.payment - receipt.gross).amountFormat() }}</p>
-                </div>
-            </div>
-            <hr class="border-black my-2">
+        <!-- Receipt -->
+        <div v-if="receipt" id="receipt" class="w-64 bg-white pb-6 -z-50">
             <div class="flex justify-center">
-                <p>Thank you. Come again.</p>
+                <img src="logo.jpg" class="w-32" alt="">
             </div>
-            <div class="flex justify-between text-sm">
-                <p>Cashier</p>
-                <p>{{ $page.props.auth.user.name }}</p>
+            <div class="grid grid-cols-2">
+                <p>{{ receipt.name ?? ' ' }}</p>
+                <p class="text-right">{{ `Order #${receipt.number}` }}</p>
             </div>
-            <div class="flex justify-between text-sm">
-                <p>Order ID</p>
-                <p class="text-right">{{ `dQw4w9WgXcQ${receipt.id.pad(4)}` }}</p>
+            <div class="grid grid-cols-2">
+                <b>Type</b>
+                <b class="text-right">{{ receipt.type }}</b>
             </div>
-            <div class="flex justify-between text-sm">
-                <p class="w-max">Order Time</p>
-                <p class="w-max">{{ Intl.DateTimeFormat('en-US', {month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: 'numeric', hour12: true}).format(new Date(receipt.created_at)) }}</p>
+            <hr class="border-black mt-2">
+            <div class="flex justify-between">
+                <p>Item</p>
+                <p>Subtotal</p>
             </div>
-                <div class="flex flex-col items-center justify-center text-sm mt-2 w-full">
-                    <b>UPTop Diner</b>
-                    <p>25 L. Geirosa Ave., Brgy. Silangan</p>
-                    <p>Calauan, Laguna</p>
-                    <p>La Famiglia Building 2nd Floor</p>
+            <hr class="border-black mb-2">
+            <div>
+                <div v-for="item in receipt.items">
+                    <p>{{ item.name }}</p>
+                    <div class="flex justify-between pl-4 w-full">
+                        <p class="w-full">{{ Number(item.price).amountFormat() }} x{{ item.quantity }}</p>
+                        <p>{{ (item.quantity * item.price).amountFormat() }}</p>
+                    </div>
                 </div>
-            <hr class="border-black my-2">
-            <p>THIS IS NOT AN OFFICIAL RECEIPT</p>
+                <hr class="border-black my-2">
+                <div>
+                    <div class="font-bold text-lg flex justify-between">
+                        <p>TOTAL</p>
+                        <p>{{ receipt.gross.amountFormat() }}</p>
+                    </div>
+                    <div class="pl-4">
+                        <p>CASH: {{ receipt.payment.amountFormat() }}</p>
+                        <p>CHANGE: {{ (receipt.payment - receipt.gross).amountFormat() }}</p>
+                    </div>
+                </div>
+                <hr class="border-black my-2">
+                <div class="flex justify-center">
+                    <p>Thank you. Come again.</p>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <p>Cashier</p>
+                    <p>{{ $page.props.auth.user.name }}</p>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <p>Order ID</p>
+                    <p class="text-right">{{ `dQw4w9WgXcQ${receipt.id.pad(4)}` }}</p>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <p class="w-max">Order Time</p>
+                    <p class="w-max">{{ Intl.DateTimeFormat('en-US', {month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: 'numeric', hour12: true}).format(new Date(receipt.created_at)) }}</p>
+                </div>
+                    <div class="flex flex-col items-center justify-center text-sm mt-2 w-full">
+                        <b>UPTop Diner</b>
+                        <p>25 L. Geirosa Ave., Brgy. Silangan</p>
+                        <p>Calauan, Laguna</p>
+                        <p>La Famiglia Building 2nd Floor</p>
+                    </div>
+                <hr class="border-black my-2">
+                <p>THIS IS NOT AN OFFICIAL RECEIPT</p>
+            </div>
         </div>
-    </div>
+
+    </main>
 
     <!-- Messages Modal -->
     <Modal :max-width="'sm'" :show="showConfirmation" @close="showConfirmation = false">
