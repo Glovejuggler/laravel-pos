@@ -62,7 +62,7 @@ const removeBreakdown = (index) => {
         </title>
     </Head>
 
-    <div class="max-w-screen-lg mx-auto mt-8">
+    <div class="max-w-screen-lg mx-auto py-8">
         <p class="dark:text-white mb-8">New item</p>
         <div class="grid grid-cols-3 gap-4">
             <div>

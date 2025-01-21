@@ -65,7 +65,7 @@ const showDeleteConfirmationModal = ref(false)
         </title>
     </Head>
 
-    <div class="max-w-screen-lg mx-auto mt-8">
+    <div class="max-w-screen-lg mx-auto py-8">
         <p class="dark:text-white mb-8">{{ item.name }}</p>
         <div class="lg:grid grid-cols-3 gap-4">
             <div>

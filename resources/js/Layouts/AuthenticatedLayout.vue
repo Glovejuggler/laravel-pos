@@ -13,34 +13,6 @@ const showingNavigationDropdown = ref(false);
 <template>
     <div>
         <div class="min-h-screen bg-zinc-100 dark:bg-zinc-900">
-            <nav class="bg-white dark:bg-zinc-800 border-b border-zinc-100 dark:border-zinc-700">
-                <!-- Responsive Navigation Menu -->
-                <div :class="{ block: showingNavigationDropdown, hidden: !showingNavigationDropdown }"
-                    class="sm:hidden">
-                    <div class="pt-2 pb-3 space-y-1">
-                        <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
-                            Dashboard
-                        </ResponsiveNavLink>
-                    </div>
-
-                    <!-- Responsive Settings Options -->
-                    <div class="pt-4 pb-1 border-t border-zinc-200 dark:border-zinc-600">
-                        <div class="px-4">
-                            <div class="font-medium text-base text-zinc-800 dark:text-zinc-200">
-                                {{ $page.props.auth.user.name }}
-                            </div>
-                            <div class="font-medium text-sm text-zinc-500">{{ $page.props.auth.user.email }}</div>
-                        </div>
-
-                        <div class="mt-3 space-y-1">
-                            <ResponsiveNavLink :href="route('profile.edit')"> Profile </ResponsiveNavLink>
-                            <ResponsiveNavLink :href="route('logout')" method="post" as="button">
-                                Log Out
-                            </ResponsiveNavLink>
-                        </div>
-                    </div>
-                </div>
-            </nav>
 
             <aside class="md:w-48 bg-white dark:bg-zinc-900 dark:text-zinc-100 fixed left-0 inset-y-0 md:block hidden">
                 <div class="flex flex-col space-y-1 py-8 mx-2 text-xs">

@@ -35,6 +35,14 @@ class TransactionController extends Controller
     }
 
     /**
+     * Advanced filter
+     */
+    public function advanced(Request $request)
+    {
+        
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()

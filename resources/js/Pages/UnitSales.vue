@@ -36,7 +36,7 @@ watch(form, (data) => {
         </title>
     </Head>
 
-    <div class="max-w-7xl md:flex mx-auto mt-8 px-6 lg:px-8">
+    <div class="max-w-7xl md:flex mx-auto py-8 px-6 lg:px-8">
         <div class="w-full md:w-1/6 bg-white dark:bg-zinc-900 border dark:border-zinc-700 py-4 rounded-lg h-min mb-6 text-sm">
             <div class="flex justify-between items-center px-4 dark:text-white">
                 <span>Categories</span>

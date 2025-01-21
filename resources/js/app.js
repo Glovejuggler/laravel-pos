@@ -33,11 +33,11 @@ createInertiaApp({
 
 // Custom methods
 Date.prototype.toWordFormat = function () {
-    return Intl.DateTimeFormat('en-US', {month: 'long', day: 'numeric', year: 'numeric'}).format(this)
+    return Intl.DateTimeFormat('en-PH', {month: 'long', day: 'numeric', year: 'numeric'}).format(this)
 }
 
 Date.prototype.toTimeFormat = function () {
-    return Intl.DateTimeFormat('en-US', {hour: 'numeric', minute: '2-digit', hour12: true}).format(this)
+    return Intl.DateTimeFormat('en-PH', {hour: 'numeric', minute: '2-digit', hour12: true}).format(this)
 }
 
 Number.prototype.amountFormat = function () {

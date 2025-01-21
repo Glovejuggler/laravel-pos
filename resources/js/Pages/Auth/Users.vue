@@ -73,7 +73,7 @@ const closeModal = () => {
         <title>Users</title>
     </Head>
 
-    <div class="max-w-md mx-auto my-8 dark:text-zinc-100">
+    <div class="max-w-md mx-auto py-8 dark:text-zinc-100">
         <div class="flex justify-end mb-4">
             <button @click="showNewUserModal = true"
                 class="py-1 px-2 text-white bg-green-500 hover:bg-green-700 active:bg-green-800 duration-200 ease-in-out rounded-lg text-xs">New

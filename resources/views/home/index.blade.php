@@ -20,7 +20,7 @@
                 </swiper-slide>
             </swiper-container>
 
-            <div class="lg:flex-col items-start self-start lg:self-center flex p-2 mt-8">
+            <div class="lg:flex-col items-start self-start lg:self-center flex p-2 mt-8 max-w-screen flex-wrap">
                 <p class="text-4xl lg:text-6xl font-bold mr-4">COFFEE.</p>
                 <p class="text-4xl lg:text-6xl font-bold mr-4">SODAS.</p>
                 <p class="text-4xl lg:text-6xl font-bold mr-4">BURGERS.</p>
@@ -29,7 +29,7 @@
             </div>
         </div>
     </div>
-    <div id="bgp" class="fixed inset-0 z-0"></div>
+    {{-- <div id="bgp" class="fixed inset-0 z-0"></div> --}}
 @endsection
 
 @section('styles')
@@ -47,13 +47,13 @@
 @endsection
 
 @section('scripts')
-    <script src="{{ asset('Custom/particles.min.js') }}"></script>
+    {{-- <script src="{{ asset('Custom/particles.min.js') }}"></script>
 
     <script>
     particlesJS.load('bgp', 'Custom/particlesjs-config.json', function() {
         console.log('callback - particles.js config loaded');
     });
-    </script>
+    </script> --}}
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-element-bundle.min.js"></script>
 @endsection
