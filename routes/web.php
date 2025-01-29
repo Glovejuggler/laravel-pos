@@ -16,6 +16,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\TransactionController;
 
 /*
@@ -108,6 +109,11 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/transact', [TransactionController::class, 'store'])->name('transaction.save');
     Route::get('order/{id}', [TransactionController::class, 'show'])->name('order.get');
+
+    Route::get('expenses', [ExpenseController::class, 'index'])->name('expenses.index');
+    Route::get('expenses/create', [ExpenseController::class, 'create'])->name('expenses.create');
+    Route::post('expenses', [ExpenseController::class, 'store'])->name('expenses.store');
+    Route::post('expenses/import', [ExpenseController::class, 'import'])->name('expenses.import');
 });
 
 
