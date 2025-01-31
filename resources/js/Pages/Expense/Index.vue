@@ -27,14 +27,32 @@ const editExpenseData = useForm({
     amount: ''
 })
 const deleteModal = ref(false)
+const deleteExpenseData = ref(null)
 
 const editExpense = (expense) => {
     editExpenseData.created_at = new Date(expense.created_at).toLocaleDateString('sv-SE')
     editExpenseData.type = expense.type
     editExpenseData.item = expense.item
     editExpenseData.amount = expense.amount
+    editExpenseData.id = expense.id
 
     editModal.value = true
+}
+
+const submitEditExpense = () => {
+    editExpenseData.put(route('expenses.update', editExpenseData.id), {
+        preserveScroll: true,
+        preserveState: (page) => Object.keys(page.props.errors).length > 0,
+        onSuccess: (page) => {
+            if (Object.keys(page.props.errors).length === 1) editExpenseData.reset()
+        }
+    })
+}
+
+const deleteExpense = (expense) => {
+    deleteExpenseData.value = expense
+
+    deleteModal.value = true
 }
 </script>
 
@@ -70,7 +88,7 @@ const editExpense = (expense) => {
                         <td class>
                             <div class="flex items-center space-x-2">
                                 <i @click="editExpense(expense)" class="bx bx-edit w-6 h-6 inline-flex justify-center items-center bg-green-500 hover:bg-green-600 active:bg-green-800 duration-200 ease-in-out rounded-full"></i>
-                                <i class="bx bx-trash w-6 h-6 inline-flex justify-center items-center bg-red-500 hover:bg-red-600 active:bg-red-800 duration-200 ease-in-out rounded-full"></i>
+                                <i @click="deleteExpense(expense)" class="bx bx-trash w-6 h-6 inline-flex justify-center items-center bg-red-500 hover:bg-red-600 active:bg-red-800 duration-200 ease-in-out rounded-full"></i>
                             </div>
                         </td>
                     </tr>
@@ -90,8 +108,44 @@ const editExpense = (expense) => {
     <Modal :show="editModal" @close="editModal = false" max-width="md">
         <div class="p-4">
             <span class="dark:text-white font-bold">Edit Expense</span>
-            <InputLabel value="Date" class="mt-4"/>
-            <TextInput type="date" class="w-full mt-2" v-model="editExpenseData.created_at"/>
+            <InputLabel value="Date" for="editExpenseData.created_at" class="mt-4"/>
+            <TextInput type="date" id="editExpenseData.created_at" class="w-full mt-2" v-model="editExpenseData.created_at"/>
+            
+            <InputLabel value="Item" class="mt-4"/>
+            <TextInput type="text" class="w-full mt-2" v-model="editExpenseData.item"/>
+
+            <InputLabel value="Amount" class="mt-4"/>
+            <TextInput type="text" class="w-full mt-2" v-model="editExpenseData.amount"/>
+
+            <InputLabel value="Deduct from" class="mt-4"/>
+            <select v-model="editExpenseData.type" id="categories" class="w-full mt-2 border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+                <option value="" selected hidden disabled>Choose one</option>
+                <option value="Net">Net</option>
+                <option value="COGS">COGS</option>
+            </select>
+
+            <div class="flex mt-8 flex-row-reverse gap-4">
+                <button @click="submitEditExpense" class="px-8 py-2 text-white text-sm bg-green-500 hover:bg-green-600 active:bg-green-800 duration-200 ease-in-out rounded-lg">Save</button>
+                <button @click="editModal = false" class="dark:text-white text-sm hover:underline">Cancel</button>
+            </div>
+        </div>
+    </Modal>
+
+    <!-- Delete Expense Modal -->
+    <Modal :show="deleteModal" @close="deleteModal = false" max-width="md">
+        <div class="p-4 dark:text-white">
+            <p class="font-bold mb-2">Confirmation</p>
+            <span>Are you sure you want to delete?</span>
+
+            <div class="flex mt-4 flex-row-reverse gap-4">
+                <button @click="$inertia.delete(route('expenses.destroy', deleteExpenseData), {
+                    onSuccess: () => {
+                        deleteModal = false
+                        deleteExpenseData = null
+                    }
+                })" class="px-8 py-2 text-white text-sm bg-red-500 hover:bg-red-600 active:bg-red-800 duration-200 ease-in-out rounded-lg">Delete</button>
+                <button @click="deleteModal = false" class="dark:text-white text-sm hover:underline">Cancel</button>
+            </div>
         </div>
     </Modal>
 </template>

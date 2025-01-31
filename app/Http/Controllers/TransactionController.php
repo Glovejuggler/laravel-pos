@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\OrderDone;
+use App\Models\Expense;
 use App\Models\SoldCost;
 use App\Models\SoldItem;
+use App\Events\OrderDone;
 use App\Events\OrderPlaced;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
@@ -17,29 +18,36 @@ class TransactionController extends Controller
      */
     public function index(Request $request)
     {
-        $transactions = Transaction::onlyTrashed()
-                        ->filter([
-                            'date' => $request->date ? $request->date : today(),
-                            'search' => $request->search
-                        ])
-                        ->get();
+        if ($request->advanced) {
+            $transactions = Transaction::onlyTrashed()
+                ->whereBetween('created_at', [$request->advanced['from'], $request->advanced['to']])
+                ->get();
+            $net = Expense::where('type', 'Net')->whereBetween('created_at', [$request->advanced['from'], $request->advanced['to']])->get();
+            $cogs = Expense::where('type', 'COGS')->whereBetween('created_at', [$request->advanced['from'], $request->advanced['to']])->get();
+        } else {
+            $transactions = Transaction::onlyTrashed()
+                            ->filter([
+                                'date' => $request->date ?: today(),
+                            ])
+                            ->get();
+            $net = Expense::where('type', 'net')->whereDate('created_at', $request->date ?: today())->get();
+            $cogs = Expense::where('type', 'COGS')->whereDate('created_at', $request->date ?: today())->get();
+        }
+        // dd($transactions);
 
         return inertia('Sales', [
             'transactions' => $transactions,
-            'filters' => $request->only(['search', 'date']),
+            'expenses' => [
+                'net' => $net,
+                'cogs' => $cogs,
+            ],
+            'filters' => $request->only(['date', 'advanced']),
             'total' => [
                 'gross' => $transactions->sum('gross'),
                 'cost' => $transactions->sum('cost'),
-            ]
+            ],
+            'batchDates' => $request->advanced
         ]);
-    }
-
-    /**
-     * Advanced filter
-     */
-    public function advanced(Request $request)
-    {
-        
     }
 
     /**

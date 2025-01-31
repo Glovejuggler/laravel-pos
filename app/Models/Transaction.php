@@ -56,9 +56,4 @@ class Transaction extends Model
             $query->whereDate('created_at', Carbon::parse($date));
         });
     }
-
-    public function scopeFromTo($query, $start, $end)
-    {
-        $query->whereDate();
-    }
 }

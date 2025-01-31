@@ -4,12 +4,15 @@ import { ref, nextTick, watch, onMounted } from 'vue';
 import Modal from '@/Components/Modal.vue';
 import { domToPng } from 'modern-screenshot';
 import Receipt from '@/Components/Receipt.vue';
+import InputLabel from '@/Components/InputLabel.vue';
+import TextInput from '@/Components/TextInput.vue';
 
 const props = defineProps({
     transactions: Object,
     filters: Object,
     total: Object,
-    batchDates: Boolean,
+    batchDates: Object,
+    expenses: Object,
 })
 
 const getRandomInt = (min, max) => {
@@ -42,10 +45,23 @@ const checkAndSubmit = (e) => {
 const date = props.filters.date ? new Date(props.filters.date) : new Date()
 const nextable = date < new Date(new Date().setHours(0, 0, 0, 0))
 
+const ConvertToDate = (d) => {
+    let date = new Date(d)
+
+    return Intl.DateTimeFormat('en-PH', {month: 'long', day: 'numeric', year: 'numeric'}).format(date)
+}
+
 const form = useForm({
     search: props.filters.search,
-    date: props.filters.date,
+    date: props.filters.date
 })
+
+const advanced = ref({
+    from: '',
+    to: '',
+})
+
+const advancedModal = ref(false)
 
 watch(form, (data) => {
     router.get(route('sales'), data, {
@@ -117,26 +133,31 @@ const printReceipt = () => {
     </Head>
 
     <div class="max-w-7xl mx-auto px-6 py-8 lg:px-8 z-50">
-        <div class="flex space-x-2 items-center mb-4">
-            <i @click="$inertia.get(route('sales'), { date: new Date(date.setDate(date.getDate() - 1)).toLocaleDateString('en-PH') })"
-                class='bx bxs-chevron-left dark:text-white hover:bg-white hover:text-zinc-900 w-6 h-6 inline-flex justify-center items-center rounded-full border dark:border-white'></i>
-            <p class="dark:text-white font-semibold">{{ date.toWordFormat() }}</p>
-            <i v-if="nextable"
-                @click="$inertia.get(route('sales'), { date: new Date(date.setDate(date.getDate() + 1)).toLocaleDateString('en-PH') })"
-                class='bx bxs-chevron-right dark:text-white hover:bg-white hover:text-zinc-900 w-6 h-6 inline-flex justify-center items-center rounded-full border dark:border-white'></i>
+        <div class="flex justify-between items-center mb-4">
+            <div v-if="filters.advanced === undefined" class="flex space-x-2 items-center">
+                <i @click="$inertia.get(route('sales'), { date: new Date(date.setDate(date.getDate() - 1)).toLocaleDateString('en-PH') })"
+                    class='bx bxs-chevron-left dark:text-white hover:bg-white hover:text-zinc-900 w-6 h-6 inline-flex justify-center items-center rounded-full border dark:border-white'></i>
+                <p class="dark:text-white font-semibold">{{ date.toWordFormat() }}</p>
+                <i v-if="nextable"
+                    @click="$inertia.get(route('sales'), { date: new Date(date.setDate(date.getDate() + 1)).toLocaleDateString('en-PH') })"
+                    class='bx bxs-chevron-right dark:text-white hover:bg-white hover:text-zinc-900 w-6 h-6 inline-flex justify-center items-center rounded-full border dark:border-white'></i>
+            </div>
+            <span v-else class="dark:text-white">{{ `${ConvertToDate(batchDates.from)} to ${ConvertToDate(batchDates.to)}` }}</span>
+            <button @click="advancedModal = true" class="text-sm dark:text-white hover:underline hover:text-blue-500 duration-200 ease-in-out">Advanced filter</button>
         </div>
 
         <div v-if="transactions.length" class="w-full rounded-lg dark:bg-zinc-800 bg-white dark:text-white p-4 flex flex-col">
             <span>Total Orders: <b>{{ transactions.length }}</b></span>
             <span>Gross Sales: <b>{{ total.gross.amountFormat() }}</b></span>
-            <span>Net Income: <b>{{ (total.gross - total.cost).amountFormat() }}</b></span>
+            <span>Cost of Goods Sold: <b>{{ total.cost.amountFormat() }}</b></span>
+            <span>Income: <b>{{ (total.gross - total.cost).amountFormat() }}</b></span>
         </div>
 
         <table v-if="transactions.length" class="dark:text-white w-full bg-white dark:bg-zinc-800 text-left text-sm rounded-lg overflow-hidden mt-4">
             <thead>
                 <tr>
                     <th class="p-4">Customer</th>
-                    <th class="p-4">Time</th>
+                    <th class="p-4">{{ batchDates ? 'Date' : 'Time' }}</th>
                     <th class="p-4">Order Type</th>
                     <th class="p-4">Orders</th>
                     <th class="p-4">Quantity</th>
@@ -148,7 +169,7 @@ const printReceipt = () => {
             <tbody>
                 <tr v-for="transaction in transactions" class="bg-white dark:bg-zinc-800 border-b border-zinc-700">
                     <td class="px-4 py-2">{{ transaction.name ?? `#${transaction.number}` }}</td>
-                    <td class="px-4 py-2">{{ new Date(transaction.created_at).toTimeFormat() }} <span class="text-xs opacity-70">{{ secToTime(transaction.elapsed) }}</span></td>
+                    <td class="px-4 py-2">{{ batchDates ? ConvertToDate(transaction.created_at) : new Date(transaction.created_at).toTimeFormat() }} <span v-if="!batchDates" class="text-xs opacity-70">{{ secToTime(transaction.elapsed) }}</span></td>
                     <td class="px-4 py-2">{{ transaction.type }}</td>
                     <td class="px-4 py-2">
                         <div>
@@ -206,6 +227,21 @@ const printReceipt = () => {
             <div class="mt-4 grid grid-cols-2 gap-2">
                 <button @click="printReceipt" class="bg-green-500 rounded-lg py-2 hover:bg-green-600 active:bg-green-800 duration-200 ease-in-out">Yes</button>
                 <button @click="printReceiptModal = false" class="bg-zinc-500 rounded-lg py-2 hover:bg-zinc-600 active:bg-zinc-900 duration-200 ease-in-out">Cancel</button>
+            </div>
+        </div>
+    </Modal>
+
+    <Modal :show="advancedModal" @close="advancedModal = false" max-width="md">
+        <div class="dark:text-white p-4">
+            <InputLabel for="from" value="From"/>
+            <TextInput type="date" id="from" v-model="advanced.from" class="w-full mt-2"/>
+
+            <InputLabel class="mt-4" for="to" value="To"/>
+            <TextInput type="date" id="to" v-model="advanced.to" class="w-full mt-2"/>
+
+            <div class="flex flex-row-reverse gap-4 mt-8">
+                <button @click="router.get(route('sales'), { advanced: {from: advanced.from, to: advanced.to} })" class="text-white rounded-lg bg-green-500 hover:bg-green-600 active:bg-green-800 duration-200 ease-in-out px-6 py-2 text-sm">Submit</button>
+                <button @click="advancedModal = false" class="dark:text-white hover:underline text-sm">Cancel</button>
             </div>
         </div>
     </Modal>

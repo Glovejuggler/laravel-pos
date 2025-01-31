@@ -114,6 +114,8 @@ Route::middleware('auth')->group(function () {
     Route::get('expenses/create', [ExpenseController::class, 'create'])->name('expenses.create');
     Route::post('expenses', [ExpenseController::class, 'store'])->name('expenses.store');
     Route::post('expenses/import', [ExpenseController::class, 'import'])->name('expenses.import');
+    Route::put('expenses/{expense}', [ExpenseController::class, 'update'])->name('expenses.update');
+    Route::delete('expense/{expense}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
 });
 
 
