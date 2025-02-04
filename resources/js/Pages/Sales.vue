@@ -1,11 +1,12 @@
 <script setup>
 import { Head, router, useForm } from '@inertiajs/vue3';
-import { ref, nextTick, watch, onMounted } from 'vue';
+import { ref, nextTick, watch, onMounted, computed } from 'vue';
 import Modal from '@/Components/Modal.vue';
 import { domToPng } from 'modern-screenshot';
 import Receipt from '@/Components/Receipt.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
+import ExpensesCard from '@/Components/ExpensesCard.vue';
 
 const props = defineProps({
     transactions: Object,
@@ -15,6 +16,13 @@ const props = defineProps({
     expenses: Object,
 })
 
+const totalNetExpense = computed(() => {
+    return props.expenses.net.reduce((acc, item) => acc + item.amount, 0)
+})
+
+const totalCogsExpense = computed(() => {
+    return props.expenses.cogs.reduce((acc, item) => acc + item.amount, 0)
+})
 const getRandomInt = (min, max) => {
     const minCeiled = Math.ceil(min);
     const maxFloored = Math.floor(max);
@@ -123,6 +131,8 @@ const printReceipt = () => {
         receipt.value = null
     })
 }
+
+const reportPage = ref(1)
 </script>
 
 <template>
@@ -146,11 +156,55 @@ const printReceipt = () => {
             <button @click="advancedModal = true" class="text-sm dark:text-white hover:underline hover:text-blue-500 duration-200 ease-in-out">Advanced filter</button>
         </div>
 
-        <div v-if="transactions.length" class="w-full rounded-lg dark:bg-zinc-800 bg-white dark:text-white p-4 flex flex-col">
-            <span>Total Orders: <b>{{ transactions.length }}</b></span>
-            <span>Gross Sales: <b>{{ total.gross.amountFormat() }}</b></span>
-            <span>Cost of Goods Sold: <b>{{ total.cost.amountFormat() }}</b></span>
-            <span>Income: <b>{{ (total.gross - total.cost).amountFormat() }}</b></span>
+        <div v-if="transactions.length" class="w-full rounded-lg dark:bg-zinc-800 bg-white dark:text-white p-4 flex flex-col relative">
+            <div class="w-full lg:w-1/4" v-if="reportPage === 1">
+                <div class="flex justify-between">
+                    <span>Total orders:</span>
+                    <b>{{ transactions.length }}</b>
+                </div>
+
+                <div class="flex justify-between">
+                    <span>Gross sales:</span>
+                    <b>{{ total.gross.amountFormat() }}</b>
+                </div>
+                
+                <div class="flex justify-between">
+                    <span>Cost of goods sold:</span>
+                    <b>{{ total.cost.amountFormat() }}</b>
+                </div>
+                
+                <div class="flex justify-between">
+                    <span>Income:</span>
+                    <b>{{ (total.gross - total.cost).amountFormat() }}</b>
+                </div>
+                
+                <ExpensesCard title="Expenses" :data="expenses.net" :total="totalNetExpense"/>
+
+                <div class="flex justify-between">
+                    <span>Net Income:</span>
+                    <b>{{ (total.gross - total.cost - totalNetExpense).amountFormat() }}</b>
+                </div>
+            </div>
+
+            <div class="w-full lg:w-1/4" v-if="reportPage === 2">
+                <b>Inventory Expense</b>
+
+                <div class="flex justify-between">
+                    <span>Cost of goods sold:</span>
+                    <b>{{ total.cost.amountFormat() }}</b>
+                </div>
+                
+                <ExpensesCard title="Expenses" :data="expenses.cogs" :total="totalCogsExpense"/>
+
+                <div class="flex justify-end">
+                    <b>{{ (total.cost - totalCogsExpense).amountFormat() }}</b>
+                </div>
+            </div>
+            
+            <div class="lg:absolute bottom-0 right-0 lg:p-4 mt-2 space-x-2 float-right">
+                <button @click="reportPage -= 1" :disabled="reportPage === 1" class='bx bxs-chevron-left dark:text-white enabled:hover:bg-white enabled:hover:text-zinc-900 w-6 h-6 inline-flex justify-center items-center rounded-full border dark:border-white disabled:opacity-20'></button>
+                <button @click="reportPage += 1" :disabled="reportPage === 2" class='bx bxs-chevron-right dark:text-white enabled:hover:bg-white enabled:hover:text-zinc-900 w-6 h-6 inline-flex justify-center items-center rounded-full border dark:border-white disabled:opacity-20'></button>
+            </div>
         </div>
 
         <table v-if="transactions.length" class="dark:text-white w-full bg-white dark:bg-zinc-800 text-left text-sm rounded-lg overflow-hidden mt-4">
