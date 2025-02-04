@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Expense;
 use App\Models\SoldCost;
 use App\Models\SoldItem;
@@ -30,8 +31,8 @@ class TransactionController extends Controller
                                 'date' => $request->date ?: today(),
                             ])
                             ->get();
-            $net = Expense::where('type', 'net')->whereDate('created_at', $request->date ?: today())->get();
-            $cogs = Expense::where('type', 'COGS')->whereDate('created_at', $request->date ?: today())->get();
+            $net = Expense::where('type', 'net')->whereDate('created_at', $request->date ? Carbon::parse($request->date): today())->get();
+            $cogs = Expense::where('type', 'COGS')->whereDate('created_at', $request->date ? Carbon::parse($request->date) : today())->get();
         }
         // dd($transactions);
 

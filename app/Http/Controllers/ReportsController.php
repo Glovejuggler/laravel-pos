@@ -81,17 +81,29 @@ class ReportsController extends Controller
     public function cost(Request $request)
     {
         if ($request->advanced) {
-
+            
         } else {
-            $costing = SoldCost::withSum(['sold as totalSold' => function ($q) use ($m) {
-                $q->whereHas('transaction', function ($q) use ($m) {
+            $date = $request->date ? Carbon::parse($request->date) : today();
+            $costing = SoldCost::withSum(['sold as totalSold' => function ($q) use ($date) {
+                $q->whereHas('transaction', function ($q) use ($date) {
                     $q->onlyTrashed()
                         ->whereNotNull('deleted_at')
-                        ->whereMonth('deleted_at', $m->month)
-                        ->whereYear('deleted_at', $m->year);
+                        ->whereMonth('deleted_at', $date->month)
+                        ->whereYear('deleted_at', $date->year);
                 });
             }],'quantity')->get();
         }
+
+        $merged = $costing->groupBy(function ($g) {
+            return strtoupper($g->name);
+        })->map(function ($group) {
+            return [
+                'name' => $group->first()->name,
+                'total' => $group->sum(function ($c) {
+                    return $c->totalSold * $c->cost;
+                }),
+            ];
+        });
         
         return inertia('Costing', [
             'costing' => $merged,
