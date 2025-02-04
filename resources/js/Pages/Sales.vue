@@ -133,6 +133,14 @@ const printReceipt = () => {
 }
 
 const reportPage = ref(1)
+
+const jumpModal = ref(false)
+const jumpDate = ref(null)
+const jumpToDate = () => {
+    let date = new Date(jumpDate.value).toLocaleDateString('en-PH')
+    console.log(date)
+    router.get(route('sales'), { date: date })
+}
 </script>
 
 <template>
@@ -147,7 +155,7 @@ const reportPage = ref(1)
             <div v-if="filters.advanced === undefined" class="flex space-x-2 items-center">
                 <i @click="$inertia.get(route('sales'), { date: new Date(date.setDate(date.getDate() - 1)).toLocaleDateString('en-PH') })"
                     class='bx bxs-chevron-left dark:text-white hover:bg-white hover:text-zinc-900 w-6 h-6 inline-flex justify-center items-center rounded-full border dark:border-white'></i>
-                <p class="dark:text-white font-semibold">{{ date.toWordFormat() }}</p>
+                <p @click="jumpModal = true" class="dark:text-white font-semibold cursor-pointer">{{ date.toWordFormat() }}</p>
                 <i v-if="nextable"
                     @click="$inertia.get(route('sales'), { date: new Date(date.setDate(date.getDate() + 1)).toLocaleDateString('en-PH') })"
                     class='bx bxs-chevron-right dark:text-white hover:bg-white hover:text-zinc-900 w-6 h-6 inline-flex justify-center items-center rounded-full border dark:border-white'></i>
@@ -201,7 +209,7 @@ const reportPage = ref(1)
                 </div>
             </div>
             
-            <div class="lg:absolute bottom-0 right-0 lg:p-4 mt-2 space-x-2 float-right">
+            <div class="lg:absolute bottom-0 right-0 lg:p-4 mt-2 space-x-2 self-end">
                 <button @click="reportPage -= 1" :disabled="reportPage === 1" class='bx bxs-chevron-left dark:text-white enabled:hover:bg-white enabled:hover:text-zinc-900 w-6 h-6 inline-flex justify-center items-center rounded-full border dark:border-white disabled:opacity-20'></button>
                 <button @click="reportPage += 1" :disabled="reportPage === 2" class='bx bxs-chevron-right dark:text-white enabled:hover:bg-white enabled:hover:text-zinc-900 w-6 h-6 inline-flex justify-center items-center rounded-full border dark:border-white disabled:opacity-20'></button>
             </div>
@@ -285,7 +293,7 @@ const reportPage = ref(1)
         </div>
     </Modal>
 
-    <Modal :show="advancedModal" @close="advancedModal = false" max-width="md">
+    <Modal :show="advancedModal" @close="advancedModal = false" max-width="md" :closeable="false">
         <div class="dark:text-white p-4">
             <InputLabel for="from" value="From"/>
             <TextInput type="date" id="from" v-model="advanced.from" class="w-full mt-2"/>
@@ -296,6 +304,16 @@ const reportPage = ref(1)
             <div class="flex flex-row-reverse gap-4 mt-8">
                 <button @click="router.get(route('sales'), { advanced: {from: advanced.from, to: advanced.to} })" class="text-white rounded-lg bg-green-500 hover:bg-green-600 active:bg-green-800 duration-200 ease-in-out px-6 py-2 text-sm">Submit</button>
                 <button @click="advancedModal = false" class="dark:text-white hover:underline text-sm">Cancel</button>
+            </div>
+        </div>
+    </Modal>
+    
+    <Modal :show="jumpModal" @close="jumpModal = false" max-width="md" :closeable="false">
+        <div class="dark:text-white p-4">
+            <TextInput type="date" id="jump" v-model="jumpDate" class="w-full"/>
+            <div class="flex flex-row-reverse mt-4 gap-4">
+                <button @click="jumpToDate" class="text-white rounded-lg bg-green-500 hover:bg-green-600 active:bg-green-800 duration-200 ease-in-out px-6 py-2 text-sm">Jump</button>
+                <button @click="jumpModal = false" class="dark:text-white hover:underline text-sm">Cancel</button>
             </div>
         </div>
     </Modal>

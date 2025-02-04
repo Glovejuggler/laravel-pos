@@ -77,4 +77,25 @@ class ReportsController extends Controller
             'total' => $merged->sum('total')
         ]);
     }
+
+    public function cost(Request $request)
+    {
+        if ($request->advanced) {
+
+        } else {
+            $costing = SoldCost::withSum(['sold as totalSold' => function ($q) use ($m) {
+                $q->whereHas('transaction', function ($q) use ($m) {
+                    $q->onlyTrashed()
+                        ->whereNotNull('deleted_at')
+                        ->whereMonth('deleted_at', $m->month)
+                        ->whereYear('deleted_at', $m->year);
+                });
+            }],'quantity')->get();
+        }
+        
+        return inertia('Costing', [
+            'costing' => $merged,
+            'total' => $merged->sum('total')
+        ]);
+    }
 }
