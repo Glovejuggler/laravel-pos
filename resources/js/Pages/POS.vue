@@ -297,7 +297,7 @@ Echo.private('done-orders')
         </div>
     </main>
 
-    <main class="md:hidden sm:block fixed inset-0 bg-zinc-900 min-h-screen">
+    <main class="md:hidden sm:block fixed inset-0 bg-zinc-900 min-h-screen overflow-y-auto">
         <nav class="p-2 flex space-x-2 overflow-x-scroll">
             <span @click="changeCat(category.name)" class="inline-flex font-semibold px-2 rounded-full border-white border whitespace-nowrap text-clip h-min" :class="currentTab === category.name ? 'text-zinc-900 bg-white' : 'text-white bg-zinc-900'" v-for="category in categories">
                 {{ category.name }}

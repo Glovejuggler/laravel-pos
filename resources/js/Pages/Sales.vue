@@ -17,11 +17,11 @@ const props = defineProps({
 })
 
 const totalNetExpense = computed(() => {
-    return props.expenses.net.reduce((acc, item) => acc + item.amount, 0)
+    return props.expenses.net.reduce((acc, item) => acc + Number(item.amount), 0)
 })
 
 const totalCogsExpense = computed(() => {
-    return props.expenses.cogs.reduce((acc, item) => acc + item.amount, 0)
+    return props.expenses.cogs.reduce((acc, item) => acc + Number(item.amount), 0)
 })
 const getRandomInt = (min, max) => {
     const minCeiled = Math.ceil(min);

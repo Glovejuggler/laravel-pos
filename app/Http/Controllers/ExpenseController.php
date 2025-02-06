@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Expense;
 use Illuminate\Http\Request;
 use App\Imports\ExpenseImport;
-use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Requests\UpdateExpenseRequest;
 
@@ -14,10 +14,21 @@ class ExpenseController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $expenses = Expense::orderBy('created_at', 'desc')->paginate(40);
+
+        $expenses->setCollection($expenses->groupBy(function ($q) {
+            return Carbon::createFromTimestampMs($q->created_at)->format('F j, Y');
+        }));
+
+        // dd($expenses->withQueryString());
+        if ($request->wantsJson()) {
+            return $expenses->withQueryString();
+        }
+
         return inertia('Expense/Index', [
-            'expenses' => Expense::orderBy('created_at', 'desc')->get()
+            'expenses' => $expenses->withQueryString()
         ]);
     }
 
