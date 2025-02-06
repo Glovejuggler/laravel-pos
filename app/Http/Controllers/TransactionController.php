@@ -89,7 +89,11 @@ class TransactionController extends Controller
                 }
             }
             
-            OrderPlaced::dispatch($order->id);
+            if (env('KITCHEN')) {
+                OrderPlaced::dispatch($order->id);
+            } else {
+                $order->delete();
+            }
 
             return [
                 'message' => 'Order placed',
@@ -132,7 +136,9 @@ class TransactionController extends Controller
         $transaction = Transaction::findOrFail($id);
         $transaction->delete();
 
-        OrderDone::dispatch($id);
+        if (env('KITCHEN')) {
+            OrderDone::dispatch($id);
+        }
 
         return 'Order done';
     }
@@ -148,7 +154,9 @@ class TransactionController extends Controller
 
         $transaction->forceDelete();
 
-        OrderDone::dispatch($id);
+        if (env('KITCHEN')) {
+            OrderDone::dispatch($id);
+        }
 
         if ($request->wantsJson()) {
             return 'Order cancelled';
