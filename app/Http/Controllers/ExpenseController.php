@@ -19,7 +19,7 @@ class ExpenseController extends Controller
         $expenses = Expense::orderBy('created_at', 'desc')->paginate(40);
 
         $expenses->setCollection($expenses->groupBy(function ($q) {
-            return Carbon::createFromTimestampMs($q->created_at)->format('F j, Y');
+            return Carbon::parse($q->created_at)->format('F j, Y');
         }));
 
         // dd($expenses->withQueryString());

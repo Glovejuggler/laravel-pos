@@ -12,11 +12,4 @@ class Expense extends Model
     use HasFactory;
 
     protected $fillable = ['item', 'amount', 'type', 'created_at'];
-
-    protected function createdAt(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => Carbon::parse($value)->getTimestampMs(),
-        );
-    }
 }
