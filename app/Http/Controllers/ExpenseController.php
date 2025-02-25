@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\Expense;
 use Illuminate\Http\Request;
 use App\Imports\ExpenseImport;
+use Illuminate\Support\Facades\Gate;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Requests\UpdateExpenseRequest;
 
@@ -16,6 +17,10 @@ class ExpenseController extends Controller
      */
     public function index(Request $request)
     {
+        if (!Gate::allows('admin')) {
+            abort(403);
+        }
+        
         $expenses = Expense::orderBy('created_at', 'desc')->paginate(40);
 
         $expenses->setCollection($expenses->groupBy(function ($q) {
@@ -54,6 +59,10 @@ class ExpenseController extends Controller
      */
     public function create()
     {
+        if (!Gate::allows('admin')) {
+            abort(403);
+        }
+        
         return inertia('Expense/Create');
     }
 

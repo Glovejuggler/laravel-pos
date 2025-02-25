@@ -20,27 +20,27 @@ const showingNavigationDropdown = ref(false);
                         <i class="bx bxs-dashboard w-5 h-5 text-lg me-2"></i><span>Dashboard</span>
                     </Link>
 
-                    <Link :data-active="route().current('items.index')" :href="route('items.index')" class="px-4 py-1 rounded-lg data-[active=true]:bg-zinc-900 data-[active=true]:text-white dark:data-[active=true]:bg-white dark:data-[active=true]:text-zinc-900">
+                    <Link v-if="$page.props.auth.user.admin" :data-active="route().current('items.index')" :href="route('items.index')" class="px-4 py-1 rounded-lg data-[active=true]:bg-zinc-900 data-[active=true]:text-white dark:data-[active=true]:bg-white dark:data-[active=true]:text-zinc-900">
                         <i class="bx bxs-dish w-5 h-5 text-lg me-2"></i><span>Products</span>
                     </Link>
 
-                    <Link :data-active="route().current('sales')" :href="route('sales')" class="px-4 py-1 rounded-lg data-[active=true]:bg-zinc-900 data-[active=true]:text-white dark:data-[active=true]:bg-white dark:data-[active=true]:text-zinc-900">
+                    <Link v-if="$page.props.auth.user.admin" :data-active="route().current('sales')" :href="route('sales')" class="px-4 py-1 rounded-lg data-[active=true]:bg-zinc-900 data-[active=true]:text-white dark:data-[active=true]:bg-white dark:data-[active=true]:text-zinc-900">
                         <i class="bx bx-line-chart w-5 h-5 text-lg me-2"></i><span>Sales</span>
                     </Link>
 
-                    <Link :data-active="route().current('unit.sales')" :href="route('unit.sales')" class="px-4 py-1 rounded-lg data-[active=true]:bg-zinc-900 data-[active=true]:text-white dark:data-[active=true]:bg-white dark:data-[active=true]:text-zinc-900">
+                    <Link v-if="$page.props.auth.user.admin" :data-active="route().current('unit.sales')" :href="route('unit.sales')" class="px-4 py-1 rounded-lg data-[active=true]:bg-zinc-900 data-[active=true]:text-white dark:data-[active=true]:bg-white dark:data-[active=true]:text-zinc-900">
                         <i class="bx bxs-bar-chart-alt-2 w-5 h-5 text-lg me-2"></i><span>Unit Sales</span>
                     </Link>
 
-                    <Link :data-active="route().current('inventory.costing')" :href="route('inventory.costing')" class="px-4 py-1 rounded-lg data-[active=true]:bg-zinc-900 data-[active=true]:text-white dark:data-[active=true]:bg-white dark:data-[active=true]:text-zinc-900">
+                    <Link v-if="$page.props.auth.user.admin" :data-active="route().current('inventory.costing')" :href="route('inventory.costing')" class="px-4 py-1 rounded-lg data-[active=true]:bg-zinc-900 data-[active=true]:text-white dark:data-[active=true]:bg-white dark:data-[active=true]:text-zinc-900">
                         <i class="bx bx-scatter-chart w-5 h-5 text-lg me-2"></i><span>Inventory Costing</span>
                     </Link>
 
-                    <Link :data-active="route().current('expenses.*')" :href="route('expenses.index')" class="px-4 py-1 rounded-lg data-[active=true]:bg-zinc-900 data-[active=true]:text-white dark:data-[active=true]:bg-white dark:data-[active=true]:text-zinc-900">
+                    <Link v-if="$page.props.auth.user.admin" :data-active="route().current('expenses.*')" :href="route('expenses.index')" class="px-4 py-1 rounded-lg data-[active=true]:bg-zinc-900 data-[active=true]:text-white dark:data-[active=true]:bg-white dark:data-[active=true]:text-zinc-900">
                         <i class="bx bx-spreadsheet w-5 h-5 text-lg me-2"></i><span>Expenses</span>
                     </Link>
 
-                    <Link v-if="$page.props.auth.user.id === 1" :data-active="route().current('users.index')" :href="route('users.index')" class="px-4 py-1 rounded-lg data-[active=true]:bg-zinc-900 data-[active=true]:text-white dark:data-[active=true]:bg-white dark:data-[active=true]:text-zinc-900">
+                    <Link v-if="$page.props.auth.user.admin" :data-active="route().current('users.index')" :href="route('users.index')" class="px-4 py-1 rounded-lg data-[active=true]:bg-zinc-900 data-[active=true]:text-white dark:data-[active=true]:bg-white dark:data-[active=true]:text-zinc-900">
                         <i class="bx bxs-group w-5 h-5 text-lg me-2"></i><span>User Management</span>
                     </Link>
                 </div>

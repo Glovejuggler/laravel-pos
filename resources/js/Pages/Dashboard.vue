@@ -15,7 +15,7 @@ const props = defineProps({
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-2">
-                <div
+                <div v-if="$page.props.auth.user.admin"
                     class="bg-gradient-to-br from-green-400 to-blue-500 overflow-hidden shadow-sm rounded-lg p-4 relative group">
                     <p class="text-white text-sm">Products</p>
                     <p class="text-white font-bold text-4xl text-end">{{ items }}</p>
@@ -38,8 +38,8 @@ const props = defineProps({
                 </div>
             </div>
 
-            <p class="mt-4 font-bold uppercase dark:text-white">Stats</p>
-            <div class="grid lg:grid-cols-6 gap-2">
+            <p v-if="$page.props.auth.user.admin" class="mt-4 font-bold uppercase dark:text-white">Stats</p>
+            <div v-if="$page.props.auth.user.admin" class="grid lg:grid-cols-6 gap-2">
                 <div class="bg-gradient-to-br from-violet-900 to-sky-400 overflow-hidden shadow-sm rounded-lg p-2 md:p-4 relative group flex justify-center items-center">
                     <div class="flex justify-center items-center flex-col">
                         <p class="font-bold text-white text-xs lg:text-3xl">{{ avgS.toLocaleString(undefine,{minimumFractionDigits:2,maximumFractionDigits:2}) }}s</p>

@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Item;
 use App\Models\Costing;
 use App\Models\Category;
-use Illuminate\Http\Request;
-use App\Http\Requests\StoreItemRequest;
 use App\Models\SoldItem;
 use App\Models\Transaction;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use App\Http\Requests\StoreItemRequest;
 use Illuminate\Support\Facades\Storage;
 
 class ItemController extends Controller
@@ -18,6 +19,10 @@ class ItemController extends Controller
      */
     public function index(Category $category = null)
     {
+        if (!Gate::allows('admin')) {
+            abort(403);
+        }
+        
         if ($category) {
             return inertia('Item/Index', [
                 'items' => Item::where('category_id', $category->id)->get(),
@@ -41,6 +46,10 @@ class ItemController extends Controller
      */
     public function create()
     {
+        if (!Gate::allows('admin')) {
+            abort(403);
+        }
+
         return inertia('Item/Create', [
             'suggestions' => Costing::selectRaw('DISTINCT UPPER(name) as name')->pluck('name'),
         ]);
@@ -51,6 +60,10 @@ class ItemController extends Controller
      */
     public function store(StoreItemRequest $request)
     {
+        if (!Gate::allows('admin')) {
+            abort(403);
+        }
+
         $item = new Item($request->validated());
 
         if ($request->image) {
@@ -81,6 +94,10 @@ class ItemController extends Controller
      */
     public function show($id)
     {
+        if (!Gate::allows('admin')) {
+            abort(403);
+        }
+        
         $item = Item::findOrFail($id);
 
         return inertia('Item/Show', [
@@ -138,6 +155,10 @@ class ItemController extends Controller
      */
     public function destroy(Item $item)
     {
+        if (!Gate::allows('admin')) {
+            abort(403);
+        }
+        
         if ($item->pic) {
             Storage::disk('public')->delete($item->pic);
         }

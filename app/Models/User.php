@@ -42,4 +42,11 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    protected $appends = ['admin'];
+
+    public function getAdminAttribute()
+    {
+        return $this->id === 1;
+    }
 }

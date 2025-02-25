@@ -21,6 +21,7 @@ const form = useForm({
     name: props.item.name,
     price: props.item.price,
     color: props.item.color,
+    menu: props.item.menu,
     breakdown: props.item.costing
 })
 
@@ -90,6 +91,11 @@ const showDeleteConfirmationModal = ref(false)
                         </template>
                     </select>
                     <div class="w-10 h-10 ml-4" :style="`background-color: ${selectedColor} !important`"></div>
+                </div>
+
+                <div class="flex mt-4 items-center space-x-2">
+                    <input v-model="form.menu" class="w-4 h-4 text-blue-600 bg-zinc-100 border-zinc-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-zinc-800 focus:ring-2 dark:bg-zinc-700 dark:border-zinc-600 appearance-none" type="checkbox" name="showInMenu" id="showInMenu">
+                    <InputLabel for="showInMenu" value="Show in menu"/>
                 </div>
             </div>
             <div class="col-span-2 p-6 rounded-lg bg-white dark:bg-zinc-800">

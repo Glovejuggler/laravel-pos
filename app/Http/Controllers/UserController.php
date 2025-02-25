@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -14,7 +15,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        if (Auth::id() != 1) {
+        if (!Gate::allows('admin')) {
             abort(403);
         }
 
@@ -36,6 +37,10 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+        if (!Gate::allows('admin')) {
+            abort(403);
+        }
+
         $request->validate([
             'name' => 'required',
             'email' => 'required|email|unique:users',
@@ -72,6 +77,10 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
+        if (!Gate::allows('admin')) {
+            abort(403);
+        }
+
         $request->validate([
             'name' => 'required',
             'email' => 'required|email',
@@ -98,7 +107,7 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        if ($id === 1) {
+        if ($id === 1 || !Gate::allows('admin')) {
             abort(403);
         }
         

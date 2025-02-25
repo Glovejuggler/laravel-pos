@@ -14,7 +14,7 @@ class StoreTransactionRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return Auth::id();
+        return true;
     }
 
     /**

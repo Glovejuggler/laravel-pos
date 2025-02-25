@@ -12,9 +12,11 @@ class Item extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'price', 'pic', 'category_id', 'color'];
+    protected $fillable = ['name', 'price', 'pic', 'category_id', 'color', 'menu'];
 
     protected $appends = ['cost'];
+
+    protected $casts = ['menu' => 'boolean'];
 
     public function costing(): HasMany
     {

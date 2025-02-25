@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreItemRequest extends FormRequest
@@ -12,7 +13,7 @@ class StoreItemRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return Auth::id();
+        return Gate::allows('admin');
     }
 
     /**
@@ -26,7 +27,8 @@ class StoreItemRequest extends FormRequest
             'name' => 'required',
             'price' => 'required|numeric',
             'category_id' => 'required|numeric',
-            'color' => 'nullable'
+            'color' => 'nullable',
+            'menu' => 'nullable|boolean',
         ];
     }
 }

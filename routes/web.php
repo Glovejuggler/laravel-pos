@@ -9,14 +9,15 @@ use App\Models\SoldItem;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Http\Controllers\POS;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\TransactionController;
 
 /*
@@ -48,6 +49,8 @@ Route::get('/menu', function() {
 
     // dd($menu->products);
 
+    // $menu = Item::with('category')->where('menu', true)->get();
+    
     return view('home.menu', [
         'menu' => $menu->products
     ]);

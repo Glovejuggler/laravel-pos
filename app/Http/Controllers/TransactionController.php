@@ -10,6 +10,7 @@ use App\Events\OrderDone;
 use App\Events\OrderPlaced;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\StoreTransactionRequest;
 
 class TransactionController extends Controller
@@ -19,6 +20,10 @@ class TransactionController extends Controller
      */
     public function index(Request $request)
     {
+        if (!Gate::allows('admin')) {
+            abort(403);
+        }
+        
         if ($request->advanced) {
             $transactions = Transaction::onlyTrashed()
                 ->whereBetween('created_at', [$request->advanced['from'], $request->advanced['to']])

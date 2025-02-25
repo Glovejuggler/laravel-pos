@@ -10,6 +10,7 @@ use App\Models\SoldCost;
 use App\Models\SoldItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class ReportsController extends Controller
 {
@@ -19,6 +20,10 @@ class ReportsController extends Controller
     public function unitSales(Request $request, Category $category = null)
     {
         // dd(SoldItem::all(), SoldCost::all());
+        if (!Gate::allows('admin')) {
+            abort(403);
+        }
+
         if ($category) {
             $date = $request->date ? Carbon::parse($request->date) : today();
             return inertia('UnitSales', [
@@ -50,6 +55,10 @@ class ReportsController extends Controller
      */
     public function costing($month = null)
     {
+        if (!Gate::allows('admin')) {
+            abort(403);
+        }
+        
         $m = Carbon::parse($month) ?: today();
 
         $costing = SoldCost::withSum(['sold as totalSold' => function ($q) use ($m) {
