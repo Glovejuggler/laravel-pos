@@ -39,7 +39,6 @@ class TransactionController extends Controller
             $net = Expense::where('type', 'net')->whereDate('created_at', $request->date ? Carbon::parse($request->date): today())->get();
             $cogs = Expense::where('type', 'COGS')->whereDate('created_at', $request->date ? Carbon::parse($request->date) : today())->get();
         }
-        // dd($transactions);
 
         return inertia('Sales', [
             'transactions' => $transactions,
@@ -94,7 +93,11 @@ class TransactionController extends Controller
                 }
             }
             
-            OrderPlaced::dispatch($order->id);
+            if (env('KITCHEN', true)) {
+                OrderPlaced::dispatch($order->id);
+            } else {
+                $order->delete();
+            }
 
             return [
                 'message' => 'Order placed',
@@ -137,7 +140,9 @@ class TransactionController extends Controller
         $transaction = Transaction::findOrFail($id);
         $transaction->delete();
 
-        OrderDone::dispatch($id);
+        if (env('KITCHEN', true)) {
+            OrderDone::dispatch($id);
+        }
 
         return 'Order done';
     }
@@ -153,7 +158,9 @@ class TransactionController extends Controller
 
         $transaction->forceDelete();
 
-        OrderDone::dispatch($id);
+        if (env('KITCHEN', true)) {
+            OrderDone::dispatch($id);
+        }
 
         if ($request->wantsJson()) {
             return 'Order cancelled';
