@@ -12,49 +12,40 @@ const props = defineProps({
 
     <Head title="Dashboard" />
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-2">
-                <div v-if="$page.props.auth.user.admin"
-                    class="bg-gradient-to-br from-green-400 to-blue-500 overflow-hidden shadow-sm rounded-lg p-4 relative group">
-                    <p class="text-white text-sm">Products</p>
-                    <p class="text-white font-bold text-4xl text-end">{{ items }}</p>
-                    <i
-                        class='bx bx-food-menu absolute -bottom-4 left-4 text-7xl text-white/40 group-hover:scale-110 duration-300 ease-in-out'></i>
-                </div>
-    
+    <div class="py-6">
+        <div class="px-6 lg:px-8">
+            <!-- Quick Actions -->
+            <div class="grid grid-cols-2 lg:grid-cols-12 gap-2 min-h-48">
                 <div @click="$inertia.get(route('pos'))"
-                    class="bg-gradient-to-br from-indigo-800 to-violet-500 overflow-hidden shadow-sm rounded-lg p-4 relative group flex justify-center items-center">
+                    class="bg-white dark:bg-zinc-800 overflow-hidden shadow-sm rounded-2xl p-4 group flex flex-col justify-center items-center">
                     <i
-                        class="bx bx-calculator text-7xl absolute -bottom-4 left-4 text-white/40 group-hover:scale-110 duration-300 ease-in-out"></i>
-                    <p class="font-black text-white text-4xl z-30">POS</p>
+                        class="bx bx-calculator text-3xl text-white group-hover:scale-110 duration-300 ease-in-out rounded-full aspect-square bg-emerald-800 p-4 text-center"></i>
+                    <p class="font-black dark:text-white z-30">POS</p>
                 </div>
     
                 <div @click="$inertia.get(route('kitchen'))"
-                    class="bg-gradient-to-br from-pink-500 to-yellow-500 overflow-hidden shadow-sm rounded-lg p-4 relative group flex justify-center items-center">
+                    class="bg-white dark:bg-zinc-800 overflow-hidden shadow-sm rounded-2xl p-4 group flex flex-col justify-center items-center">
                     <i
-                        class="bx bx-bowl-hot text-7xl absolute -bottom-4 left-4 text-white/40 group-hover:scale-110 duration-300 ease-in-out"></i>
-                    <p class="font-black text-white text-4xl z-30">Kitchen</p>
+                        class="bx bx-bowl-hot text-3xl text-white group-hover:scale-110 duration-300 ease-in-out rounded-full aspect-square bg-rose-900 p-4 text-center"></i>
+                    <p class="font-black dark:text-white z-30">Kitchen</p>
                 </div>
             </div>
 
-            <p v-if="$page.props.auth.user.admin" class="mt-4 font-bold uppercase dark:text-white">Stats</p>
-            <div v-if="$page.props.auth.user.admin" class="grid lg:grid-cols-6 gap-2">
-                <div class="bg-gradient-to-br from-violet-900 to-sky-400 overflow-hidden shadow-sm rounded-lg p-2 md:p-4 relative group flex justify-center items-center">
-                    <div class="flex justify-center items-center flex-col">
-                        <p class="font-bold text-white text-xs lg:text-3xl">{{ avgS.toLocaleString(undefine,{minimumFractionDigits:2,maximumFractionDigits:2}) }}s</p>
-                        <i class="text-white text-sm font-bold block lg:hidden bx bx-timer"></i>
-                        <p class="text-white text-xs font-bold lg:block hidden">AVG SERVING TIME</p>
+            <section v-if="$page.props.auth.user.admin">
+                <p class="mt-8 font-bold dark:text-white">Stats</p>
+                <div class="grid lg:grid-cols-6 gap-2 mt-4">
+                    <div class="bg-white dark:bg-zinc-800 overflow-hidden shadow-sm rounded-2xl p-6 relative aspect-[3/2] dark:text-white">
+                        <div class="flex items-center space-x-2">
+                            <i class="bx bx-dollar aspect-square p-4 bg-slate-200 dark:bg-zinc-900 rounded-full"></i>
+                            <span>Total sold</span>
+                        </div>
+                        <div class="bottom-6 absolute flex flex-col">
+                            <span class="text-4xl font-black">{{ Number(sold).toLocaleString('en-US') }}</span>
+                            <span class="text-sm dark:text-zinc-300">Items</span>
+                        </div>
                     </div>
                 </div>
-                <div class="bg-gradient-to-br from-violet-900 to-sky-400 overflow-hidden shadow-sm rounded-lg p-2 md:p-4 relative group flex justify-center items-center">
-                    <div class="flex justify-center items-center flex-col">
-                        <p class="font-bold text-white text-xs lg:text-3xl">{{ sold }}</p>
-                        <i class="text-white text-sm font-bold block lg:hidden bx bx-money-withdraw"></i>
-                        <p class="text-white text-xs font-bold lg:block hidden">TOTAL SOLD</p>
-                    </div>
-                </div>
-            </div>
+            </section>
         </div>
     </div>
 </template>

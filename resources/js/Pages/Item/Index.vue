@@ -92,8 +92,8 @@ const editCatForm = useForm({
         </title>
     </Head>
 
-    <div class="max-w-7xl lg:flex mx-auto py-8 px-6 lg:px-8">
-        <div class="w-full lg:w-1/6 bg-white dark:bg-zinc-900 py-4 rounded-lg h-min border dark:border-zinc-700 mb-6 text-sm">
+    <div class="lg:flex py-8 px-6 lg:px-8">
+        <div class="w-full lg:w-1/6 bg-white dark:bg-zinc-900 py-4 rounded-2xl h-min border dark:border-zinc-700 mb-6 text-sm">
             <div class="flex justify-between items-center px-4 dark:text-white">
                 <span>Categories</span>
                 <i @click="addNewCategory"
@@ -118,7 +118,7 @@ const editCatForm = useForm({
             </div>
             <div class="grid grid-cols-3 lg:grid-cols-5 gap-2">
                 <div @click="$inertia.get(route('items.show', item.id))" v-for="item in items"
-                    class="flex aspect-square w-full rounded-lg overflow-hidden border dark:border-zinc-700 relative"
+                    class="flex aspect-square w-full rounded-2xl overflow-hidden border dark:border-zinc-700 relative"
                     :style="`background: ${item.color ?? 'rgb(56, 56, 65)'} !important`">
                         <img class="object-cover w-full aspect-square" v-if="item.pic" :src="`../storage/${item.pic}`">
                     <div class="bg-black/70 p-2 inset-x-0 bottom-0 absolute text-sm text-white">{{ item.name }}</div>
