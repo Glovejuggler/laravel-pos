@@ -8,6 +8,7 @@ use App\Models\Costing;
 use App\Models\Category;
 use App\Models\SoldCost;
 use App\Models\SoldItem;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -117,6 +118,58 @@ class ReportsController extends Controller
         return inertia('Costing', [
             'costing' => $merged,
             'total' => $merged->sum('total')
+        ]);
+    }
+
+    /**
+     * Sales from the last 7 days
+     */
+    public function fetchLast7DaysSales()
+    {
+        // $data = Transaction::onlyTrashed()
+        //                     ->selectRaw('DATE(created_at) as date, COUNT(*) as total')
+        //                     ->where('created_at', '>=', Carbon::now()->subdays(6)->startOfDay())
+        //                     ->groupBy('date')
+        //                     ->orderBy('date')
+        //                     ->get();
+        
+        // $dates = collect(range(0, 6))->map(function ($i) use ($data) {
+        //     $date = Carbon::now()->subDays(6 - $i)->format('Y-m-d');
+        //     return [
+        //         'date' => Carbon::parse($date)->format('F j, Y'),
+        //         'total' => $data->firstWhere('date', $date)->total ?? 0,
+        //     ];
+        // });
+
+        // return response()->json([
+        //     'labels' => $dates->pluck('date'),
+        //     'data' => $dates->pluck('total')
+        // ]);
+
+
+        $data = Transaction::with('items')->onlyTrashed()
+                ->where('created_at', '>=', Carbon::now()->subDays(6)->startOfDay())
+                ->get()
+                ->groupBy(fn($transaction) => $transaction->created_at->format('m-d'))
+                ->map(fn($transactions) => [
+                    'total_cost' => $transactions->flatMap->items->sum('cost'),
+                    'total_net' => $transactions->flatMap->items->sum('gross') - $transactions->flatMap->items->sum('cost'),
+                ]);
+        // dd($data);
+
+        $dates = collect(range(0, 6))->map(function ($i) use ($data) {
+            $date = Carbon::now()->subDays(6 - $i)->format('m-d');
+            return [
+                'date' => $date,
+                'total_net' => $data[$date]['total_net'] ?? 0,
+                'total_cost' => $data[$date]['total_cost'] ?? 0,
+            ];
+        });
+
+        return response()->json([
+            'labels' => $dates->pluck('date'),
+            'net' => $dates->pluck('total_net'),
+            'cost' => $dates->pluck('total_cost'),
         ]);
     }
 }

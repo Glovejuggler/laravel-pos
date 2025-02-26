@@ -61,16 +61,13 @@ Route::get('/contacts', function() {
 })->name('contacts');
 
 Route::get('/dashboard', function () {
-    $finishedOrders = Transaction::onlyTrashed();
-
-    $transactionCount = $finishedOrders->count();
     $soldItemsCount = SoldItem::whereHas('transaction', function ($query) {
-        $query->onlyTrashed();
+        $query->onlyTrashed()->where('created_at', '>=', Carbon::now()->subDays(6)->startOfDay());
     })->sum('quantity');
     return Inertia::render('Dashboard', [
         'items' => Item::count(),
-        'avgS' => $transactionCount ? $finishedOrders->get()->sum('elapsed') / $finishedOrders->count() : 0,
         'sold' => $soldItemsCount,
+        'orders' => Transaction::onlyTrashed()->where('created_at', '>=', Carbon::now()->subDays(6)->startOfDay())->count()
     ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -119,6 +116,8 @@ Route::middleware('auth')->group(function () {
     Route::post('expenses/import', [ExpenseController::class, 'import'])->name('expenses.import');
     Route::put('expenses/{expense}', [ExpenseController::class, 'update'])->name('expenses.update');
     Route::delete('expense/{expense}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
+
+    Route::get('last_7_days', [ReportsController::class, 'fetchLast7DaysSales'])->name('7days');
 });
 
 
