@@ -15,7 +15,7 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidth))
 
 <template>
 <Transition enter-from-class="-translate-x-full"  enter-active-class="duration-200 ease-in-out" leave-active-class="duration-200 ease-in-out" leave-to-class="-translate-x-full">
-    <aside v-if="isOpen || windowWidth >= 768" class="bg-white dark:bg-zinc-800 dark:text-zinc-100 z-50 inset-y-0 left-0 fixed md:static w-72">
+    <aside v-if="isOpen || windowWidth >= 768" class="bg-white dark:bg-zinc-800 dark:text-zinc-100 z-50 inset-y-0 left-0 fixed w-72">
         <div class="flex flex-col py-6 px-3 text-xs">
             <SidebarLink @click="$emit('close')" label="Dashboard" link="dashboard" :active="route().current('dashboard')" icon="bx bxs-dashboard"/>
             <SidebarLink @click="$emit('close')" v-if="$page.props.auth.user.admin" label="Products" link="items.index" :active="route().current('items.*')" icon="bx bxs-dish"/>

@@ -1,6 +1,7 @@
 <script setup>
 import { Head } from '@inertiajs/vue3';
 import Last7Days from '@/Components/Reports/Last7Days.vue';
+import Kitchen from '@/Components/QuickActions/Kitchen.vue';
 
 const props = defineProps({
     sold: Number,
@@ -23,16 +24,14 @@ const props = defineProps({
                     <p class="font-black dark:text-white z-30">POS</p>
                 </div>
     
-                <div @click="$inertia.get(route('kitchen'))"
-                    class="bg-white dark:bg-zinc-800 overflow-hidden shadow-sm rounded-2xl p-4 group flex flex-col justify-center items-center">
-                    <i
-                        class="bx bx-bowl-hot text-3xl text-white group-hover:scale-110 duration-300 ease-in-out rounded-full aspect-square bg-rose-900 p-4 text-center"></i>
-                    <p class="font-black dark:text-white z-30">Kitchen</p>
-                </div>
+                <Kitchen/>
             </div>
 
             <div v-if="$page.props.auth.user.admin" class="mt-8">
-                <Last7Days :sold="Number(sold).toLocaleString('en-US')" :orders="Number(orders).toLocaleString('en-US')"/>
+                <keep-alive>
+                    <Last7Days :sold="Number(sold).toLocaleString('en-US')" :orders="Number(orders).toLocaleString('en-US')"/>
+                
+                </keep-alive>
             </div>
         </div>
     </div>
