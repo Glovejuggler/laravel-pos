@@ -126,27 +126,6 @@ class ReportsController extends Controller
      */
     public function fetchLast7DaysSales()
     {
-        // $data = Transaction::onlyTrashed()
-        //                     ->selectRaw('DATE(created_at) as date, COUNT(*) as total')
-        //                     ->where('created_at', '>=', Carbon::now()->subdays(6)->startOfDay())
-        //                     ->groupBy('date')
-        //                     ->orderBy('date')
-        //                     ->get();
-        
-        // $dates = collect(range(0, 6))->map(function ($i) use ($data) {
-        //     $date = Carbon::now()->subDays(6 - $i)->format('Y-m-d');
-        //     return [
-        //         'date' => Carbon::parse($date)->format('F j, Y'),
-        //         'total' => $data->firstWhere('date', $date)->total ?? 0,
-        //     ];
-        // });
-
-        // return response()->json([
-        //     'labels' => $dates->pluck('date'),
-        //     'data' => $dates->pluck('total')
-        // ]);
-
-
         $data = Transaction::with('items')->onlyTrashed()
                 ->where('created_at', '>=', Carbon::now()->subDays(6)->startOfDay())
                 ->get()
@@ -155,10 +134,40 @@ class ReportsController extends Controller
                     'total_cost' => $transactions->flatMap->items->sum('cost'),
                     'total_net' => $transactions->flatMap->items->sum('gross') - $transactions->flatMap->items->sum('cost'),
                 ]);
-        // dd($data);
 
         $dates = collect(range(0, 6))->map(function ($i) use ($data) {
             $date = Carbon::now()->subDays(6 - $i)->format('m-d');
+            return [
+                'date' => $date,
+                'total_net' => $data[$date]['total_net'] ?? 0,
+                'total_cost' => $data[$date]['total_cost'] ?? 0,
+            ];
+        });
+
+        return response()->json([
+            'labels' => $dates->pluck('date'),
+            'net' => $dates->pluck('total_net'),
+            'cost' => $dates->pluck('total_cost'),
+        ]);
+    }
+
+    /**
+     * Sales this week
+     */
+    public function thisWeek()
+    {
+        $start = Carbon::now()->startOfWeek()->startOfDay();
+        $data = Transaction::with('items')->onlyTrashed()
+                ->whereBetween('created_at', [$start, Carbon::now()->endOfWeek()->endOfDay()])
+                ->get()
+                ->groupBy(fn($transaction) => $transaction->created_at->format('m-d'))
+                ->map(fn($transactions) => [
+                    'total_cost' => $transactions->flatMap->items->sum('cost'),
+                    'total_net' => $transactions->flatMap->items->sum('gross') - $transactions->flatMap->items->sum('cost'),
+                ]);
+
+        $dates = collect(range(0, 6))->map(function ($i) use ($data, $start) {
+            $date = $start->copy()->addDays($i)->format('m-d');
             return [
                 'date' => $date,
                 'total_net' => $data[$date]['total_net'] ?? 0,

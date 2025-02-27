@@ -2,6 +2,7 @@
 import { Head } from '@inertiajs/vue3';
 import Last7Days from '@/Components/Reports/Last7Days.vue';
 import Kitchen from '@/Components/QuickActions/Kitchen.vue';
+import ThisWeek from '@/Components/Reports/ThisWeek.vue';
 
 const props = defineProps({
     sold: Number,
@@ -27,11 +28,10 @@ const props = defineProps({
                 <Kitchen/>
             </div>
 
-            <div v-if="$page.props.auth.user.admin" class="mt-8">
-                <keep-alive>
-                    <Last7Days :sold="Number(sold).toLocaleString('en-US')" :orders="Number(orders).toLocaleString('en-US')"/>
-                
-                </keep-alive>
+            <div v-if="$page.props.auth.user.admin">
+                <Last7Days class="mt-8"/>
+
+                <ThisWeek class="mt-8"/>
             </div>
         </div>
     </div>

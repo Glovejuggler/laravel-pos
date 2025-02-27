@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 
 const orders = ref([])
 
@@ -14,6 +14,11 @@ Echo.private('kitchen')
     .listen('OrderDone', (e) => {
         orders.value.splice(orders.value.findIndex(o => o == e.order), 1)
     })
+
+onMounted(async () => {
+    const response = await axios.get(route('kitchen'))
+    orders.value = [...orders.value, ...response.data]
+})
 </script>
 
 <template>

@@ -92,11 +92,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/items/{item}/update', [ItemController::class, 'update'])->name('items.update');
     Route::delete('/item/delete/{item}', [ItemController::class, 'destroy'])->name('items.destroy');
 
-    Route::get('/kitchen', function () {
-        return inertia('Kitchen', [
-            'orders' => Transaction::all()->pluck('id')
-        ]);
-    })->name('kitchen');
+    Route::get('/kitchen', [POS::class, 'kitchen'])->name('kitchen');
     Route::delete('/order/{id}/cancel', [TransactionController::class, 'raze'])->name('order.cancel');
     Route::delete('/order/{id}/delete', [TransactionController::class, 'destroy'])->name('order.done');
 
@@ -118,6 +114,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('expense/{expense}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
 
     Route::get('last_7_days', [ReportsController::class, 'fetchLast7DaysSales'])->name('7days');
+    Route::get('this_week', [ReportsController::class, 'thisWeek'])->name('thisWeek');
 });
 
 

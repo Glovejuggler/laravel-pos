@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use App\Models\Category;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -66,5 +67,19 @@ class POS extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    /**
+     * Kitchen
+     */
+    public function kitchen(Request $request)
+    {
+        if ($request->wantsJson()) {
+            return Transaction::all()->pluck('id');
+        }
+        
+        return inertia('Kitchen', [
+            'orders' => Transaction::all()->pluck('id')
+        ]);
     }
 }

@@ -5,9 +5,8 @@ import Chart from 'chart.js/auto';
 
 const loading = ref(true)
 const chart = ref(null)
-
 onMounted(async () => {
-  const response = await axios.get('/api/reports/daily-sales/last-7-days?chart=true')
+  const response = await axios.get('/api/reports/daily-sales/this-week?chart=true')
   const { labels, net, cost } = response.data
 
   const footer = (tooltipItems) => {

@@ -1,13 +1,15 @@
 <script setup>
 import { onMounted, ref } from 'vue';
-import axios from 'axios';
 import Chart from 'chart.js/auto';
+
+const props = defineProps({
+    fetch: String
+})
 
 const loading = ref(true)
 const chart = ref(null)
-
 onMounted(async () => {
-  const response = await axios.get('/api/reports/daily-sales/last-7-days?chart=true')
+  const response = await axios.get(props.fetch)
   const { labels, net, cost } = response.data
 
   const footer = (tooltipItems) => {
