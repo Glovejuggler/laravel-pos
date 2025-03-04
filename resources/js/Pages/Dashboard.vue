@@ -17,7 +17,7 @@ const props = defineProps({
     <div class="py-6">
         <div class="px-6 lg:px-8">
             <!-- Quick Actions -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 min-h-48">
+            <div class="grid grid-cols-2 2xl:grid-cols-4 gap-2 min-h-48">
                 <div @click="$inertia.get(route('pos'))"
                     class="bg-white dark:bg-zinc-800 overflow-hidden shadow-sm rounded-2xl p-4 group flex flex-col justify-center items-center">
                     <i
@@ -25,7 +25,7 @@ const props = defineProps({
                     <p class="font-black dark:text-white z-30">POS</p>
                 </div>
     
-                <Kitchen/>
+                <Kitchen v-if="$page.props.kitchen"/>
             </div>
 
             <div v-if="$page.props.auth.user.admin">

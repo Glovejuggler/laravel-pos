@@ -93,7 +93,7 @@ class TransactionController extends Controller
                 }
             }
             
-            if (env('KITCHEN', true)) {
+            if (config('app.kitchen')) {
                 OrderPlaced::dispatch($order->id);
             } else {
                 $order->delete();
@@ -140,7 +140,7 @@ class TransactionController extends Controller
         $transaction = Transaction::findOrFail($id);
         $transaction->delete();
 
-        if (env('KITCHEN', true)) {
+        if (config('app.kitchen')) {
             OrderDone::dispatch($id);
         }
 
@@ -158,7 +158,7 @@ class TransactionController extends Controller
 
         $transaction->forceDelete();
 
-        if (env('KITCHEN', true)) {
+        if (config('app.kitchen')) {
             OrderDone::dispatch($id);
         }
 

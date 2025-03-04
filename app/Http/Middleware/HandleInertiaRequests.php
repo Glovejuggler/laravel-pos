@@ -34,6 +34,8 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'kitchen' => config('app.kitchen'),
+            'client' => config('app.client')
         ];
     }
 }

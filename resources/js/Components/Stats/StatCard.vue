@@ -40,7 +40,7 @@ if (props.fetch) {
 
 <template>
     <div>
-        <div v-if="loading" class="overflow-hidden shadow-sm p-6 relative aspect-[3/2] text-white animate-pulse">
+        <div v-if="loading" class="overflow-hidden shadow-sm p-6 relative 2xl:aspect-[3/2] aspect-[19/8] text-white animate-pulse">
             <div class="flex items-center space-x-2">
                 <i :class="`aspect-square p-6 bg-black/30 rounded-full`"></i>
                 <span class="bg-white rounded-2xl overflow-hidden opacity-50">{{ title }}</span>
@@ -51,7 +51,7 @@ if (props.fetch) {
             </div>
         </div>
 
-        <div v-else class="overflow-hidden shadow-sm p-6 relative aspect-[3/2] dark:text-white">
+        <div v-else class="overflow-hidden shadow-sm p-6 relative 2xl:aspect-[3/2] aspect-[19/8] dark:text-white">
             <div class="flex items-center space-x-2">
                 <i :class="`aspect-square p-4 bg-black/30 rounded-full ${icon}`"></i>
                 <span>{{ title }}</span>

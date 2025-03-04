@@ -1,3 +1,3 @@
 <template>
-    <p>UPTOP DINER</p>
+    <p>{{ $page.props.client ?? 'UPTOP DINER' }}</p>
 </template>
