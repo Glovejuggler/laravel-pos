@@ -15,7 +15,7 @@
 </head>
 
 <body class="font-sans antialiased min-h-screen flex flex-col">
-    {{-- @include('clients.sawadeecup.layouts.header') --}}
+    @include('clients.sawadeecup.layouts.header')
 
     @yield('content')
 

@@ -15,7 +15,8 @@ class POS extends Controller
      */
     public function index()
     {
-        return inertia('POS', [
+        $pos = config('app.client') == 'Sawadeecup' ? 'SAWADEECUPOS' : 'POS';
+        return inertia($pos, [
             'items' => Item::all()->groupBy('category.name'),
             'categories' => Category::all()
         ]);

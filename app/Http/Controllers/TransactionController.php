@@ -40,7 +40,7 @@ class TransactionController extends Controller
             $cogs = Expense::where('type', 'COGS')->whereDate('created_at', $request->date ? Carbon::parse($request->date) : today())->get();
         }
 
-        return inertia('Sales', [
+        return inertia(config('app.client') == 'Sawadeecup' ? 'SawadeecupSales' : 'Sales', [
             'transactions' => $transactions,
             'expenses' => [
                 'net' => $net,

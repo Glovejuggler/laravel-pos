@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\OrdersReportController;
 use App\Http\Controllers\API\DailySalesReportController;
+use App\Http\Controllers\API\MonthlySalesReportController;
 use App\Http\Controllers\API\ProductsSoldReportController;
 
 /*
@@ -35,4 +36,6 @@ Route::group(['prefix' => 'reports'], function () {
     Route::get('/products-sold/last-7-days', [ProductsSoldReportController::class, 'last7days']);
     Route::get('/products-sold/last-week', [ProductsSoldReportController::class, 'lastWeek']);
     Route::get('/products-sold/this-month', [ProductsSoldReportController::class, 'thisMonth']);
+
+    Route::get('/monthly-sales/last-6-months', [MonthlySalesReportController::class, 'last6Months']);
 })->middleware('auth');
