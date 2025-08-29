@@ -30,12 +30,7 @@ use App\Http\Controllers\TransactionController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-if (config('app.client') == 'Sawadeecup') {
-    require __DIR__.'/sawadeecup.php';
-} else {
-    require __DIR__.'/uptop.php';
-}
+require __DIR__.'/uptop.php';
 
 Route::get('/dashboard', function () {
     $soldItemsCount = SoldItem::whereHas('transaction', function ($query) {
@@ -93,3 +88,6 @@ Route::middleware('auth')->group(function () {
 
 
 require __DIR__.'/auth.php';
+Route::get('play', function () {
+    return inertia('Playground');
+});

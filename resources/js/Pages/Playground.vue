@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, onBeforeMount } from 'vue';
+import { ref, computed, onMounted, watch, onBeforeMount } from 'vue';
 import { Head } from '@inertiajs/vue3';
 import axios from 'axios';
 import Modal from '@/Components/Modal.vue';
@@ -22,44 +22,11 @@ const isAndroid = ref(false)
 
 const openCart = ref(false)
 
-const sortedProducts = ref([])
-
 const changeCat = (cat) => {
     currentTab.value = cat
-    
-    visibleItems.value = props.items[cat]
-
-    const localProdOrder = JSON.parse(localStorage.getItem(`prodOrder.${cat}`)) || []
-    
-    if (localProdOrder.length) {
-        const map = new Map(localProdOrder.map(i => [i.id, i.order]))
-        sortedProducts.value = visibleItems.value.map(i => ({
-            ...i,
-            order: map.get(i.id) ?? i.order,
-        }))
-        
-        sortedProducts.value.sort((a, b) => a.order - b.order)
-    } else {
-        sortedProducts.value = visibleItems.value
-    }
+    if (visibleItems.length) visibleItems.value.splice(0, visibleItems.value.length, ...props.items[cat])
+    else visibleItems.value = props.items[cat]
 }
-
-watch(sortedProducts, (value) => {
-    value.forEach((item, index) => {
-        item.order = index + 1
-    })
-
-    const payload = value.map(i => ({
-        id: i.id,
-        order: i.order,
-    }))
-
-    console.log(currentTab.value)
-
-    localStorage.setItem(`prodOrder.${currentTab.value}`, JSON.stringify(payload))
-}, {
-    deep: true,
-})
 
 const cart = ref(null)
 const cartValue = computed(() => {
@@ -80,8 +47,6 @@ const showMessage = () => {
 }
 
 const addToCart = (item) => {
-    if (edittingProdOrder.value) return
-    
     if (cart.value) {
         var dupe = cart.value.findIndex((i) => i.id === item.id)
         if (dupe == -1) {
@@ -200,24 +165,13 @@ Echo.private('done-orders')
     })
 
 const edittingCatOrder = ref(false)
-const edittingProdOrder = ref(false)
 const dragging = ref(false)
-
-const categoriesSortableOptions = computed(() => {
-    return {
-        animation: 200,
-        group: 'categories',
-        ghostClass: 'opacity-40',
-        disabled: !edittingCatOrder.value,
-    }
-})
 
 const productsTransitionOptions = computed(() => {
     return {
         animation: 200,
         group: 'products',
         ghostClass: 'opacity-40',
-        disabled: !edittingProdOrder.value,
     }
 })
 </script>
@@ -232,28 +186,30 @@ const productsTransitionOptions = computed(() => {
     <main class="fixed inset-0 overflow-hidden min-h-screen max-h-screen bg-zinc-900 sm:hidden md:block">
         <div class="grid grid-cols-12">
             <aside class="bg-zinc-900 flex flex-col space-y-2 col-span-2 p-2 text-xs md:text-sm min-h-screen max-h-screen z-50 overflow-y-auto">
-                <div v-if="edittingCatOrder" class="flex justify-between items-center text-white py-1">
-                    <span>Editting sort</span>
-                    <i @click="edittingCatOrder = false" class="bx bx-check rounded-full text-xl cursor-pointer bg-white text-black h-7 w-7 inline-flex justify-center items-center"></i>
-                </div>
-                <draggable :list="sortedCat" item-key="order" v-bind="categoriesSortableOptions">
+                <draggable :list="sortedCat" item-key="order" :disabled="!edittingCatOrder">
                     <template #item="{element}">
-                        <div :key="element.id" :class="{ 'bg-zinc-600 font-bold px-5': currentTab === element.name }" v-longpress="() => edittingCatOrder = true"
+                        <div :class="{ 'bg-zinc-600 font-bold px-5': currentTab === element.name }" v-longpress="() => edittingCatOrder = true"
                             @click="changeCat(element.name)" class="py-2 px-4 text-white hover:bg-zinc-700 rounded-lg duration-200 ease-in-out">{{ element.name }}</div>
+                    </template>
+
+                    <template #header v-if="edittingCatOrder">
+                        <div class="flex justify-between items-center text-white py-1">
+                            <span>Editting sort</span>
+                            <i @click="edittingCatOrder = false" class="bx bx-check rounded-full text-xl cursor-pointer bg-white text-black h-7 w-7 inline-flex justify-center items-center"></i>
+                        </div>
                     </template>
                 </draggable>
             </aside>
         
-            <div v-if="sortedProducts.length" class="select-none overflow-y-auto col-span-7 max-h-screen min-h-screen z-50" @contextmenu.prevent="">
-                <draggable class="grid grid-cols-4 gap-2 p-2"
-                    :list="sortedProducts" item-key="order"
-                    v-bind="productsTransitionOptions">
+            <div v-if="visibleItems.length" class="select-none overflow-y-auto col-span-7 max-h-screen min-h-screen z-50" @contextmenu.prevent="">
+                <draggable
+                    :key="currentTab.id"
+                    :list="visibleItems"
+                    v-bind="productsTransitionOptions"
+                    tag="transition-group"
+                    :component-data="{ name: 'shift', tag: 'div', class: 'grid grid-cols-4 gap-2 p-2'}">
                         <template #item="{ element }">
-                            <div v-longpress="() => edittingProdOrder = true" :key="element.order" :style="`background: ${element.color ?? '#121212'} !important`"
-                                    :class="[
-                                        'flex w-full aspect-square relative duration-150 ease-in-out rounded-md overflow-hidden',
-                                        {'active:scale-95': !edittingProdOrder}
-                                        ]"
+                            <div :key="element.id" :style="`background: ${element.color ?? '#121212'} !important`" class="flex w-full aspect-square relative active:scale-95 duration-150 ease-in-out rounded-md overflow-hidden"
                                     @click="addToCart(element)" ontouchstart>
                                 <img v-if="element.pic" draggable="false" @contextmenu.prevent="" @dragstart.prevent="" :src="`../storage/${element.pic}`"
                                     class="w-full aspect-square object-cover" height="25px" width="25px">
@@ -262,17 +218,6 @@ const productsTransitionOptions = computed(() => {
                             </div>
                         </template>
                 </draggable>
-
-                <Transition enter-active-class="ease-out duration-300" enter-from-class="translate-y-full" leave-active-class="ease-in duration-150" leave-to-class="translate-y-full">
-                    <div v-show="edittingProdOrder" class="fixed bottom-8 inset-x-0">
-                        <div class="rounded-xl max-w-80 mx-auto p-4 bg-zinc-950 shadow-2xl border border-zinc-800 text-white text-xs">
-                            <div class="flex justify-between items-center">
-                                <span>Sorting</span>
-                                <button @click="edittingProdOrder = false" class="px-3 py-1 rounded-lg bg-white text-black">Save</button>
-                            </div>
-                        </div>
-                    </div>
-                </Transition>
             </div>
         
             <div class="bg-zinc-900 p-4 col-span-3 min-h-screen max-h-screen">
@@ -613,7 +558,7 @@ const productsTransitionOptions = computed(() => {
     </Modal>
 </template>
 
-<style>
+<style scoped>
 /* width */
 ::-webkit-scrollbar {
   width: 5px;
@@ -636,10 +581,10 @@ const productsTransitionOptions = computed(() => {
 
 /* Transition */
 .shift-move {
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease-in-out;
 }
 
-/* .shift-enter-active,
+.shift-enter-active,
 .shift-leave-active {
   transition: all 0.3s ease-in-out;
 }
@@ -648,6 +593,6 @@ const productsTransitionOptions = computed(() => {
 .shift-leave-to {
   opacity: 0;
   transform: scale(0.95);
-} */
+}
 
 </style>

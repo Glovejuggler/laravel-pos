@@ -6,6 +6,7 @@ import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import Authenticated from './Layouts/AuthenticatedLayout.vue';
+import longPress from './Directives/long-press';
 
 const appName = import.meta.env.VITE_APP_NAME || 'UPTop Diner';
 
@@ -24,6 +25,7 @@ createInertiaApp({
         return createApp({ render: () => h(App, props) })
             .use(plugin)
             .use(ZiggyVue)
+            .directive('longpress', longPress)
             .mount(el);
     },
     progress: {

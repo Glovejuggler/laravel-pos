@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
 
 return [
-    'client' => env('CLIENT', 'uptop'),
     'kitchen' => env('KITCHEN', true),
     /*
     |--------------------------------------------------------------------------
