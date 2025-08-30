@@ -2,11 +2,12 @@
 import { Head, useForm } from '@inertiajs/vue3';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import colors from 'tailwindcss/colors';
 
 const props = defineProps({
-    suggestions: Object
+    suggestions: Object,
+    duplicate: Object,
 })
 
 const tc = Object.keys(colors)
@@ -17,17 +18,28 @@ const params = new URLSearchParams(window.location.search)
 const form = useForm({
     category_id: params.get('category'),
     image: '',
-    name: '',
-    price: '',
+    name: props.duplicate?.name ?? '',
+    price: props.duplicate?.price ?? '',
     color: '',
     menu: '',
     breakdown: []
 })
 
-const costValue = computed(() => {
-    return form.breakdown.reduce((acc, item) => acc + item.cost, 0)
+onMounted(() => {
+    if (props.duplicate && props.duplicate.costing.length) {
+        props.duplicate.costing.forEach(c => {
+            form.breakdown.push({
+                name: c.name,
+                cost: c.cost,
+            })
+        });
+    }
 })
-const profit = computed(() => form.price - costValue.value)
+
+const costValue = computed(() => {
+    return form.breakdown.reduce((acc, item) => acc + Number(item.cost), 0)
+})
+const profit = computed(() => (form.price - costValue.value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2}))
 
 const selectedColor = ref('')
 const newImage = ref(null)

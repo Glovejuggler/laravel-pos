@@ -22,7 +22,7 @@ class ItemController extends Controller
         if (!Gate::allows('admin')) {
             abort(403);
         }
-        
+
         if ($category) {
             return inertia('Item/Index', [
                 'items' => Item::where('category_id', $category->id)->get(),
@@ -50,8 +50,11 @@ class ItemController extends Controller
             abort(403);
         }
 
+        $dupe = request()->query('duplicate');
+
         return inertia('Item/Create', [
             'suggestions' => Costing::selectRaw('DISTINCT UPPER(name) as name')->pluck('name'),
+            'duplicate' => $dupe ? Item::find($dupe) : null,
         ]);
     }
 
@@ -97,7 +100,7 @@ class ItemController extends Controller
         if (!Gate::allows('admin')) {
             abort(403);
         }
-        
+
         $item = Item::findOrFail($id);
 
         return inertia('Item/Show', [
@@ -158,13 +161,13 @@ class ItemController extends Controller
         if (!Gate::allows('admin')) {
             abort(403);
         }
-        
+
         if ($item->pic) {
             Storage::disk('public')->delete($item->pic);
         }
 
         Costing::where('item_id', $item->id)->delete();
-        
+
         $item->delete();
 
         return redirect()->route('items.index');

@@ -30,7 +30,8 @@ use App\Http\Controllers\TransactionController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-require __DIR__.'/uptop.php';
+
+require __DIR__ . '/uptop.php';
 
 Route::get('/dashboard', function () {
     $soldItemsCount = SoldItem::whereHas('transaction', function ($query) {
@@ -47,12 +48,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    
+
     Route::get('users', [UserController::class, 'index'])->name('users.index');
     Route::post('users', [UserController::class, 'store'])->name('users.store');
     Route::put('users/{id}', [UserController::class, 'update'])->name('users.update');
     Route::delete('users/{id}/destroy', [UserController::class, 'destroy'])->name('users.destroy');
-    
+
     Route::post('/category', [CategoryController::class, 'store'])->name('categories.store');
     Route::put('/category/{id}/update', [CategoryController::class, 'update'])->name('categories.update');
     Route::delete('/category/{category}/delete', [CategoryController::class, 'destroy'])->name('categories.destroy');
@@ -87,7 +88,7 @@ Route::middleware('auth')->group(function () {
 });
 
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 Route::get('play', function () {
     return inertia('Playground');
 });

@@ -144,7 +144,9 @@ const showDeleteConfirmationModal = ref(false)
             </div>
         </div>
 
-        <div class="flex justify-end py-8">
+        <div class="flex justify-end py-8 space-x-8">
+            <button @click="$inertia.get(route('items.create', { duplicate: item.id, category: item.category_id }))" type="button"
+                class="text-blue-500 border border-blue-500 px-4 hover:bg-blue-500 hover:text-white rounded-lg text-sm">Duplicate</button>
             <button @click="showDeleteConfirmationModal = true" type="button"
                 class="text-red-500 border border-red-500 px-4 hover:bg-red-500 hover:text-white rounded-lg text-sm">Delete</button>
         </div>
