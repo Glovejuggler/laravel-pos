@@ -4,7 +4,8 @@ import { Head } from '@inertiajs/vue3';
 import axios from 'axios';
 import Modal from '@/Components/Modal.vue';
 import { domToPng } from 'modern-screenshot';
-import draggable from 'vuedraggable';
+import draggable from 'vuedraggable'
+import { vOnLongPress } from '@vueuse/components';
 
 defineOptions({
     layout: null
@@ -15,14 +16,56 @@ const props = defineProps({
     categories: Object
 })
 
-const visibleItems = ref(null)
 const currentTab = ref(null)
-const isProcessing = ref(false)
-const isAndroid = ref(false)
+const sortedCat = ref([])
+const visibleItems = ref(null)
+const sortedProducts = ref([])
+const edittingCatOrder = ref(false)
+const edittingProdOrder = ref(false)
+const dragging = ref(false)
 
 const openCart = ref(false)
+const isProcessing = ref(false)
+const cart = ref(null)
+const cartValue = computed(() => {
+    return cart.value?.reduce((acc, item) => acc + item.price * item.count, 0)
+})
+const payment = ref(0)
+const customer = ref('')
+const type = ref('')
+const note = ref('')
 
-const sortedProducts = ref([])
+const isAndroid = ref(false)
+const receipt = ref(null)
+const askReceipt = ref(false)
+const noteModal = ref(false)
+const showConfirmation = ref(false)
+const confirmationMessage = ref(null)
+
+onBeforeMount(() => {
+    let ua = navigator.userAgent.toLowerCase()
+    isAndroid.value = ua.indexOf('android') > -1
+    
+    const localCatOrder = JSON.parse(localStorage.getItem('catOrder')) || []
+    
+    if (localCatOrder.length) {
+        const map = new Map(localCatOrder.map(i => [i.id, i.order]))
+        sortedCat.value = props.categories.map(c => ({
+            ...c,
+            order: map.get(c.id) ?? c.order,
+        }))
+        
+        sortedCat.value.sort((a, b) => a.order - b.order)
+    } else {
+        sortedCat.value = props.categories
+    }
+
+    changeCat(sortedCat.value[0].name)
+})
+
+const showMessage = () => {
+    showConfirmation.value = true
+}
 
 const changeCat = (cat) => {
     currentTab.value = cat
@@ -60,24 +103,6 @@ watch(sortedProducts, (value) => {
 }, {
     deep: true,
 })
-
-const cart = ref(null)
-const cartValue = computed(() => {
-    return cart.value?.reduce((acc, item) => acc + item.price * item.count, 0)
-})
-const payment = ref(0)
-const customer = ref('')
-const type = ref('')
-const note = ref('')
-
-const receipt = ref(null)
-const askReceipt = ref(false)
-const noteModal = ref(false)
-const showConfirmation = ref(false)
-const confirmationMessage = ref(null)
-const showMessage = () => {
-    showConfirmation.value = true
-}
 
 const addToCart = (item) => {
     if (edittingProdOrder.value) return
@@ -142,30 +167,6 @@ const saveTransaction = (print) => {
     })
 }
 
-const sortedCat = ref([])
-
-onBeforeMount(() => {
-    let ua = navigator.userAgent.toLowerCase()
-    isAndroid.value = ua.indexOf('android') > -1
-    
-    // localStorage.removeItem('catOrder')
-    const localCatOrder = JSON.parse(localStorage.getItem('catOrder')) || []
-    
-    if (localCatOrder.length) {
-        const map = new Map(localCatOrder.map(i => [i.id, i.order]))
-        sortedCat.value = props.categories.map(c => ({
-            ...c,
-            order: map.get(c.id) ?? c.order,
-        }))
-        
-        sortedCat.value.sort((a, b) => a.order - b.order)
-    } else {
-        sortedCat.value = props.categories
-    }
-
-    changeCat(sortedCat.value[0].name)
-})
-
 watch(sortedCat, (value) => {
     value.forEach((item, index) => {
         item.order = index + 1
@@ -199,9 +200,6 @@ Echo.private('done-orders')
         notif.play()
     })
 
-const edittingCatOrder = ref(false)
-const edittingProdOrder = ref(false)
-const dragging = ref(false)
 
 const categoriesSortableOptions = computed(() => {
     return {
@@ -229,6 +227,11 @@ const productsTransitionOptions = computed(() => {
         </title>
     </Head>
 
+    <div class="fixed">
+
+    </div>
+
+    <!-- Wide Screen Layout -->
     <main class="fixed inset-0 overflow-hidden min-h-screen max-h-screen bg-zinc-900 sm:hidden md:block">
         <div class="grid grid-cols-12">
             <aside class="bg-zinc-900 flex flex-col space-y-2 col-span-2 p-2 text-xs md:text-sm min-h-screen max-h-screen z-50 overflow-y-auto">
@@ -238,7 +241,7 @@ const productsTransitionOptions = computed(() => {
                 </div>
                 <draggable :list="sortedCat" item-key="order" v-bind="categoriesSortableOptions">
                     <template #item="{element}">
-                        <div :key="element.id" :class="{ 'bg-zinc-600 font-bold px-5': currentTab === element.name }" v-longpress="() => edittingCatOrder = true"
+                        <div :key="element.id" :class="{ 'bg-zinc-600 font-bold px-5': currentTab === element.name }" v-on-long-press="() => edittingCatOrder = true"
                             @click="changeCat(element.name)" class="py-2 px-4 text-white hover:bg-zinc-700 rounded-lg duration-200 ease-in-out">{{ element.name }}</div>
                     </template>
                 </draggable>
@@ -249,7 +252,7 @@ const productsTransitionOptions = computed(() => {
                     :list="sortedProducts" item-key="order"
                     v-bind="productsTransitionOptions">
                         <template #item="{ element }">
-                            <div v-longpress="() => edittingProdOrder = true" :key="element.order" :style="`background: ${element.color ?? '#121212'} !important`"
+                            <div v-on-long-press="() => edittingProdOrder = true" :key="element.order" :style="`background: ${element.color ?? '#121212'} !important`"
                                     :class="[
                                         'flex w-full aspect-square relative duration-150 ease-in-out rounded-md overflow-hidden',
                                         {'active:scale-95': !edittingProdOrder}
@@ -412,6 +415,7 @@ const productsTransitionOptions = computed(() => {
         </div>
     </main>
 
+    <!-- Mobile Layout -->
     <main class="md:hidden sm:block fixed inset-0 bg-zinc-900 min-h-screen overflow-y-auto">
         <nav class="p-2 flex space-x-2 overflow-x-scroll">
             <span @click="changeCat(category.name)" class="inline-flex font-semibold px-2 rounded-full border-white border whitespace-nowrap text-clip h-min" :class="currentTab === category.name ? 'text-zinc-900 bg-white' : 'text-white bg-zinc-900'" v-for="category in categories">
@@ -633,21 +637,4 @@ const productsTransitionOptions = computed(() => {
 ::-webkit-scrollbar-thumb:hover {
   background: #777;
 }
-
-/* Transition */
-.shift-move {
-  transition: all 0.3s ease;
-}
-
-/* .shift-enter-active,
-.shift-leave-active {
-  transition: all 0.3s ease-in-out;
-}
-
-.shift-enter-from,
-.shift-leave-to {
-  opacity: 0;
-  transform: scale(0.95);
-} */
-
 </style>
