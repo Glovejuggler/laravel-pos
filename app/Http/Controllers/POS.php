@@ -27,6 +27,20 @@ class POS extends Controller
         ]);
     }
 
+    public function indexV2()
+    {
+        return inertia('POS2', [
+            'items' => Item::all()->groupBy('category.name'),
+            'categories' => Category::all()->map(function ($q) {
+                return [
+                    'id' => $q->id,
+                    'name' => $q->name,
+                    'order' => null,
+                ];
+            })
+        ]);
+    }
+
     /**
      * Show the form for creating a new resource.
      */

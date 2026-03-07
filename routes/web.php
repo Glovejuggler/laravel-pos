@@ -74,6 +74,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('sales', [TransactionController::class, 'index'])->name('sales');
     Route::get('/pos', [POS::class, 'index'])->name('pos');
+    Route::get('/pos/v2', [POS::class, 'indexV2'])->name('pos2');
     Route::get('receipt/{id}', [TransactionController::class, 'show'])->name('receipt');
 
     Route::post('/transact', [TransactionController::class, 'store'])->name('transaction.save');
