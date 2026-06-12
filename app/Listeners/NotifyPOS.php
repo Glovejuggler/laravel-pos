@@ -3,8 +3,6 @@
 namespace App\Listeners;
 
 use App\Events\OrderDone;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 
 class NotifyPOS
 {

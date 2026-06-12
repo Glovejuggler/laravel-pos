@@ -3,9 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Enums\OrderType;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreTransactionRequest extends FormRequest
 {
@@ -28,7 +27,7 @@ class StoreTransactionRequest extends FormRequest
             'name' => 'nullable',
             'payment' => 'required',
             'note' => 'nullable',
-            'type' => [Rule::enum(OrderType::class)]
+            'type' => [Rule::enum(OrderType::class)],
         ];
     }
 }

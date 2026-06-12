@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\API;
 
-use Carbon\Carbon;
-use App\Models\SoldItem;
 use App\Http\Controllers\Controller;
+use App\Models\SoldItem;
+use Carbon\Carbon;
 
 class ProductsSoldReportController extends Controller
 {

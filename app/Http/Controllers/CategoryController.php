@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Item;
 use App\Models\Category;
+use App\Models\Item;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -30,11 +30,11 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required'
+            'name' => 'required',
         ]);
 
         Category::create([
-            'name' => $request->name
+            'name' => $request->name,
         ]);
 
         return redirect()->back();
@@ -64,7 +64,7 @@ class CategoryController extends Controller
         // dd($id);
         $category = Category::findOrFail($id);
         $category->update([
-            'name' => $request->name
+            'name' => $request->name,
         ]);
 
         return redirect()->route('items.index');
@@ -75,11 +75,11 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-    	if (Item::where('category_id',$category->id)->exists()) {
-        	Item::where('category_id', $category->id)->update([
-        		'category_id' => 999
-    		]);
-    	}
+        if (Item::where('category_id', $category->id)->exists()) {
+            Item::where('category_id', $category->id)->update([
+                'category_id' => 999,
+            ]);
+        }
 
         $category->delete();
 

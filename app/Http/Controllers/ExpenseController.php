@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
-use App\Models\Expense;
-use Illuminate\Http\Request;
+use App\Http\Requests\UpdateExpenseRequest;
 use App\Imports\ExpenseImport;
+use App\Models\Expense;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Http\Requests\UpdateExpenseRequest;
 
 class ExpenseController extends Controller
 {
@@ -17,10 +17,10 @@ class ExpenseController extends Controller
      */
     public function index(Request $request)
     {
-        if (!Gate::allows('admin')) {
+        if (! Gate::allows('admin')) {
             abort(403);
         }
-        
+
         $expenses = Expense::orderBy('created_at', 'desc')->paginate(40);
 
         $expenses->setCollection($expenses->groupBy(function ($q) {
@@ -33,7 +33,7 @@ class ExpenseController extends Controller
         }
 
         return inertia('Expense/Index', [
-            'expenses' => $expenses->withQueryString()
+            'expenses' => $expenses->withQueryString(),
         ]);
     }
 
@@ -45,12 +45,12 @@ class ExpenseController extends Controller
         //     'expenses.*.item' => 'required',
         //     'file' => 'required|mimes:xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         // ]);
-        
+
         $expenses = Excel::toArray(new ExpenseImport, $request->file);
 
         return response()->json([
             'message' => 'File imported successfully',
-            'data' => $expenses[0]
+            'data' => $expenses[0],
         ]);
     }
 
@@ -59,10 +59,10 @@ class ExpenseController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('admin')) {
+        if (! Gate::allows('admin')) {
             abort(403);
         }
-        
+
         return inertia('Expense/Create');
     }
 
@@ -76,7 +76,7 @@ class ExpenseController extends Controller
             'expenses.*.item' => 'required',
             'expenses.*.amount' => 'required|numeric',
             'expenses.*.type' => 'required',
-            'expenses.*.created_at' => 'required|date'
+            'expenses.*.created_at' => 'required|date',
         ]);
 
         foreach ($request->expenses as $expense) {

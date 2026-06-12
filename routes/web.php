@@ -1,24 +1,20 @@
 <?php
 
-use Carbon\Carbon;
-use App\Models\Item;
-use Inertia\Inertia;
-use App\Models\Costing;
-use App\Models\Category;
-use App\Models\SoldItem;
-use App\Models\Transaction;
-use Illuminate\Http\Request;
-use App\Http\Controllers\POS;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Foundation\Application;
-use App\Http\Controllers\ItemController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\ItemController;
+use App\Http\Controllers\POS;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportsController;
-use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\UserController;
+use App\Models\Item;
+use App\Models\SoldItem;
+use App\Models\Transaction;
+use Carbon\Carbon;
+use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,16 +27,17 @@ use App\Http\Controllers\TransactionController;
 |
 */
 
-require __DIR__ . '/uptop.php';
+require __DIR__.'/uptop.php';
 
 Route::get('/dashboard', function () {
     $soldItemsCount = SoldItem::whereHas('transaction', function ($query) {
         $query->onlyTrashed()->where('created_at', '>=', Carbon::now()->subDays(6)->startOfDay());
     })->sum('quantity');
+
     return Inertia::render('Dashboard', [
         'items' => Item::count(),
         'sold' => $soldItemsCount,
-        'orders' => Transaction::onlyTrashed()->where('created_at', '>=', Carbon::now()->subDays(6)->startOfDay())->count()
+        'orders' => Transaction::onlyTrashed()->where('created_at', '>=', Carbon::now()->subDays(6)->startOfDay())->count(),
     ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -88,8 +85,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('expense/{expense}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
 });
 
-
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
 Route::get('play', function () {
     return inertia('Playground');
 });

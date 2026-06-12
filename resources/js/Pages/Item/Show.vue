@@ -1,13 +1,12 @@
 <script setup>
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, useForm, Link } from '@inertiajs/vue3';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { ref, computed } from 'vue';
 import Modal from '@/Components/Modal.vue';
 import colors from 'tailwindcss/colors';
 
-const tc = Object.keys(colors)
-    .filter(key => typeof colors[key] === 'object')
+const tc = Object.keys(colors).filter(key => typeof colors[key] === 'object')
 
 const props = defineProps({
     item: Object,
@@ -22,152 +21,386 @@ const form = useForm({
     price: props.item.price,
     color: props.item.color,
     menu: props.item.menu,
-    breakdown: props.item.costing
+    breakdown: props.item.costing,
 })
 
-const costValue = computed(() => {
-    return form.breakdown.reduce((acc, item) => acc + Number(item.cost), 0)
-})
+const costValue = computed(() =>
+    form.breakdown.reduce((acc, item) => acc + Number(item.cost), 0)
+)
 const profit = computed(() => (Number(form.price) - costValue.value).toFixed(2))
 
 const selectedColor = ref(form.color)
 const newImage = ref(null)
 const imgTmp = ref(null)
+
 const showImage = () => {
     if (form.image) {
-        let reader = new FileReader();
+        const reader = new FileReader()
         reader.readAsDataURL(form.image)
-
-        reader.onload = (e) => {
-            imgTmp.value = e.target.result
-        }
+        reader.onload = (e) => { imgTmp.value = e.target.result }
     }
 }
 
-const addBreakdown = () => {
-    form.breakdown.push({
-        name: '',
-        cost: '',
-    })
-}
+const addBreakdown = () => { form.breakdown.push({ name: '', cost: '' }) }
+const removeBreakdown = (index) => { form.breakdown.splice(index, 1) }
 
-const removeBreakdown = (index) => {
-    form.breakdown.splice(index, 1)
-}
-
-const showDeleteConfirmationModal = ref(false)
+const showDeleteModal = ref(false)
 </script>
 
 <template>
 
     <Head>
-        <title>
-            {{ item.name }}
-        </title>
+        <title>{{ item.name }}</title>
     </Head>
 
-    <div class="max-w-screen-lg mx-auto py-8">
-        <p class="dark:text-white mb-8">{{ item.name }}</p>
-        <div class="lg:grid grid-cols-3 gap-4">
+    <!-- ─── Page Header ──────────────────────────────────────────────────── -->
+    <div class="px-6 lg:px-8 pt-6 pb-2">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-                <div @click="newImage.click()"
-                    class="h-72 w-72 rounded-lg overflow-hidden bg-white dark:bg-zinc-700 flex justify-center items-center relative group">
-                    <div v-if="item.pic"
-                        class="absolute inset-0 flex justify-center items-center bg-black/40 group-hover:opacity-100 opacity-0 duration-200 ease-in-out">
-                        <i class='bx bx-photo-album text-5xl text-white p-3 rounded-full'></i>
-                    </div>
-                    <i v-if="!form.image && !item.pic" class="bx bx-plus font-bold text-3xl dark:text-white"></i>
-                    <img v-if="form.image || item.pic" :src="imgTmp || `../../storage/${item.pic}`"
-                        class="w-72 h-72 object-cover" alt="">
-                </div>
-
-                <InputLabel class="mt-4" for="color" value="Color"/>
-                <div class="flex mt-2">
-                    <select v-model="form.color" id="color" name="color" @change="selectedColor = $event.target.value" class="rounded-lg border border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white">
-                        <template v-for="color in tc">
-                            <option v-for="shade in colors[color]" :style="`background: ${shade} !important`" :value="shade">
-                                {{ shade }}
-                            </option>
-                        </template>
-                    </select>
-                    <div class="w-10 h-10 ml-4" :style="`background-color: ${selectedColor} !important`"></div>
-                </div>
-
-                <div class="flex mt-4 items-center space-x-2">
-                    <input v-model="form.menu" class="w-4 h-4 text-blue-600 bg-zinc-100 border-zinc-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-zinc-800 focus:ring-2 dark:bg-zinc-700 dark:border-zinc-600 appearance-none" type="checkbox" name="showInMenu" id="showInMenu">
-                    <InputLabel for="showInMenu" value="Show in menu"/>
-                </div>
+                <!-- Breadcrumbs -->
+                <nav class="flex items-center gap-1.5 text-sm text-zinc-500 dark:text-zinc-400 mb-1">
+                    <Link :href="route('items.index')" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+                        Products
+                    </Link>
+                    <i class="bx bx-chevron-right text-xs"></i>
+                    <span class="text-zinc-800 dark:text-zinc-200 font-medium truncate">{{ item.name }}</span>
+                </nav>
+                <h1 class="text-2xl font-bold text-zinc-900 dark:text-white tracking-tight">{{ item.name }}</h1>
+                <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Edit product details, pricing, and costing</p>
             </div>
-            <div class="col-span-2 p-6 rounded-lg bg-white dark:bg-zinc-800">
-                <form @submit.prevent="form.post(route('items.update', item))" enctype="multipart/form-data">
-                    <input ref="newImage" @input="form.image = $event.target.files[0]" @change="showImage" type="file"
-                        accept="image/*" hidden>
-                    <InputLabel for="categories" value="Category" />
-                    <select v-model="form.category_id" id="categories" class="w-full mt-2 border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
-                        <option hidden disabled :selected="item.category_id === 69420">Select category</option>
-                        <option v-for="category in categories" :value="category.id" :selected="item.category_id === category.id">{{ category.name }}</option>
-                    </select>
-                    <InputLabel class="mt-4" for="name" value="Name" />
-                    <TextInput id="name" type="text" v-model="form.name" class="mt-2 w-full block" />
-                    
-                    <div class="grid grid-cols-3 gap-1">
-                        <div>
-                            <InputLabel class="mt-4" for="price" value="Price" />
-                            <TextInput id="price" type="number" v-model="form.price" class="mt-2 w-full block" />
-                        </div>
-                        <div>
-                            <InputLabel class="mt-4" for="cost" value="Cost" />
-                            <TextInput disabled id="cost" type="number" v-model="costValue" class="mt-2 w-full block disabled:bg-zinc-700" />
-                        </div>
-                        <div>
-                            <InputLabel class="mt-4" for="profit" value="Profit" />
-                            <TextInput disabled id="profit" type="number" v-model="profit" class="mt-2 w-full block disabled:bg-zinc-700" />
-                        </div>
-                    </div>
-
-                    <p class="block font-medium text-sm text-zinc-700 dark:text-zinc-300 mt-4 select-none">Breakdown of
-                        cost</p>
-                    <div v-for="(ing, index) in form.breakdown" :key="index" class="grid grid-cols-11 gap-2 m-2">
-                        <TextInput list="costings" type="text" v-model="ing.name" class="w-full block col-span-5" placeholder="Item" />
-                        <TextInput type="number" v-model="ing.cost" class="w-full block col-span-5"
-                            placeholder="Cost" />
-                        <i @click="removeBreakdown(index)"
-                            class="bx bx-x p-2 w-8 h-8 rounded-lg text-white bg-red-500 hover:bg-red-700 duration-200 ease-in-out inline-flex justify-center items-center"></i>
-                    </div>
-                    <button type="button" class="text-xs px-4 py-1 rounded-lg bg-zinc-400 text-white"
-                        @click="addBreakdown">Add</button>
-                    <div class="flex justify-end">
-                        <button type-="submit"
-                            class="rounded-lg px-4 py-2 bg-green-500 hover:bg-green-700 active:bg-green-900 text-white text-sm duration-200 ease-in-out">Save</button>
-                    </div>
-                </form>
+            <div class="flex items-center gap-3">
+                <button
+                    @click="$inertia.get(route('items.create', { duplicate: item.id, category: item.category_id }))"
+                    class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-emerald-600 dark:text-emerald-400 bg-white dark:bg-zinc-800/70 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-700/60 rounded-lg transition-colors"
+                >
+                    <i class="bx bx-copy"></i>
+                    Duplicate
+                </button>
+                <button
+                    @click="showDeleteModal = true"
+                    class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 bg-white dark:bg-zinc-800/70 border border-zinc-200 dark:border-zinc-700 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
+                >
+                    <i class="bx bx-trash"></i>
+                    Delete
+                </button>
             </div>
-        </div>
-
-        <div class="flex justify-end py-8 space-x-8">
-            <button @click="$inertia.get(route('items.create', { duplicate: item.id, category: item.category_id }))" type="button"
-                class="text-blue-500 border border-blue-500 px-4 hover:bg-blue-500 hover:text-white rounded-lg text-sm">Duplicate</button>
-            <button @click="showDeleteConfirmationModal = true" type="button"
-                class="text-red-500 border border-red-500 px-4 hover:bg-red-500 hover:text-white rounded-lg text-sm">Delete</button>
         </div>
     </div>
 
-    <!-- Delete Modal -->
-    <Modal :show="showDeleteConfirmationModal" @close="showDeleteConfirmationModal = false" max-width="md">
-        <div class="p-4 dark:text-white">
-            <p class="font-bold">Confirmation</p>
-            <p>Are you sure you want to delete {{ item.name }}?</p>
-            <div class="mt-4 flex justify-end space-x-2">
-                <button @click="showDeleteConfirmationModal = false"
-                    class="dark:text-white hover:underline">Cancel</button>
-                <button @click="$inertia.delete(route('items.destroy', item))"
-                    class="bg-red-500 hover:bg-red-700 active:bg-red-900 duration-200 ease-in-out px-3 py-1 text-white rounded-lg">Delete</button>
+    <!-- ─── Main Form ────────────────────────────────────────────────────── -->
+    <div class="px-6 lg:px-8 py-6">
+        <form @submit.prevent="form.post(route('items.update', item))" enctype="multipart/form-data">
+            <div class="lg:grid grid-cols-3 gap-6">
+
+                <!-- ─── Left Column: Image & Appearance ──────────────────── -->
+                <div class="space-y-5">
+                    <!-- Image upload -->
+                    <div class="bg-white dark:bg-zinc-800/70 rounded-xl border border-zinc-200 dark:border-zinc-700/60 p-5 shadow-sm">
+                        <InputLabel value="Product Image" class="mb-3" />
+                        <div
+                            @click="newImage.click()"
+                            class="aspect-square w-full max-w-xs mx-auto rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-700/50 flex items-center justify-center relative group cursor-pointer border-2 border-dashed border-zinc-300 dark:border-zinc-600 hover:border-emerald-400 dark:hover:border-emerald-500 transition-colors"
+                        >
+                            <div
+                                v-if="item.pic || form.image"
+                                class="absolute inset-0 flex items-center justify-center bg-black/50 group-hover:opacity-100 opacity-0 transition-opacity duration-200"
+                            >
+                                <span class="flex flex-col items-center text-white text-xs gap-1">
+                                    <i class="bx bx-camera text-2xl"></i>
+                                    <span>Change photo</span>
+                                </span>
+                            </div>
+                            <i v-if="!form.image && !item.pic" class="bx bx-image-add text-4xl text-zinc-300 dark:text-zinc-500"></i>
+                            <img
+                                v-if="form.image || item.pic"
+                                :src="imgTmp || `../../storage/${item.pic}`"
+                                class="w-full h-full object-cover"
+                                alt=""
+                            />
+                            <input
+                                ref="newImage"
+                                @input="form.image = $event.target.files[0]"
+                                @change="showImage"
+                                type="file"
+                                accept="image/*"
+                                hidden
+                            />
+                        </div>
+                    </div>
+
+                    <!-- Color picker -->
+                    <div class="bg-white dark:bg-zinc-800/70 rounded-xl border border-zinc-200 dark:border-zinc-700/60 p-5 shadow-sm">
+                        <InputLabel for="color" value="Background Color" class="mb-3" />
+                        <div class="flex items-center gap-3">
+                            <select
+                                v-model="form.color"
+                                id="color"
+                                @change="selectedColor = $event.target.value"
+                                class="flex-1 rounded-lg border border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 focus:border-emerald-500 dark:focus:border-emerald-600 focus:ring-emerald-500 dark:focus:ring-emerald-600 text-sm shadow-sm"
+                            >
+                                <option value="" disabled>Select a color</option>
+                                <template v-for="color in tc" :key="color">
+                                    <option
+                                        v-for="(shade, shadeName) in colors[color]"
+                                        :style="`background: ${shade} !important; color: ${shadeName > 500 || color === 'black' ? '#fff' : '#000'}`"
+                                        :value="shade"
+                                    >
+                                        {{ shade }}
+                                    </option>
+                                </template>
+                            </select>
+                            <div
+                                class="w-10 h-10 shrink-0 rounded-lg border border-zinc-300 dark:border-zinc-600"
+                                :style="`background-color: ${selectedColor} !important`"
+                            ></div>
+                        </div>
+                    </div>
+
+                    <!-- Show in menu toggle -->
+                    <div class="bg-white dark:bg-zinc-800/70 rounded-xl border border-zinc-200 dark:border-zinc-700/60 p-5 shadow-sm">
+                        <label class="flex items-center gap-3 cursor-pointer select-none">
+                            <div class="relative">
+                                <input
+                                    v-model="form.menu"
+                                    type="checkbox"
+                                    class="sr-only peer"
+                                />
+                                <div class="w-10 h-6 bg-zinc-200 dark:bg-zinc-600 rounded-full peer-checked:bg-emerald-500 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                            </div>
+                            <div>
+                                <span class="text-sm font-medium text-zinc-800 dark:text-zinc-200">Show in menu</span>
+                                <p class="text-xs text-zinc-400 dark:text-zinc-500">Display this product on the public menu</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- ─── Right Column: Details & Pricing ──────────────────── -->
+                <div class="col-span-2 space-y-5">
+
+                    <!-- Details card -->
+                    <div class="bg-white dark:bg-zinc-800/70 rounded-xl border border-zinc-200 dark:border-zinc-700/60 p-5 shadow-sm">
+                        <div class="flex items-center gap-2 mb-4 pb-3 border-b border-zinc-100 dark:border-zinc-700/50">
+                            <i class="bx bx-info-circle text-emerald-500"></i>
+                            <span class="text-sm font-semibold text-zinc-800 dark:text-zinc-100">Product Details</span>
+                        </div>
+
+                        <div class="space-y-4">
+                            <!-- Category -->
+                            <div>
+                                <InputLabel for="categories" value="Category" />
+                                <select
+                                    v-model="form.category_id"
+                                    id="categories"
+                                    class="mt-1.5 w-full rounded-lg border border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 focus:border-emerald-500 dark:focus:border-emerald-600 focus:ring-emerald-500 dark:focus:ring-emerald-600 text-sm shadow-sm"
+                                >
+                                    <option hidden disabled>Select category</option>
+                                    <option
+                                        v-for="category in categories"
+                                        :key="category.id"
+                                        :value="category.id"
+                                        :selected="item.category_id === category.id"
+                                    >
+                                        {{ category.name }}
+                                    </option>
+                                </select>
+                            </div>
+
+                            <!-- Name -->
+                            <div>
+                                <InputLabel for="name" value="Product Name" />
+                                <TextInput
+                                    id="name"
+                                    type="text"
+                                    v-model="form.name"
+                                    class="mt-1.5 w-full block"
+                                    placeholder="e.g. Iced Latte, Pad Thai, Cheesecake"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pricing card -->
+                    <div class="bg-white dark:bg-zinc-800/70 rounded-xl border border-zinc-200 dark:border-zinc-700/60 p-5 shadow-sm">
+                        <div class="flex items-center gap-2 mb-4 pb-3 border-b border-zinc-100 dark:border-zinc-700/50">
+                            <i class="bx bx-dollar-circle text-emerald-500"></i>
+                            <span class="text-sm font-semibold text-zinc-800 dark:text-zinc-100">Pricing</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <InputLabel for="price" value="Selling Price" />
+                                <TextInput
+                                    id="price"
+                                    type="number"
+                                    v-model="form.price"
+                                    class="mt-1.5 w-full block"
+                                    placeholder="0.00"
+                                />
+                            </div>
+                            <div>
+                                <InputLabel for="cost" value="Total Cost" />
+                                <TextInput
+                                    disabled
+                                    id="cost"
+                                    type="number"
+                                    v-model="costValue"
+                                    class="mt-1.5 w-full block disabled:opacity-60"
+                                />
+                            </div>
+                            <div>
+                                <InputLabel for="profit" value="Profit Margin" />
+                                <TextInput
+                                    disabled
+                                    id="profit"
+                                    type="number"
+                                    v-model="profit"
+                                    class="mt-1.5 w-full block disabled:opacity-60"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cost Breakdown card -->
+                    <div class="bg-white dark:bg-zinc-800/70 rounded-xl border border-zinc-200 dark:border-zinc-700/60 p-5 shadow-sm">
+                        <div class="flex items-center justify-between mb-4 pb-3 border-b border-zinc-100 dark:border-zinc-700/50">
+                            <div class="flex items-center gap-2">
+                                <i class="bx bx-list-ul text-emerald-500"></i>
+                                <span class="text-sm font-semibold text-zinc-800 dark:text-zinc-100">Cost Breakdown</span>
+                                <span class="text-xs text-zinc-400 dark:text-zinc-500">({{ form.breakdown.length }} item{{ form.breakdown.length !== 1 ? 's' : '' }})</span>
+                            </div>
+                            <button
+                                type="button"
+                                @click="addBreakdown"
+                                class="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 transition-colors"
+                            >
+                                <i class="bx bx-plus"></i>
+                                Add item
+                            </button>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div
+                                v-for="(ing, index) in form.breakdown"
+                                :key="index"
+                                class="flex items-center gap-2 group"
+                            >
+                                <TextInput
+                                    list="costings"
+                                    type="text"
+                                    v-model="ing.name"
+                                    class="flex-1 block"
+                                    placeholder="Ingredient name"
+                                />
+                                <div class="relative w-28">
+                                    <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-zinc-400">$</span>
+                                    <TextInput
+                                        type="number"
+                                        v-model="ing.cost"
+                                        class="w-full block pl-5"
+                                        placeholder="0.00"
+                                    />
+                                </div>
+                                <button
+                                    type="button"
+                                    @click="removeBreakdown(index)"
+                                    class="shrink-0 w-8 h-8 inline-flex items-center justify-center rounded-lg text-zinc-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors opacity-0 group-hover:opacity-100"
+                                >
+                                    <i class="bx bx-x text-lg"></i>
+                                </button>
+                            </div>
+
+                            <div v-if="!form.breakdown.length" class="py-6 text-center">
+                                <i class="bx bx-receipt text-2xl text-zinc-300 dark:text-zinc-600"></i>
+                                <p class="mt-1 text-sm text-zinc-400 dark:text-zinc-500">No cost items added yet</p>
+                            </div>
+                        </div>
+
+                        <!-- Totals bar -->
+                        <div v-if="form.breakdown.length" class="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-700/50 flex items-center justify-end gap-6 text-sm">
+                            <div>
+                                <span class="text-zinc-500 dark:text-zinc-400">Total cost:</span>
+                                <span class="ml-1.5 font-semibold text-zinc-800 dark:text-zinc-200">${{ costValue.toFixed(2) }}</span>
+                            </div>
+                            <div>
+                                <span class="text-zinc-500 dark:text-zinc-400">Profit:</span>
+                                <span
+                                    class="ml-1.5 font-semibold"
+                                    :class="Number(profit) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'"
+                                >
+                                    ${{ profit }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="flex justify-end gap-3">
+                        <Link
+                            :href="route('items.index')"
+                            class="px-4 py-2 text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors"
+                        >
+                            Cancel
+                        </Link>
+                        <button
+                            type="submit"
+                            :disabled="form.processing"
+                            class="inline-flex items-center gap-1.5 px-5 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 rounded-lg shadow-sm disabled:opacity-50 transition-colors"
+                        >
+                            <template v-if="form.processing">
+                                <i class="bx bx-loader-alt animate-spin"></i>
+                                Saving…
+                            </template>
+                            <template v-else>
+                                <i class="bx bx-check"></i>
+                                Save Changes
+                            </template>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- ─── Delete Modal ─────────────────────────────────────────────────── -->
+    <Modal :show="showDeleteModal" @close="showDeleteModal = false" max-width="md">
+        <div class="p-6">
+            <div class="flex items-center gap-3 mb-5">
+                <div class="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-500/20 flex items-center justify-center">
+                    <i class="bx bx-trash text-xl text-red-600 dark:text-red-400"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-semibold text-zinc-900 dark:text-zinc-100">Delete Product</h3>
+                    <p class="text-sm text-zinc-500 dark:text-zinc-400">This action cannot be undone</p>
+                </div>
+            </div>
+            <div class="bg-zinc-50 dark:bg-zinc-800/50 rounded-lg p-4 border border-zinc-200 dark:border-zinc-700/50">
+                <p class="text-sm text-zinc-700 dark:text-zinc-300">
+                    Are you sure you want to delete <strong class="text-zinc-900 dark:text-white">{{ item.name }}</strong>?
+                </p>
+                <p class="mt-1 text-sm text-red-500">This will permanently remove this product and all its data.</p>
+            </div>
+            <div class="mt-5 flex justify-end gap-3">
+                <button
+                    @click="showDeleteModal = false"
+                    class="px-4 py-2 text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors"
+                >
+                    Cancel
+                </button>
+                <button
+                    @click="$inertia.delete(route('items.destroy', item))"
+                    class="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 active:bg-red-800 rounded-lg shadow-sm transition-colors"
+                >
+                    <i class="bx bx-trash mr-1.5"></i>
+                    Delete Product
+                </button>
             </div>
         </div>
     </Modal>
 
-    <!-- Suggestions -->
+    <!-- ─── Datalist for suggestions ─────────────────────────────────────── -->
     <datalist id="costings">
-        <option v-for="s in suggestions" :value="s"></option>
+        <option v-for="s in suggestions" :value="s" />
     </datalist>
 </template>

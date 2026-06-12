@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
+use App\Events\OrderDone;
+use App\Events\OrderPlaced;
+use App\Http\Requests\StoreTransactionRequest;
 use App\Models\Expense;
 use App\Models\SoldCost;
 use App\Models\SoldItem;
-use App\Events\OrderDone;
-use App\Events\OrderPlaced;
 use App\Models\Transaction;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use App\Http\Requests\StoreTransactionRequest;
 
 class TransactionController extends Controller
 {
@@ -20,10 +20,10 @@ class TransactionController extends Controller
      */
     public function index(Request $request)
     {
-        if (!Gate::allows('admin')) {
+        if (! Gate::allows('admin')) {
             abort(403);
         }
-        
+
         if ($request->advanced) {
             $transactions = Transaction::onlyTrashed()
                 ->whereBetween('created_at', [$request->advanced['from'], $request->advanced['to']])
@@ -32,11 +32,11 @@ class TransactionController extends Controller
             $cogs = Expense::where('type', 'COGS')->whereBetween('created_at', [$request->advanced['from'], $request->advanced['to']])->get();
         } else {
             $transactions = Transaction::onlyTrashed()
-                            ->filter([
-                                'date' => $request->date ?: today(),
-                            ])
-                            ->get();
-            $net = Expense::where('type', 'net')->whereDate('created_at', $request->date ? Carbon::parse($request->date): today())->get();
+                ->filter([
+                    'date' => $request->date ?: today(),
+                ])
+                ->get();
+            $net = Expense::where('type', 'net')->whereDate('created_at', $request->date ? Carbon::parse($request->date) : today())->get();
             $cogs = Expense::where('type', 'COGS')->whereDate('created_at', $request->date ? Carbon::parse($request->date) : today())->get();
         }
 
@@ -51,7 +51,7 @@ class TransactionController extends Controller
                 'gross' => $transactions->sum('gross'),
                 'cost' => $transactions->sum('cost'),
             ],
-            'batchDates' => $request->advanced
+            'batchDates' => $request->advanced,
         ]);
     }
 
@@ -71,17 +71,17 @@ class TransactionController extends Controller
         // if ($request->wantsJson()) {
         //     return $request;
         // }
-        
+
         if ($request->wantsJson()) {
             $order = Transaction::create($request->validated());
-    
+
             foreach ($request->items as $item) {
                 $soldItem = SoldItem::create([
                     'transaction_id' => $order->id,
                     'name' => $item['name'],
                     'category' => $item['category']['name'],
                     'price' => $item['price'],
-                    'quantity' => $item['count']
+                    'quantity' => $item['count'],
                 ]);
 
                 foreach ($item['costing'] as $cost) {
@@ -92,7 +92,7 @@ class TransactionController extends Controller
                     ]);
                 }
             }
-            
+
             if (config('app.kitchen')) {
                 OrderPlaced::dispatch($order->id);
             } else {

@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
-use App\Models\Item;
-use App\Models\Costing;
 use App\Models\Category;
+use App\Models\Costing;
+use App\Models\Item;
 use App\Models\SoldCost;
 use App\Models\SoldItem;
 use App\Models\Transaction;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class ReportsController extends Controller
@@ -18,26 +17,27 @@ class ReportsController extends Controller
     /**
      * Sales per product report
      */
-    public function unitSales(Request $request, Category $category = null)
+    public function unitSales(Request $request, ?Category $category = null)
     {
         // dd(SoldItem::all(), SoldCost::all());
-        if (!Gate::allows('admin')) {
+        if (! Gate::allows('admin')) {
             abort(403);
         }
 
         if ($category) {
             $date = $request->date ? Carbon::parse($request->date) : today();
+
             return inertia('UnitSales', [
-                'items' => Item::where('category_id',$category->id)
-                            ->withSum(['sales as total_quantity' => function ($query) use ($date) {
-                                $query->whereDate('created_at', $date);
-                            }], 'quantity')
-                            ->orderBy('total_quantity', 'desc')
-                            ->filter($request->only(['search']))
-                            ->get(),
+                'items' => Item::where('category_id', $category->id)
+                    ->withSum(['sales as total_quantity' => function ($query) use ($date) {
+                        $query->whereDate('created_at', $date);
+                    }], 'quantity')
+                    ->orderBy('total_quantity', 'desc')
+                    ->filter($request->only(['search']))
+                    ->get(),
                 'categories' => Category::all(),
                 'filters' => $request->only(['date', 'search']),
-                'cat' => $category
+                'cat' => $category,
             ]);
         } else {
             $category = Category::first();
@@ -45,7 +45,7 @@ class ReportsController extends Controller
                 return redirect()->route('unit.sales', $category);
             } else {
                 return inertia('UnitSales', [
-                    'categories' => Category::all()
+                    'categories' => Category::all(),
                 ]);
             }
         }
@@ -56,10 +56,10 @@ class ReportsController extends Controller
      */
     public function costing($month = null)
     {
-        if (!Gate::allows('admin')) {
+        if (! Gate::allows('admin')) {
             abort(403);
         }
-        
+
         $m = Carbon::parse($month) ?: today();
 
         $costing = SoldCost::withSum(['sold as totalSold' => function ($q) use ($m) {
@@ -69,7 +69,7 @@ class ReportsController extends Controller
                     ->whereMonth('deleted_at', $m->month)
                     ->whereYear('deleted_at', $m->year);
             });
-        }],'quantity')->get();
+        }], 'quantity')->get();
 
         $merged = $costing->groupBy(function ($g) {
             return strtoupper($g->name);
@@ -84,14 +84,14 @@ class ReportsController extends Controller
 
         return inertia('Costing', [
             'costing' => $merged,
-            'total' => $merged->sum('total')
+            'total' => $merged->sum('total'),
         ]);
     }
 
     public function cost(Request $request)
     {
         if ($request->advanced) {
-            
+
         } else {
             $date = $request->date ? Carbon::parse($request->date) : today();
             $costing = SoldCost::withSum(['sold as totalSold' => function ($q) use ($date) {
@@ -101,7 +101,7 @@ class ReportsController extends Controller
                         ->whereMonth('deleted_at', $date->month)
                         ->whereYear('deleted_at', $date->year);
                 });
-            }],'quantity')->get();
+            }], 'quantity')->get();
         }
 
         $merged = $costing->groupBy(function ($g) {
@@ -114,10 +114,10 @@ class ReportsController extends Controller
                 }),
             ];
         });
-        
+
         return inertia('Costing', [
             'costing' => $merged,
-            'total' => $merged->sum('total')
+            'total' => $merged->sum('total'),
         ]);
     }
 
@@ -127,16 +127,17 @@ class ReportsController extends Controller
     public function fetchLast7DaysSales()
     {
         $data = Transaction::with('items')->onlyTrashed()
-                ->where('created_at', '>=', Carbon::now()->subDays(6)->startOfDay())
-                ->get()
-                ->groupBy(fn($transaction) => $transaction->created_at->format('m-d'))
-                ->map(fn($transactions) => [
-                    'total_cost' => $transactions->flatMap->items->sum('cost'),
-                    'total_net' => $transactions->flatMap->items->sum('gross') - $transactions->flatMap->items->sum('cost'),
-                ]);
+            ->where('created_at', '>=', Carbon::now()->subDays(6)->startOfDay())
+            ->get()
+            ->groupBy(fn ($transaction) => $transaction->created_at->format('m-d'))
+            ->map(fn ($transactions) => [
+                'total_cost' => $transactions->flatMap->items->sum('cost'),
+                'total_net' => $transactions->flatMap->items->sum('gross') - $transactions->flatMap->items->sum('cost'),
+            ]);
 
         $dates = collect(range(0, 6))->map(function ($i) use ($data) {
             $date = Carbon::now()->subDays(6 - $i)->format('m-d');
+
             return [
                 'date' => $date,
                 'total_net' => $data[$date]['total_net'] ?? 0,
@@ -158,16 +159,17 @@ class ReportsController extends Controller
     {
         $start = Carbon::now()->startOfWeek()->startOfDay();
         $data = Transaction::with('items')->onlyTrashed()
-                ->whereBetween('created_at', [$start, Carbon::now()->endOfWeek()->endOfDay()])
-                ->get()
-                ->groupBy(fn($transaction) => $transaction->created_at->format('m-d'))
-                ->map(fn($transactions) => [
-                    'total_cost' => $transactions->flatMap->items->sum('cost'),
-                    'total_net' => $transactions->flatMap->items->sum('gross') - $transactions->flatMap->items->sum('cost'),
-                ]);
+            ->whereBetween('created_at', [$start, Carbon::now()->endOfWeek()->endOfDay()])
+            ->get()
+            ->groupBy(fn ($transaction) => $transaction->created_at->format('m-d'))
+            ->map(fn ($transactions) => [
+                'total_cost' => $transactions->flatMap->items->sum('cost'),
+                'total_net' => $transactions->flatMap->items->sum('gross') - $transactions->flatMap->items->sum('cost'),
+            ]);
 
         $dates = collect(range(0, 6))->map(function ($i) use ($data, $start) {
             $date = $start->copy()->addDays($i)->format('m-d');
+
             return [
                 'date' => $date,
                 'total_net' => $data[$date]['total_net'] ?? 0,

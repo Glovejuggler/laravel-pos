@@ -2,14 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Item;
-use App\Models\Costing;
-use App\Models\Category;
-use App\Models\SoldItem;
-use App\Models\Transaction;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\StoreItemRequest;
+use App\Models\Category;
+use App\Models\Costing;
+use App\Models\Item;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
 class ItemController extends Controller
@@ -17,9 +14,9 @@ class ItemController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Category $category = null)
+    public function index(?Category $category = null)
     {
-        if (!Gate::allows('admin')) {
+        if (! Gate::allows('admin')) {
             abort(403);
         }
 
@@ -27,7 +24,7 @@ class ItemController extends Controller
             return inertia('Item/Index', [
                 'items' => Item::where('category_id', $category->id)->get(),
                 'categories' => Category::all(),
-                'category' => $category
+                'category' => $category,
             ]);
         } else {
             $category = Category::first();
@@ -35,7 +32,7 @@ class ItemController extends Controller
                 return redirect()->route('items.index', $category);
             } else {
                 return inertia('Item/Index', [
-                    'categories' => Category::all()
+                    'categories' => Category::all(),
                 ]);
             }
         }
@@ -46,7 +43,7 @@ class ItemController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('admin')) {
+        if (! Gate::allows('admin')) {
             abort(403);
         }
 
@@ -63,7 +60,7 @@ class ItemController extends Controller
      */
     public function store(StoreItemRequest $request)
     {
-        if (!Gate::allows('admin')) {
+        if (! Gate::allows('admin')) {
             abort(403);
         }
 
@@ -84,7 +81,7 @@ class ItemController extends Controller
                 Costing::create([
                     'name' => $costing['name'],
                     'cost' => $costing['cost'],
-                    'item_id' => $item->id
+                    'item_id' => $item->id,
                 ]);
             }
         }
@@ -97,7 +94,7 @@ class ItemController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('admin')) {
+        if (! Gate::allows('admin')) {
             abort(403);
         }
 
@@ -141,7 +138,7 @@ class ItemController extends Controller
                     'item_id' => $item->id,
                     'name' => $costing['name'],
                 ], [
-                    'cost' => $costing['cost']
+                    'cost' => $costing['cost'],
                 ]);
                 $arr[] = $foc->id;
             }
@@ -158,7 +155,7 @@ class ItemController extends Controller
      */
     public function destroy(Item $item)
     {
-        if (!Gate::allows('admin')) {
+        if (! Gate::allows('admin')) {
             abort(403);
         }
 

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 
@@ -15,12 +14,12 @@ class UserController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('admin')) {
+        if (! Gate::allows('admin')) {
             abort(403);
         }
 
         return inertia('Auth/Users', [
-            'users' => User::all()
+            'users' => User::all(),
         ]);
     }
 
@@ -37,7 +36,7 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('admin')) {
+        if (! Gate::allows('admin')) {
             abort(403);
         }
 
@@ -50,7 +49,7 @@ class UserController extends Controller
         $newUser = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password)
+            'password' => Hash::make($request->password),
         ]);
 
         return redirect()->back();
@@ -77,14 +76,14 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('admin')) {
+        if (! Gate::allows('admin')) {
             abort(403);
         }
 
         $request->validate([
             'name' => 'required',
             'email' => 'required|email',
-            'password' => 'nullable'
+            'password' => 'nullable',
         ]);
 
         $user = User::findOrFail($id);
@@ -95,7 +94,7 @@ class UserController extends Controller
 
         if ($request->password) {
             $user->update([
-                'password' => Hash::make($request->password)
+                'password' => Hash::make($request->password),
             ]);
         }
 
@@ -107,10 +106,10 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        if ($id === 1 || !Gate::allows('admin')) {
+        if ($id === 1 || ! Gate::allows('admin')) {
             abort(403);
         }
-        
+
         $user = User::findOrFail($id);
         $user->delete();
 

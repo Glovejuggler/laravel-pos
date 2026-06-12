@@ -1,11 +1,11 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\API\OrdersReportController;
 use App\Http\Controllers\API\DailySalesReportController;
 use App\Http\Controllers\API\MonthlySalesReportController;
+use App\Http\Controllers\API\OrdersReportController;
 use App\Http\Controllers\API\ProductsSoldReportController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------

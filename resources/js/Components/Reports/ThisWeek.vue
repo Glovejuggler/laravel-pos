@@ -5,14 +5,19 @@ import StatCard from '../Stats/StatCard.vue';
 
 <template>
     <div>
-        <p class="font-bold dark:text-white">This week</p>
-        <div class="grid 2xl:grid-rows-2 2xl:grid-cols-6 2xl:grid-flow-col gap-2 mt-4">
-            <div class="aspect-[3/2] p-6 dark:bg-zinc-800 bg-white 2xl:row-span-2 2xl:col-span-2 rounded-2xl dark:text-white">
+        <div class="flex items-center gap-2 mb-4">
+            <i class="bx bx-calendar-check text-emerald-500 text-sm"></i>
+            <h3 class="text-sm font-semibold text-zinc-800 dark:text-zinc-100">This Week</h3>
+        </div>
+        <div class="grid lg:grid-rows-2 lg:grid-cols-6 lg:grid-flow-col gap-3">
+            <!-- Chart -->
+            <div class="aspect-[3/2] lg:aspect-auto lg:row-span-2 lg:col-span-3 p-5 bg-white dark:bg-zinc-800/70 rounded-xl border border-zinc-200 dark:border-zinc-700/60 shadow-sm">
                 <DailySales class="h-full" fetch="/api/reports/daily-sales/this-week?chart=true"/>
             </div>
-    
-            <StatCard class="bg-zinc-800 text-white rounded-2xl" title="Total sold" icon="bx bx-dollar" subtitle="Items" fetch="/api/reports/products-sold/this-week" diff="/api/reports/products-sold/last-week"/>
-            <StatCard class="bg-zinc-800 text-white rounded-2xl" title="Total orders" icon="bx bx-shopping-bag" subtitle="Orders" fetch="/api/reports/orders/this-week" diff="/api/reports/orders/last-week"/>
+
+            <!-- Stat cards -->
+            <StatCard title="Total sold" icon="bx bx-dollar" subtitle="Items sold" fetch="/api/reports/products-sold/this-week" diff="/api/reports/products-sold/last-week"/>
+            <StatCard title="Total orders" icon="bx bx-shopping-bag" subtitle="Orders placed" fetch="/api/reports/orders/this-week" diff="/api/reports/orders/last-week"/>
         </div>
     </div>
 </template>

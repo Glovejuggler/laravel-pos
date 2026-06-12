@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Item;
 use App\Models\Category;
+use App\Models\Item;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class POS extends Controller
 {
@@ -23,7 +22,7 @@ class POS extends Controller
                     'name' => $q->name,
                     'order' => null,
                 ];
-            })
+            }),
         ]);
     }
 
@@ -37,7 +36,7 @@ class POS extends Controller
                     'name' => $q->name,
                     'order' => null,
                 ];
-            })
+            }),
         ]);
     }
 
@@ -97,9 +96,9 @@ class POS extends Controller
         if ($request->wantsJson()) {
             return Transaction::all()->pluck('id');
         }
-        
+
         return inertia('Kitchen', [
-            'orders' => Transaction::all()->pluck('id')
+            'orders' => Transaction::all()->pluck('id'),
         ]);
     }
 }
