@@ -2,15 +2,12 @@
 import { Head, useForm, Link } from '@inertiajs/vue3';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
+import ColorPicker from '@/Components/ColorPicker.vue';
 import { ref, computed, onMounted } from 'vue';
-import colors from 'tailwindcss/colors';
-
 const props = defineProps({
     suggestions: Object,
     duplicate: Object,
 })
-
-const tc = Object.keys(colors).filter(key => typeof colors[key] === 'object')
 
 const params = new URLSearchParams(window.location.search)
 
@@ -21,6 +18,7 @@ const form = useForm({
     price: props.duplicate?.price ?? '',
     color: '',
     menu: '',
+    menu_name: props.duplicate?.menu_name ?? '',
     breakdown: [],
 })
 
@@ -42,7 +40,6 @@ const profit = computed(() =>
     })
 )
 
-const selectedColor = ref('')
 const newImage = ref(null)
 const imgTmp = ref(null)
 
@@ -128,29 +125,7 @@ const removeBreakdown = (index) => { form.breakdown.splice(index, 1) }
                     <!-- Color picker -->
                     <div class="bg-white dark:bg-zinc-800/70 rounded-xl border border-zinc-200 dark:border-zinc-700/60 p-5 shadow-sm">
                         <InputLabel for="color" value="Background Color" class="mb-3" />
-                        <div class="flex items-center gap-3">
-                            <select
-                                v-model="form.color"
-                                id="color"
-                                @change="selectedColor = $event.target.value"
-                                class="flex-1 rounded-lg border border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 focus:border-emerald-500 dark:focus:border-emerald-600 focus:ring-emerald-500 dark:focus:ring-emerald-600 text-sm shadow-sm"
-                            >
-                                <option value="" disabled>Select a color</option>
-                                <template v-for="color in tc" :key="color">
-                                    <option
-                                        v-for="(shade, shadeName) in colors[color]"
-                                        :style="`background: ${shade} !important; color: ${shadeName > 500 || color === 'black' ? '#fff' : '#000'}`"
-                                        :value="shade"
-                                    >
-                                        {{ shade }}
-                                    </option>
-                                </template>
-                            </select>
-                            <div
-                                class="w-10 h-10 shrink-0 rounded-lg border border-zinc-300 dark:border-zinc-600"
-                                :style="`background-color: ${selectedColor} !important`"
-                            ></div>
-                        </div>
+                        <ColorPicker id="color" v-model="form.color" />
                     </div>
 
                     <!-- Show in menu toggle -->
@@ -169,6 +144,19 @@ const removeBreakdown = (index) => { form.breakdown.splice(index, 1) }
                                 <p class="text-xs text-zinc-400 dark:text-zinc-500">Display this product on the public menu</p>
                             </div>
                         </label>
+
+                        <!-- Menu name (visible when show in menu is on) -->
+                        <div v-if="form.menu" class="mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-700/50">
+                            <InputLabel for="menu_name" value="Menu Display Name" />
+                            <TextInput
+                                id="menu_name"
+                                type="text"
+                                v-model="form.menu_name"
+                                class="mt-1.5 w-full block"
+                                :placeholder="form.name || 'Enter menu name'"
+                            />
+                            <p class="mt-1.5 text-xs text-zinc-400 dark:text-zinc-500">Leave blank to use the product name</p>
+                        </div>
                     </div>
                 </div>
 
@@ -272,7 +260,7 @@ const removeBreakdown = (index) => { form.breakdown.splice(index, 1) }
                                     placeholder="Ingredient name"
                                 />
                                 <div class="relative w-28">
-                                    <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-zinc-400">$</span>
+                                    <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-zinc-400">₱</span>
                                     <TextInput
                                         type="number"
                                         v-model="ing.cost"
@@ -299,7 +287,7 @@ const removeBreakdown = (index) => { form.breakdown.splice(index, 1) }
                         <div v-if="form.breakdown.length" class="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-700/50 flex items-center justify-end gap-6 text-sm">
                             <div>
                                 <span class="text-zinc-500 dark:text-zinc-400">Total cost:</span>
-                                <span class="ml-1.5 font-semibold text-zinc-800 dark:text-zinc-200">${{ costValue.toFixed(2) }}</span>
+                                <span class="ml-1.5 font-semibold text-zinc-800 dark:text-zinc-200">₱{{ costValue.toFixed(2) }}</span>
                             </div>
                             <div>
                                 <span class="text-zinc-500 dark:text-zinc-400">Profit:</span>
@@ -307,7 +295,7 @@ const removeBreakdown = (index) => { form.breakdown.splice(index, 1) }
                                     class="ml-1.5 font-semibold"
                                     :class="Number(String(profit).replace(/,/g, '')) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'"
                                 >
-                                    ${{ profit }}
+                                    ₱{{ profit }}
                                 </span>
                             </div>
                         </div>

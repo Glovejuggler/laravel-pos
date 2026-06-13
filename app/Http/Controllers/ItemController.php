@@ -169,4 +169,44 @@ class ItemController extends Controller
 
         return redirect()->route('items.index');
     }
+
+    /**
+     * Show the menu settings page.
+     */
+    public function menuSettings()
+    {
+        if (! Gate::allows('admin')) {
+            abort(403);
+        }
+
+        $categories = Category::with('items')->get();
+
+        return inertia('Menu/Settings', [
+            'categories' => $categories,
+        ]);
+    }
+
+    /**
+     * Update menu settings (menu toggle and menu_name) in bulk.
+     */
+    public function updateMenuSettings(\Illuminate\Http\Request $request)
+    {
+        if (! Gate::allows('admin')) {
+            abort(403);
+        }
+
+        $items = $request->input('items', []);
+
+        foreach ($items as $id => $data) {
+            $item = Item::find($id);
+            if ($item) {
+                $item->update([
+                    'menu' => filter_var($data['menu'] ?? false, FILTER_VALIDATE_BOOLEAN),
+                    'menu_name' => $data['menu_name'] ?? null,
+                ]);
+            }
+        }
+
+        return redirect()->route('menu.settings')->with('success', 'Menu settings updated successfully.');
+    }
 }

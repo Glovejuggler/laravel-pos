@@ -62,6 +62,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/items/{item}/update', [ItemController::class, 'update'])->name('items.update');
     Route::delete('/item/delete/{item}', [ItemController::class, 'destroy'])->name('items.destroy');
 
+    Route::get('/menu-settings', [ItemController::class, 'menuSettings'])->name('menu.settings');
+    Route::post('/menu-settings/update', [ItemController::class, 'updateMenuSettings'])->name('menu.settings.update');
+
     Route::get('/kitchen', [POS::class, 'kitchen'])->name('kitchen');
     Route::delete('/order/{id}/cancel', [TransactionController::class, 'raze'])->name('order.cancel');
     Route::delete('/order/{id}/delete', [TransactionController::class, 'destroy'])->name('order.done');

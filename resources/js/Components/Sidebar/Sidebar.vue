@@ -62,6 +62,13 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateWidth))
                 />
                 <SidebarLink
                     @click="$emit('close')"
+                    label="Menu Settings"
+                    link="menu.settings"
+                    :active="route().current('menu.settings')"
+                    icon="bx bx-menu"
+                />
+                <SidebarLink
+                    @click="$emit('close')"
                     label="Expenses"
                     link="expenses.index"
                     :active="route().current('expenses.*')"

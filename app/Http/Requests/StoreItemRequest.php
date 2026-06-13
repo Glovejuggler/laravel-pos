@@ -28,6 +28,7 @@ class StoreItemRequest extends FormRequest
             'category_id' => 'required|numeric',
             'color' => 'nullable',
             'menu' => 'nullable|boolean',
+            'menu_name' => 'nullable|string|max:255',
         ];
     }
 }
