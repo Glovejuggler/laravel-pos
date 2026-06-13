@@ -22,7 +22,7 @@
     @include('clients.uptop.layouts.footer')
 
     @yield('scripts')
-    <script src="../Custom/header.js"></script>
+    <script src="{{ asset('Custom/header.js') }}"></script>
 </body>
 
 </html>

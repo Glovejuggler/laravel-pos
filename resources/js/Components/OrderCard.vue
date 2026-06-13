@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 const props = defineProps({
     data: { type: Object },
@@ -24,6 +24,17 @@ onMounted(() => {
                 isFetching.value = false
             })
     }
+})
+
+const groupedItems = computed(() => {
+    if (!order.value) return {}
+    const groups = {}
+    order.value.items.forEach((item) => {
+        const cat = item.category || 'Uncategorized'
+        if (!groups[cat]) groups[cat] = []
+        groups[cat].push(item)
+    })
+    return groups
 })
 
 const removeOrder = () => emit('remove')
@@ -81,26 +92,33 @@ const finishOrder = () => emit('finish')
             </span>
         </div>
 
-        <!-- Items -->
-        <div class="space-y-1 mb-3">
-            <div
-                v-for="item in order.items"
-                :key="item.id ?? item.name"
-                @click="item.done = !item.done"
-                class="flex items-center gap-2 px-3 py-2 rounded-lg bg-zinc-900/50 cursor-pointer transition-all"
-                :class="item.done ? 'opacity-40 line-through' : 'hover:bg-zinc-900/80'"
-            >
-                <div
-                    class="w-4 h-4 rounded border shrink-0 flex items-center justify-center transition-colors"
-                    :class="item.done
-                        ? 'bg-emerald-500 border-emerald-500'
-                        : 'border-zinc-600'"
-                >
-                    <i v-if="item.done" class="bx bx-check text-[10px] text-white"></i>
+        <!-- Items grouped by category -->
+        <div class="space-y-3 mb-3">
+            <div v-for="(items, category) in groupedItems" :key="category">
+                <p class="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 px-1 mb-1.5">
+                    {{ category }}
+                </p>
+                <div class="space-y-1">
+                    <div
+                        v-for="item in items"
+                        :key="item.id ?? item.name"
+                        @click="item.done = !item.done"
+                        class="flex items-center gap-2 px-3 py-2 rounded-lg bg-zinc-900/50 cursor-pointer transition-all"
+                        :class="item.done ? 'opacity-40 line-through' : 'hover:bg-zinc-900/80'"
+                    >
+                        <div
+                            class="w-4 h-4 rounded border shrink-0 flex items-center justify-center transition-colors"
+                            :class="item.done
+                                ? 'bg-emerald-500 border-emerald-500'
+                                : 'border-zinc-600'"
+                        >
+                            <i v-if="item.done" class="bx bx-check text-[10px] text-white"></i>
+                        </div>
+                        <span class="text-sm text-zinc-200">
+                            {{ item.name }} <span class="text-zinc-500">x{{ item.quantity }}</span>
+                        </span>
+                    </div>
                 </div>
-                <span class="text-sm text-zinc-200">
-                    {{ item.name }} <span class="text-zinc-500">x{{ item.quantity }}</span>
-                </span>
             </div>
         </div>
 

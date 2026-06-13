@@ -66,7 +66,7 @@ UPTop Diner - Menu
                 {{-- Items --}}
                 <div class="space-y-4">
                     @foreach ($category->items as $item)
-                    <div @class([ 'menu-item group relative' , 'magicshop'=> $item->name == 'Magic Shop!',
+                    <div @class([ 'menu-item group relative' , 'magicshop'=> $item->name == 'Magic Shop',
                         'butterbeer' => $item->name == 'Butter Beer',
                         ])>
                         <div class="flex items-start justify-between gap-4">
@@ -75,14 +75,14 @@ UPTop Diner - Menu
                                     <span class="item-name text-white font-semibold text-base md:text-lg">
                                         {{ $item->menu_name ?? $item->name }}
                                     </span>
-                                    @if ($item->name == 'Magic Shop!')
+                                    {{-- @if ($item->name == 'Magic Shop!')
                                     <span
                                         class="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-purple-500/20 text-purple-300 border border-purple-500/30">Featured</span>
                                     @elseif ($item->name == 'Butter Beer')
                                     <span
                                         class="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">House
                                         Special</span>
-                                    @endif
+                                    @endif --}}
                                 </div>
                             </div>
                             <span

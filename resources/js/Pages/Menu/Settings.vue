@@ -1,6 +1,6 @@
 <script setup>
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 const props = defineProps({
     categories: Object,
@@ -9,6 +9,8 @@ const props = defineProps({
 const form = useForm({
     items: {},
 })
+
+const original = ref(null)
 
 // Build form data from props
 const buildForm = () => {
@@ -22,9 +24,15 @@ const buildForm = () => {
         })
     })
     form.items = items
+    original.value = JSON.parse(JSON.stringify(items))
 }
 
 buildForm()
+
+const hasChanges = computed(() => {
+    if (!original.value) return false
+    return JSON.stringify(form.items) !== JSON.stringify(original.value)
+})
 
 const submit = () => {
     form.post(route('menu.settings.update'), {
@@ -44,6 +52,18 @@ const enabledCount = computed(() => {
     Object.values(form.items).forEach(i => { if (i.menu) count++ })
     return count
 })
+
+const collapsed = ref(new Set())
+
+const toggleCategory = (id) => {
+    const next = new Set(collapsed.value)
+    if (next.has(id)) {
+        next.delete(id)
+    } else {
+        next.add(id)
+    }
+    collapsed.value = next
+}
 </script>
 
 <template>
@@ -55,9 +75,6 @@ const enabledCount = computed(() => {
     <div class="px-6 lg:px-8 pt-6 pb-2">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-                <nav class="flex items-center gap-1.5 text-sm text-zinc-500 dark:text-zinc-400 mb-1">
-                    <span class="text-zinc-800 dark:text-zinc-200 font-medium">Menu Settings</span>
-                </nav>
                 <h1 class="text-2xl font-bold text-zinc-900 dark:text-white tracking-tight">Menu Settings</h1>
                 <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
                     Manage which products appear on the public menu and their display names
@@ -71,20 +88,6 @@ const enabledCount = computed(() => {
                     <i class="bx bx-arrow-back"></i>
                     Back to Products
                 </Link>
-                <button
-                    @click="submit"
-                    :disabled="form.processing"
-                    class="inline-flex items-center gap-1.5 px-5 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 rounded-lg shadow-sm disabled:opacity-50 transition-colors"
-                >
-                    <template v-if="form.processing">
-                        <i class="bx bx-loader-alt animate-spin"></i>
-                        Saving…
-                    </template>
-                    <template v-else>
-                        <i class="bx bx-check"></i>
-                        Save Changes
-                    </template>
-                </button>
             </div>
         </div>
     </div>
@@ -117,28 +120,42 @@ const enabledCount = computed(() => {
     </div>
 
     <!-- ─── Categories ───────────────────────────────────────────────────── -->
-    <div class="px-6 lg:px-8 py-6 space-y-6">
+    <div class="px-6 lg:px-8 py-6 pb-24 space-y-6">
 
         <div
             v-for="category in categories"
             :key="category.id"
             class="bg-white dark:bg-zinc-800/70 rounded-xl border border-zinc-200 dark:border-zinc-700/60 shadow-sm overflow-hidden"
         >
-            <!-- Category Header -->
-            <div class="flex items-center justify-between px-5 py-3.5 bg-zinc-50 dark:bg-zinc-800/90 border-b border-zinc-100 dark:border-zinc-700/50">
+            <!-- Category Header (clickable) -->
+            <div
+                @click="toggleCategory(category.id)"
+                class="flex items-center justify-between px-5 py-3.5 bg-zinc-50 dark:bg-zinc-800/90 border-b border-zinc-100 dark:border-zinc-700/50 cursor-pointer select-none hover:bg-zinc-100 dark:hover:bg-zinc-700/70 transition-colors"
+            >
                 <div class="flex items-center gap-2.5">
+                    <i
+                        class="bx text-emerald-500 text-lg transition-transform duration-200"
+                        :class="collapsed.has(category.id) ? 'bx-chevron-right' : 'bx-chevron-down'"
+                    ></i>
                     <i class="bx bx-folder-open text-emerald-500 text-lg"></i>
                     <h2 class="text-sm font-semibold text-zinc-800 dark:text-zinc-100">{{ category.name }}</h2>
                     <span class="text-xs text-zinc-400 dark:text-zinc-500">({{ category.items.length }})</span>
                 </div>
-                <div class="flex items-center gap-3 text-xs text-zinc-400 dark:text-zinc-500">
+                <div
+                    v-show="!collapsed.has(category.id)"
+                    class="flex items-center gap-3 text-xs text-zinc-400 dark:text-zinc-500"
+                >
                     <span class="w-48 text-left">Menu Name</span>
                     <span class="w-16 text-center">Visible</span>
                 </div>
             </div>
 
-            <!-- Items -->
-            <div class="divide-y divide-zinc-100 dark:divide-zinc-700/50">
+            <!-- Items (animated) -->
+            <Transition name="collapse">
+                <div
+                    v-show="!collapsed.has(category.id)"
+                    class="divide-y divide-zinc-100 dark:divide-zinc-700/50"
+                >
                 <div
                     v-for="item in category.items"
                     :key="item.id"
@@ -190,7 +207,8 @@ const enabledCount = computed(() => {
                         </label>
                     </div>
                 </div>
-            </div>
+                </div>
+            </Transition>
         </div>
 
         <!-- Empty state -->
@@ -203,4 +221,72 @@ const enabledCount = computed(() => {
             <p class="text-xs text-zinc-400 dark:text-zinc-500 mt-1">Create a category and add some products first.</p>
         </div>
     </div>
+
+    <!-- ─── Floating Save Bar ───────────────────────────────────────────── -->
+    <Transition name="float-up">
+        <div
+            v-if="hasChanges"
+            class="fixed bottom-0 left-0 right-0 z-50 flex justify-center pointer-events-none"
+        >
+            <div
+                class="mb-6 px-5 py-3 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-lg flex items-center gap-4 pointer-events-auto"
+            >
+                <span class="text-sm text-zinc-500 dark:text-zinc-400">
+                    <i class="bx bx-edit-alt mr-1.5"></i>
+                    You have unsaved changes
+                </span>
+                <button
+                    @click="submit"
+                    :disabled="form.processing"
+                    class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 rounded-lg shadow-sm disabled:opacity-50 transition-colors"
+                >
+                    <template v-if="form.processing">
+                        <i class="bx bx-loader-alt animate-spin"></i>
+                        Saving…
+                    </template>
+                    <template v-else>
+                        <i class="bx bx-check"></i>
+                        Save Changes
+                    </template>
+                </button>
+            </div>
+        </div>
+    </Transition>
 </template>
+
+<style scoped>
+.float-up-enter-active,
+.float-up-leave-active {
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.float-up-enter-from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+}
+
+.float-up-leave-to {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+}
+
+/* ─── Category collapse animation ──────────────────────────────────── */
+.collapse-enter-active,
+.collapse-leave-active {
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
+}
+
+.collapse-enter-from,
+.collapse-leave-to {
+    opacity: 0;
+    max-height: 0;
+    margin-bottom: 0;
+}
+
+.collapse-enter-to,
+.collapse-leave-from {
+    opacity: 1;
+    max-height: 2000px;
+}
+</style>

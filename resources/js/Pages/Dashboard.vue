@@ -43,7 +43,7 @@ const page = usePage()
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                 <!-- POS -->
                 <Link
-                    :href="route('pos')"
+                    :href="route('pos2')"
                     class="group relative bg-white dark:bg-zinc-800/70 rounded-xl border border-zinc-200 dark:border-zinc-700/60 shadow-sm p-5 flex flex-col items-center justify-center gap-3 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
                 >
                     <div class="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
